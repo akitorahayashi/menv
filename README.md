@@ -154,7 +154,23 @@ $ ssh -T git@github.com
 Hi ${GITHUB_USERNAME}! You've successfully authenticated, but GitHub does not provide shell access.
 ```
 
-### 9. Configure GitHub CLI
+### 9. Git User Configuration
+
+スクリプト実行後、Gitのユーザー情報を設定してください：
+
+```sh
+# Gitユーザー名を設定
+$ git config --global user.name "あなたの名前"
+
+# Gitメールアドレスを設定（SSHキー生成時と同じメールアドレスを推奨）
+$ git config --global user.email "あなたのメールアドレス"
+
+# 設定の確認
+$ git config --global user.name
+$ git config --global user.email
+```
+
+### 10. Configure GitHub CLI
 
 スクリプト実行中にプロンプトが表示された場合、またはスキップした場合は、GitHub CLIを認証してください
 
