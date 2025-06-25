@@ -32,7 +32,7 @@ environment/
     -   既存の`.zshrc`は上書きされます
 
 3.  **Git Configuration**
-    -   `config/git/.gitconfig`から`~/.config/git/config`へのシンボリックリンクを作成
+    -   `config/git/.gitconfig`を`~/.config/git/config`にコピー
     -   Gitのエイリアスなどの設定を適用
 
 4.  **macOS Settings**

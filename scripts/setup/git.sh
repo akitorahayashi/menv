@@ -15,18 +15,18 @@ setup_git_config() {
     # ~/.config/gitディレクトリの作成
     mkdir -p "$HOME/.config/git"
 
-    # 既存の設定ファイルのバックアップ
-    if [ -f "$HOME/.config/git/config" ]; then
-        log_warning "既存の設定ファイルをバックアップします: $HOME/.config/git/config"
-        mv "$HOME/.config/git/config" "$HOME/.config/git/config.backup"
+    # 既存の設定ファイルの削除
+    if [ -f "$HOME/.config/git/config" ] || [ -L "$HOME/.config/git/config" ]; then
+        log_info "既存の設定ファイルを削除します: $HOME/.config/git/config"
+        rm -f "$HOME/.config/git/config"
     fi
 
-    # シンボリックリンクの作成
-    log_info "Git設定ファイルのシンボリックリンクを作成します..."
-    if ln -s "$REPO_ROOT/config/git/.gitconfig" "$HOME/.config/git/config"; then
-        log_success "Git設定ファイルのシンボリックリンクを作成しました。"
+    # 設定ファイルのコピー
+    log_info "Git設定ファイルをコピーします..."
+    if cp "$REPO_ROOT/config/git/.gitconfig" "$HOME/.config/git/config"; then
+        log_success "Git設定ファイルをコピーしました。"
     else
-        log_error "Git設定ファイルのシンボリックリンク作成に失敗しました。"
+        log_error "Git設定ファイルのコピーに失敗しました。"
         return 1
     fi
 
@@ -85,11 +85,11 @@ verify_git_setup() {
     verify_git_command || return 1 # Gitコマンド自体の検証は必要
 
     # 設定ファイルの存在確認
-    if [ ! -L "$HOME/.config/git/config" ]; then
-        log_error "$HOME/.config/git/config がシンボリックリンクではありません。"
+    if [ ! -f "$HOME/.config/git/config" ]; then
+        log_error "$HOME/.config/git/config が存在しません。"
         verification_failed=true
     else
-        log_success "$HOME/.config/git/config がシンボリックリンクとして存在します。"
+        log_success "$HOME/.config/git/config が存在します。"
     fi
 
     # SSHキーの検証
