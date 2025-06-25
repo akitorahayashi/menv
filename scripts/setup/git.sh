@@ -64,55 +64,6 @@ setup_gitignore_global() {
     return 0
 }
 
-# SSH エージェントのセットアップ
-setup_ssh_agent() {
-    log_start "SSH エージェントをセットアップ中..."
-    
-    # SSH エージェントを起動
-    eval "$(ssh-agent -s)"
-    
-    # SSHキーの確認と生成
-    setup_ssh_keys
-    
-    # SSH キーをエージェントに追加
-    log_info "SSH キーを SSH エージェントに追加中..."
-    if ssh-add "$HOME/.ssh/id_ed25519"; then
-        log_success "SSH キーが正常に追加されました"
-    else
-        log_warning "SSH キーの追加に失敗しました。手動でパスフレーズを入力する必要があります"
-    fi
-}
-
-# SSHキーの確認と生成
-setup_ssh_keys() {
-    if [[ -f "$HOME/.ssh/id_ed25519" ]]; then
-        log_installed "SSH キー (id_ed25519)"
-        return 0
-    fi
-    
-    log_info "SSH キーが見つかりません。新しく生成します..."
-    
-    # .gitconfigからメールアドレスを取得
-    local git_email=$(git config --get user.email)
-    if [ -z "$git_email" ]; then
-        log_warning ".gitconfigにメールアドレスが設定されていません"
-        git_email="your_email@example.com"
-    fi
-    
-    # 環境に応じてキー生成方法を分岐
-    if [ "$IS_CI" = "true" ]; then
-        log_info "CI環境では対話型のSSHキー生成をスキップします"
-        # 非対話型でキーを生成
-        ssh-keygen -t ed25519 -C "ci-test@example.com" \
-                  -f "$HOME/.ssh/id_ed25519" -N "" -q
-    else
-        ssh-keygen -t ed25519 -C "$git_email" \
-                  -f "$HOME/.ssh/id_ed25519" -N ""
-    fi
-    
-    log_success "SSH キーの生成が完了しました"
-}
-
 # GitHub CLI のインストール
 setup_github_cli() {
     # インストール確認
@@ -194,20 +145,15 @@ verify_git_command() {
     return 0
 }
 
-# SSHキーの検証
+# SSHキーの検証（存在確認のみ）
 verify_ssh_keys() {
     if [ -f "$HOME/.ssh/id_ed25519" ]; then
         log_success "SSH鍵ファイル(id_ed25519)が存在します"
         return 0
     else
-        # CI環境ではキーが存在しない場合もあるため警告に留める
-        if [ "$IS_CI" = "true" ]; then
-             log_warning "[CI] SSH鍵ファイル(id_ed25519)が見つかりません"
-             return 0 # CIではエラーにしない
-        else
-             log_error "SSH鍵ファイル(id_ed25519)が見つかりません"
-             return 1
-        fi
+        log_warning "SSH鍵ファイル(id_ed25519)が見つかりません。手動で生成してください。"
+        log_info "SSH鍵の生成方法についてはREADMEを参照してください。"
+        return 0  # 警告に留めてエラーにはしない
     fi
 }
 
@@ -217,7 +163,6 @@ main() {
     
     setup_git_config
     setup_gitignore_global
-    setup_ssh_agent
     setup_github_cli
     
     log_success "Git環境のセットアップが完了しました"

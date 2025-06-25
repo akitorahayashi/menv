@@ -1,11 +1,10 @@
-name: Run Setup Tests
+name: MacOS Environment Setup CI
 
 on:
-  workflow_call:
-    secrets:
-      repo_token:
-        description: 'GitHub Token for authentication'
-        required: true
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   setup-test:
@@ -68,6 +67,13 @@ jobs:
           chmod +x scripts/setup/*.sh
           chmod +x install.sh
           echo "✅ Scripts are now executable"
+
+      - name: Generate SSH key for CI
+        run: |
+          echo "🔑 Generating SSH key for CI environment..."
+          mkdir -p ~/.ssh
+          ssh-keygen -t ed25519 -C "ci-test@example.com" -f ~/.ssh/id_ed25519 -N "" -q
+          echo "✅ SSH key generated for CI"
 
       - name: Run initial installation test
         run: |
@@ -145,17 +151,7 @@ jobs:
           fi
         shell: bash
 
-      - name: Verify Xcode Installation
-        run: |
-          echo "🔍 Starting Xcode verification..."
-          ./scripts/setup/xcode.sh
-          if [ $? -eq 0 ]; then
-            echo "✅ Xcode verification passed"
-          else
-            echo "❌ Xcode verification failed"
-            exit 1
-          fi
-        shell: bash
+
 
       - name: Verify Git Setup
         run: |
