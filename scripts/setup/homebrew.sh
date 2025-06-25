@@ -12,6 +12,30 @@ source "$SCRIPT_DIR/../utils/logging.sh" || { echo "❌ logging.shをロード�
 # CI環境かどうかを確認
 export IS_CI=${CI:-false}
 
+# Xcode Command Line Toolsのインストール
+install_xcode_command_line_tools() {
+    # Xcode Command Line Tools のインストール
+    if ! xcode-select -p &>/dev/null; then
+        log_installing "Xcode Command Line Tools"
+        if [ "$IS_CI" = "true" ]; then
+            # CI環境ではすでにインストールされていることを前提とする
+            log_info "CI環境では Xcode Command Line Tools はすでにインストールされていると想定します"
+        else
+            xcode-select --install
+            # インストールが完了するまで待機
+            log_info "インストールが完了するまで待機..."
+            until xcode-select -p &>/dev/null; do
+                sleep 5
+            done
+        fi
+        log_success "Xcode Command Line Tools のインストール完了"
+    else
+        log_installed "Xcode Command Line Tools"
+    fi
+    
+    return 0
+}
+
 # Homebrew のインストール
 install_homebrew() {
     if ! command_exists brew; then
@@ -264,9 +288,27 @@ verify_brew_package() {
     fi
 }
 
+# Xcode Command Line Toolsのインストールを検証する関数
+verify_xcode_command_line_tools() {
+    log_start "Xcode Command Line Toolsのインストールを検証中..."
+    
+    # Xcode Command Line Toolsの確認
+    if ! xcode-select -p &>/dev/null; then
+        log_error "Xcode Command Line Toolsがインストールされていません"
+        return 1
+    else
+        log_success "Xcode Command Line Toolsがインストールされています"
+        log_info "インストールパス: $(xcode-select -p)"
+        return 0
+    fi
+}
+
 # メイン関数
 main() {
-    log_start "Homebrewのセットアップを開始します"
+    log_start "HomebrewとXcode Command Line Toolsのセットアップを開始します"
+    
+    # Xcode Command Line Toolsのインストール（Homebrewより先に実行）
+    install_xcode_command_line_tools
     
     # Homebrewのインストール
     install_homebrew
@@ -275,11 +317,12 @@ main() {
     install_brewfile
     
     # 検証
+    verify_xcode_command_line_tools
     verify_homebrew_setup
     verify_brewfile
     verify_package_counts "$REPO_ROOT/config/brew/Brewfile"
     
-    log_success "Homebrewのセットアップが完了しました"
+    log_success "HomebrewとXcode Command Line Toolsのセットアップが完了しました"
 }
 
 # スクリプトが直接実行された場合のみメイン関数を実行
