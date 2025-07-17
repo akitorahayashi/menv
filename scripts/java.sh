@@ -44,9 +44,12 @@ verify_java_setup() {
 
     # JAVA_HOMEが設定されているか確認
     if [ -z "${JAVA_HOME:-}" ]; then
-        echo "[INFO] JAVA_HOME が設定されていないため、.zprofile を読み込みます"
-        if [ -f "$HOME/.zprofile" ]; then
-            eval "$(zsh -c '{ source "$HOME/.zprofile" >/dev/null 2>&1; export -p; }')"
+        echo "[INFO] JAVA_HOME が設定されていないため、動的に設定します"
+        if [ -x "/usr/libexec/java_home" ]; then
+            export JAVA_HOME=$(/usr/libexec/java_home -v "$JDK_VERSION")
+            echo "[INFO] JAVA_HOME を設定しました: $JAVA_HOME"
+        else
+            echo "[WARN] /usr/libexec/java_home が見つかりません。JAVA_HOME の自動設定をスキップします。"
         fi
     fi
 
