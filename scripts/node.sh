@@ -6,10 +6,10 @@ REPO_ROOT="$( cd "$SCRIPT_DIR/.." && pwd )"
 
 # 依存関係をインストール
 install_dependencies() {
-    echo "[INFO] 依存関係をチェック・インストールします: node, jq"
+    echo "[INFO] 依存関係をチェック・インストールします: nvm, jq"
     local changed=false
-    if ! command -v node &> /dev/null; then
-        brew install node
+    if ! command -v nvm &> /dev/null; then
+        brew install nvm
         changed=true
     fi
     if ! command -v jq &> /dev/null; then
@@ -22,8 +22,46 @@ install_dependencies() {
     fi
 }
 
+# nvm を使って Node.js をインストール
+install_node_with_nvm() {
+    local node_version="22.17.1"
+    local changed=false
+
+    # nvm の初期化
+    if [ -s "$(brew --prefix nvm)/nvm.sh" ]; then
+        # shellcheck source=/dev/null
+        . "$(brew --prefix nvm)/nvm.sh"
+    else
+        echo "[ERROR] nvm.sh が見つかりません。nvmが正しくインストールされているか確認してください。"
+        exit 1
+    fi
+
+    # Node.js のインストール
+    if ! nvm ls "$node_version" &> /dev/null; then
+        echo "[INFO] Node.js v$node_version をインストールします..."
+        nvm install "$node_version"
+        changed=true
+    else
+        echo "[INFO] Node.js v$node_version はすでにインストールされています"
+    fi
+
+    # グローバルバージョンの設定
+    if [ "$(nvm current)" != "$node_version" ]; then
+        nvm use "$node_version"
+        nvm alias default "$node_version"
+        changed=true
+    else
+        echo "[INFO] 現在の Node.js は v$node_version です"
+    fi
+
+    if [ "$changed" = true ]; then
+        echo "IDEMPOTENCY_VIOLATION" >&2
+    fi
+}
+
 main() {
     install_dependencies
+    install_node_with_nvm
     echo "[Start] Node.js のセットアップを開始します..."
 
     # npm のインストール確認
@@ -42,6 +80,12 @@ main() {
 }
 
 install_global_packages() {
+    # nvm の初期化
+    if [ -s "$(brew --prefix nvm)/nvm.sh" ]; then
+        # shellcheck source=/dev/null
+        . "$(brew --prefix nvm)/nvm.sh"
+    fi
+
     local packages_file="$REPO_ROOT/config/node/global-packages.json"
     
     if [ ! -f "$packages_file" ]; then
@@ -107,12 +151,18 @@ install_global_packages() {
 }
 
 verify_node_setup() {
+    # nvm の初期化
+    if [ -s "$(brew --prefix nvm)/nvm.sh" ]; then
+        # shellcheck source=/dev/null
+        . "$(brew --prefix nvm)/nvm.sh"
+    fi
+
     echo ""
     echo "==== Start: Node.js 環境を検証中... ===="
     local verification_failed=false
     
     # Node.js と npm の確認は setup 関数の後に実行されるため、既にインストールされているはず
-    echo "[SUCCESS] Node.js: $(node --version)"
+    echo "[SUCCESS] Node.js: $(node --version) (nvm current: $(nvm current))"
     echo "[SUCCESS] npm: $(npm --version)"
     
     # グローバルパッケージの確認
@@ -128,6 +178,12 @@ verify_node_setup() {
 }
 
 verify_global_packages() {
+    # nvm の初期化
+    if [ -s "$(brew --prefix nvm)/nvm.sh" ]; then
+        # shellcheck source=/dev/null
+        . "$(brew --prefix nvm)/nvm.sh"
+    fi
+
     local packages_file="$REPO_ROOT/config/node/global-packages.json"
     
     if [ ! -f "$packages_file" ]; then
