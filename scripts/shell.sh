@@ -27,6 +27,7 @@ main() {
     verify_shell_setup
 }
 
+# verify_shell_setup runs a series of checks to validate the user's shell configuration and reports the overall verification result.
 verify_shell_setup() {
     echo "[Start] シェル設定を検証中..."
     local verification_failed=false
@@ -44,6 +45,7 @@ verify_shell_setup() {
     fi
 }
 
+# verify_zprofile checks whether $HOME/.zprofile is a symbolic link pointing to the expected repository location, and reports errors or warnings if not.
 verify_zprofile() {
     if [ ! -L "$HOME/.zprofile" ]; then
         echo "[ERROR] .zprofile がシンボリックリンクではありません"

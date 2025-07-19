@@ -9,7 +9,7 @@ REPO_ROOT="$( cd "$SCRIPT_DIR/.." && pwd )"
 # 使用するPythonのバージョンを定数として定義
 readonly PYTHON_VERSION="3.12.4"
 
-# 依存関係をインストール
+# install_dependencies checks for the presence of pyenv and installs it using Homebrew if it is not already installed, signaling an idempotency violation if installation occurs.
 install_dependencies() {
     echo "[INFO] 依存関係をチェック・インストールします: pyenv"
     if ! command -v pyenv &> /dev/null; then
@@ -18,6 +18,7 @@ install_dependencies() {
     fi
 }
 
+# main sets up the Python environment using pyenv, ensuring Python 3.12.4 is installed and configured as the global version, and signals if any changes were made during the process.
 main() {
     install_dependencies
     echo "==== Start: Python環境のセットアップを開始します..."

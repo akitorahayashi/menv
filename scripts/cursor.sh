@@ -4,7 +4,7 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REPO_ROOT="$( cd "$SCRIPT_DIR/.." && pwd )"
 
-# 依存関係をインストール
+# install_dependencies checks if the Cursor application is installed via Homebrew Cask and installs it if missing, emitting an idempotency warning if installation occurs.
 install_dependencies() {
     echo "[INFO] 依存関係をチェック・インストールします: cursor"
     if ! brew list --cask cursor &> /dev/null; then
@@ -13,6 +13,7 @@ install_dependencies() {
     fi
 }
 
+# main sets up Cursor application configuration by linking repository config files to the user's Cursor settings directory and verifies the setup.
 main() {
     install_dependencies
     echo "[Start] Cursor のセットアップを開始します..."

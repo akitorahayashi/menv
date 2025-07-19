@@ -24,6 +24,7 @@ set -e
 start_time=$(date +%s)
 echo "Macをセットアップ中..."
 
+# main orchestrates the sequential execution of all setup scripts required for initializing the macOS development environment, terminating immediately if any script fails.
 main() {
     echo ""
     echo "==== Start: 開発環境のセットアップを開始します ===="

@@ -9,7 +9,7 @@ REPO_ROOT="$( cd "$SCRIPT_DIR/.." && pwd )"
 # 使用するRubyのバージョンを定数として定義
 readonly RUBY_VERSION="3.3.0"
 
-# 依存関係をインストール
+# install_dependencies checks for rbenv and ruby-build, installing them via Homebrew if missing, and signals if any installation occurs.
 install_dependencies() {
     echo "[INFO] 依存関係をチェック・インストールします: rbenv, ruby-build"
     local changed=false
@@ -23,6 +23,7 @@ install_dependencies() {
     fi
 }
 
+# main orchestrates the setup of the Ruby environment, ensuring all dependencies, Ruby version, and gems are installed and configured as required. It emits an idempotency violation marker if any changes are made during setup.
 main() {
     install_dependencies
     echo "==== Start: Ruby環境のセットアップを開始します..."
@@ -69,7 +70,7 @@ main() {
     fi
 }
 
-# gemのインストール（Bundlerのバージョン問題を修正）
+# install_gems installs Ruby gems specified in the global-gems.rb file, ensuring the required Bundler version is present and signaling if any changes are made.
 install_gems() {
     local gem_file="${REPO_ROOT:-.}/config/gems/global-gems.rb"
     if [ ! -f "$gem_file" ]; then
@@ -149,6 +150,7 @@ install_gems() {
     fi
 }
 
+# verify_ruby_setup checks that rbenv, ruby-build, the required Ruby version, and Bundler are correctly installed and available in the environment. Returns 0 if all checks pass, or 1 if any component is missing or misconfigured.
 verify_ruby_setup() {
     echo "==== Start: Ruby環境を検証中..."
     # rbenvチェック

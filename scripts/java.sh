@@ -5,6 +5,7 @@ set -euo pipefail
 # 使用するJDKのバージョンを定数として定義
 readonly JDK_VERSION="21"
 
+# main sets up the Java development environment by ensuring Temurin JDK version 21 is installed, applies environment changes, and verifies the installation.
 main() {
     echo "==== Start: Java環境のセットアップを開始します..."
 

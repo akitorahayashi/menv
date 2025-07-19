@@ -7,7 +7,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REPO_ROOT="$( cd "$SCRIPT_DIR/.." && pwd )"
 SETUP_DIR="$SCRIPT_DIR"  # セットアップディレクトリを保存
 
-# 依存関係をインストール
+# install_dependencies checks for the presence of the fvm command and installs it via Homebrew if missing, signaling a state change by printing "IDEMPOTENCY_VIOLATION" to stderr.
 install_dependencies() {
     echo "[INFO] 依存関係をチェック・インストールします: fvm"
     if ! command -v fvm &> /dev/null; then
@@ -17,6 +17,9 @@ install_dependencies() {
     fi
 }
 
+# main sets up the Flutter SDK using FVM, ensuring installation, global configuration, and environment verification.
+#
+# Installs the stable Flutter SDK via FVM if not already present, sets it as the global version, updates the PATH for the current shell session, and verifies the Flutter command and environment. Prints "IDEMPOTENCY_VIOLATION" to stderr if any installation or configuration changes occur. Exits with an error if any step fails. Calls verify_flutter_setup for additional validation after setup.
 main() {
     install_dependencies
     echo "[Start] fvm を使用してFlutter SDK のセットアップを開始します"
@@ -141,6 +144,7 @@ verify_flutter_installation() {
     return 0
 }
 
+# verify_flutter_path checks if the flutter command resolves to the expected FVM-managed path and returns success if it matches, or failure otherwise.
 verify_flutter_path() {
     FLUTTER_PATH=$(which flutter)
     echo "[INFO] Flutter PATH: $FLUTTER_PATH"

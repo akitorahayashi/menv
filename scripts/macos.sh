@@ -4,7 +4,7 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REPO_ROOT="$( cd "$SCRIPT_DIR/.." && pwd )"
 
-# 依存関係をインストール
+# install_dependencies checks for the displayplacer command and installs it using Homebrew if not present.
 install_dependencies() {
     echo "[INFO] 依存関係をチェック・インストールします: displayplacer"
     if ! command -v displayplacer &> /dev/null; then
@@ -13,6 +13,7 @@ install_dependencies() {
     fi
 }
 
+# main applies macOS system settings from a configuration file and verifies the setup.
 main() {
     install_dependencies
     echo "[Start] Mac のシステム設定を適用中..."

@@ -4,7 +4,7 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REPO_ROOT="$( cd "$SCRIPT_DIR/.." && pwd )"
 
-# 依存関係をインストール
+# install_dependencies checks for the presence of git and gh commands and installs them using Homebrew if missing, indicating if any installation occurred.
 install_dependencies() {
     echo "[INFO] 依存関係をチェック・インストールします: git, gh"
     local changed=false
@@ -22,6 +22,7 @@ install_dependencies() {
     fi
 }
 
+# main orchestrates the setup and verification of the Git environment, including dependency installation, configuration, SSH key setup, and validation.
 main() {
     install_dependencies
     setup_git_config
@@ -33,6 +34,7 @@ main() {
     verify_git_setup
 }
 
+# setup_git_config sets up the user's global Git configuration file, preserving and restoring any existing user name and email settings. Exits with an error if the configuration file cannot be copied.
 setup_git_config() {
     echo "[Start] Gitの設定ファイルのセットアップを開始します..."
 

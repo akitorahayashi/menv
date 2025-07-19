@@ -4,6 +4,7 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REPO_ROOT="$( cd "$SCRIPT_DIR/.." && pwd )"
 
+# main orchestrates the installation and verification of Homebrew and its packages using a Brewfile.
 main() {
     # Homebrewのインストール
     install_homebrew
@@ -19,6 +20,7 @@ main() {
     verify_homebrew_setup
 }
 
+# install_homebrew checks for Homebrew and installs it if missing, signaling idempotency violations if installation occurs.
 install_homebrew() {
     if ! command -v brew; then
         echo "[INSTALL] Homebrew ..."
@@ -30,6 +32,7 @@ install_homebrew() {
     fi
 }
 
+# install_homebrew_binary downloads and runs the official Homebrew installation script, configures the shell environment, and verifies successful installation.
 install_homebrew_binary() {
     local install_url="https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
     
@@ -57,6 +60,7 @@ install_homebrew_binary() {
     echo "[OK] Homebrewバイナリのインストールが完了しました。"
 }
 
+# install_packages_from_brewfile installs or upgrades Homebrew packages listed in the specified Brewfile and checks for idempotency violations.
 install_packages_from_brewfile() {
     local brewfile_path="$1"
     

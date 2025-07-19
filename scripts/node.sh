@@ -4,7 +4,7 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REPO_ROOT="$( cd "$SCRIPT_DIR/.." && pwd )"
 
-# 依存関係をインストール
+# install_dependencies checks for the presence of Node.js and jq, installing them via Homebrew if missing, and signals if any installation occurred.
 install_dependencies() {
     echo "[INFO] 依存関係をチェック・インストールします: node, jq"
     local changed=false
@@ -22,6 +22,7 @@ install_dependencies() {
     fi
 }
 
+# main is the entry point for the script, orchestrating Node.js environment setup, global package installation, and verification steps.
 main() {
     install_dependencies
     echo "[Start] Node.js のセットアップを開始します..."
@@ -41,6 +42,7 @@ main() {
     verify_node_setup
 }
 
+# install_global_packages installs or updates global npm packages as specified in the repository's global-packages.json configuration file, ensuring required versions are present. If any package is installed or updated, it signals a state change by printing "IDEMPOTENCY_VIOLATION" to stderr. Skips installation if the configuration file is missing or empty, and exits with an error if any package operation fails.
 install_global_packages() {
     local packages_file="$REPO_ROOT/config/node/global-packages.json"
     

@@ -4,7 +4,7 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REPO_ROOT="$( cd "$SCRIPT_DIR/.." && pwd )"
 
-# 依存関係をインストール
+# install_dependencies checks if Visual Studio Code is installed via Homebrew cask and installs it if missing.
 install_dependencies() {
     echo "[INFO] 依存関係をチェック・インストールします: visual-studio-code"
     if ! brew list --cask visual-studio-code &> /dev/null; then
@@ -13,6 +13,7 @@ install_dependencies() {
     fi
 }
 
+# main sets up Visual Studio Code configuration by creating symbolic links from repository config files to the user's VS Code settings directory on macOS.
 main() {
     install_dependencies
     echo "[Start] VS Code のセットアップを開始します..."
