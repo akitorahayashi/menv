@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 # 現在のスクリプトディレクトリを取得
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REPO_ROOT="$( cd "$SCRIPT_DIR/.." && pwd )"
@@ -25,7 +27,7 @@ install_dependencies() {
 
 # nvm を使って Node.js をインストール
 install_node_with_nvm() {
-    local node_version="22.7.1"
+    local node_version="20.15.1"
     local changed=false
 
     # Node.js のインストール

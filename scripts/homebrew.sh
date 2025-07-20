@@ -43,10 +43,21 @@ install_homebrew_binary() {
     
     # インストールスクリプト実行後、現在のシェルセッションにPATHを設定
     # これにより、次のcommand -v brewが正しく機能するようになる
-    if [[ "$(uname -m)" == "arm64" ]]; then
-        eval "$(/opt/homebrew/bin/brew shellenv)"
+    local brew_path=""
+    if [[ "$(uname)" == "Darwin" ]]; then # macOS
+        if [[ "$(uname -m)" == "arm64" ]]; then # Apple Silicon
+            brew_path="/opt/homebrew/bin/brew"
+        else # Intel
+            brew_path="/usr/local/bin/brew"
+        fi
+    elif [[ "$(uname)" == "Linux" ]]; then # Linux
+        brew_path="/home/linuxbrew/.linuxbrew/bin/brew"
+    fi
+
+    if [ -n "$brew_path" ] && [ -f "$brew_path" ]; then
+        eval "$($brew_path shellenv)"
     else
-        eval "$(/usr/local/bin/brew shellenv)"
+        echo "[ERROR] brewコマンドのパスを設定できませんでした。"
     fi
     
     # インストール結果確認 (この時点でbrewコマンドが利用可能になっているはず)
@@ -84,11 +95,15 @@ verify_brew_path() {
     BREW_PATH=$(which brew)
     local expected_path=""
     
-    # アーキテクチャに応じた期待値
-    if [[ "$(uname -m)" == "arm64" ]]; then
-        expected_path="/opt/homebrew/bin/brew"
-    else
-        expected_path="/usr/local/bin/brew"
+    # OSとアーキテクチャに応じた期待値
+    if [[ "$(uname)" == "Darwin" ]]; then # macOS
+        if [[ "$(uname -m)" == "arm64" ]]; then # Apple Silicon
+            expected_path="/opt/homebrew/bin/brew"
+        else # Intel
+            expected_path="/usr/local/bin/brew"
+        fi
+    elif [[ "$(uname)" == "Linux" ]]; then # Linux
+        expected_path="/home/linuxbrew/.linuxbrew/bin/brew"
     fi
     
     if [[ "$BREW_PATH" != "$expected_path" ]]; then
