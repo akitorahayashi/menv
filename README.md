@@ -1,178 +1,80 @@
-# MacOS Environment Setup
+# macOS Environment Setup
 
-## Directory Structure
+This repository provides a streamlined way to automate the setup of a development environment on macOS. It uses a collection of scripts to install tools, configure settings, and manage system preferences.
+
+## Architecture
+
+The repository is organized based on the principle of "separation of concerns".
+
+-   **`install.sh`**: The main script for installing applications and command-line tools.
+-   **`apply.sh`**: A dedicated script to apply macOS-specific system settings.
+-   **`macos/backup.sh`**: A script to back up your current macOS settings.
+-   **`config/`**: Contains configuration files for various tools (e.g., `Brewfile`, `.gitconfig`).
+-   **`installer/`**: Contains the individual scripts that are called by `install.sh`.
+-   **`macos/default/`**: Stores the backed-up macOS settings as `.plist` files.
+
+### Directory Structure
 
 ```
-environment/
-├── .github/
-│   └── workflows/
-├── config/
+.
+├── apply.sh              # Applies macOS system settings
+├── install.sh            # Installs tools and applications
+│
+├── config/               # Configuration files for tools and shells
 │   ├── brew/
-│   ├── gems/
-│   ├── git/
-│   ├── macos/
-│   ├── node/
-│   ├── shell/
-│   └── vscode/
-├── scripts/
-│   ├── flutter.sh
-│   ├── git.sh
-│   ├── homebrew.sh
-│   ├── java.sh
-│   ├── macos.sh
-│   ├── node.sh
-│   ├── python.sh
-│   ├── ruby.sh
-│   ├── shell.sh
-│   └── vscode.sh
-├── .gitignore
-├── install.sh
+│   │   └── Brewfile
+│   └── ...
+│
+├── installer/            # Scripts to install tools and apply settings
+│   ├── brew.sh
+│   └── ...
+│
+├── macos/                # Manages macOS-specific settings
+│   ├── backup.sh         # Script to export all system settings
+│   └── default/          # Stores exported settings as *.plist files
+│       ├── com.apple.dock.plist
+│       └── ...
+│
+├── .github/
 └── README.md
 ```
 
-## Implementation Features
+## How to Use
 
-1.  **Homebrew Setup**
-    -   Homebrewと必要なコマンドラインツールのインストール
+There are two main scripts to use:
 
-2.  **Shell Configuration**
-    -   `config/shell/`から`$HOME`への`.zprofile`と`.zshrc`のシンボリックリンクを作成
-    -   既存の`.zshrc`は上書きされます
+1.  **`install.sh`**: For installing tools and applications.
+2.  **`apply.sh`**: For applying your custom macOS settings.
 
-3.  **Git Configuration**
-    -   `config/git/.gitconfig`から`~/.config/git/config`へのコピーを作成
-    -   Gitのエイリアスなどの設定を適用
+### 1. Back Up Your macOS Settings (Optional)
 
-4.  **macOS Settings**
-    -   `config/macos/settings.sh`からトラックパッド、マウス、キーボード、Dock、Finder、スクリーンショットなどの設定を適用
-    -   `config/macos/backup_settings.sh`で現在の設定をバックアップして設定ファイルを生成可能
-
-5.  **Package Installation from Brewfile**
-    -   `config/brew/Brewfile`に記載されたパッケージを`brew bundle`を使用してインストール
-
-6.  **Ruby Environment Setup**
-    -   `rbenv`と`ruby-build`をインストール
-    -   特定のバージョンのRubyをインストールし、グローバルに設定
-    -   `config/gems/global-gems.rb`に基づき、`bundler`を使用してgemをインストール
-
-7.  **VS Code Configuration**
-    -   `config/vscode/`から`$HOME/Library/Application Support/Code/User`への設定ファイルのシンボリックリンクを作成
-
-8.  **Python Environment Setup**
-    -   `pyenv`をインストール
-    -   特定のバージョンのPythonをインストールし、グローバルに設定
-
-9. **Java Environment Setup**
-    -   `Homebrew`を使用して特定のバージョンのJava (Temurin)をインストール
-
-10. **Node.js Environment Setup**
-    -   `nvm`と`jq`をHomebrewでインストール
-    -   特定のバージョンのNode.jsをインストールし、デフォルトとして設定
-    -   `config/node/global-packages.json`に基づき、グローバルnpmパッケージをインストール
-
-11. **Flutter Setup**
-
-12. **GitHub CLI Configuration**
-
-13. **SSH Key Management**
-    -   SSHキーの存在確認
-    -   SSHエージェントの設定
-
-## Setup Instructions
-
-### 1. Clone or Download the Repository
+If you want to save your current system settings, run the backup script. This will export your settings for the Dock, Finder, etc., into the `macos/default/` directory.
 
 ```sh
-$ git clone git@github.com:akitorahayashi/environment.git
-$ cd environment
+./macos/backup.sh
 ```
 
-### 2. Pre-setup Script
+### 2. Install Tools and Applications
 
-事前準備を行うスクリプトを実行します
-特に初回は実行してください
+Run the `install.sh` script to install everything defined in your `config/` files (like the `Brewfile`).
 
 ```sh
-$ chmod +x initial-setup.sh
-$ ./initial-setup.sh
+./install.sh
 ```
 
-このスクリプトは以下を行います
-- Xcode Command Line Tools のインストール
-- SSH鍵の生成（存在しない場合）
-- GitHubへのSSH鍵追加のガイド
-- SSH接続のテスト
-- 実行権限の付与
+This script handles the installation of:
+- Homebrew and command-line tools
+- Packages, casks, and App Store apps
+- Shell, Git, VS Code, Ruby, Python, Node.js, etc.
 
-### 3. Run the Installation Script
+### 3. Apply macOS Settings
+
+After the installation is complete, run `apply.sh` to configure your macOS system settings based on the files in `macos/default/`.
 
 ```sh
-$ ./install.sh
+./apply.sh
 ```
 
-### 4. Configure Git
+### 4. Restart macOS
 
-`~/.gitconfig` に `user.name` と `user.email` を設定してください。
-
-```sh
-$ git config --global user.name "Your Name"
-$ git config --global user.email "your.email@example.com"
-```
-
-### 6. Configure GitHub CLI
-
-GitHub CLIを認証してください
-
-```sh
-# GitHub.comの認証を追加
-$ gh auth login
-
-# GitHub Enterpriseの認証を追加（該当する場合）
-$ gh auth login --hostname your-enterprise-hostname.com
-```
-
-### 7. Restart macOS
-
-設定を完全に適用するために、macOSを再起動してください。
-
-## Individual Setup Scripts
-
-`scripts/`内の各セットアップスクリプトは個別に実行できます
-
-```sh
-# Homebrewのセットアップ
-$ ./scripts/homebrew.sh
-
-# シェルの設定
-$ ./scripts/shell.sh
-
-# Gitの設定
-$ ./scripts/git.sh
-
-# Ruby環境のセットアップ
-$ ./scripts/ruby.sh
-
-# Python環境のセットアップ
-$ ./scripts/python.sh
-
-# Java環境のセットアップ
-$ ./scripts/java.sh
-
-# Node.js環境のセットアップ
-$ ./scripts/node.sh
-
-# Flutterのセットアップ
-$ ./scripts/flutter.sh
-
-# VSCodeの設定
-$ ./scripts/vscode.sh
-
-# macOSの設定
-$ ./scripts/macos.sh
-```
-
-各スクリプトは以下のように動作します
-1. コンポーネントが既にインストール/設定されているかチェック
-2. 必要な場合のみインストールまたは設定を実行
-3. セットアップを検証
-
+A system restart is recommended to ensure all settings are fully applied.

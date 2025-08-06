@@ -11,20 +11,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install ShellCheck
-        run: brew install shellcheck
-
       - name: Grant execution permission
-        run: chmod +x config/macos/backup_settings.sh
+        run: chmod +x macos/backup.sh
 
       - name: Run backup script
-        run: ./config/macos/backup_settings.sh
+        run: ./macos/backup.sh
 
-      - name: Check if settings.sh is generated
-        run: test -f /tmp/macos-settings.sh
-
-      - name: Lint generated settings.sh
-        run: shellcheck /tmp/macos-settings.sh
-
-      - name: Clean up temporary file
-        run: rm -f /tmp/macos-settings.sh
+      - name: Check if backup files are generated
+        run: |
+          if [ -z "$(ls -A macos/default)" ]; then
+            echo "No backup files were generated in macos/default."
+            exit 1
+          fi
+          echo "Backup files generated successfully."

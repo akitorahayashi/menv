@@ -13,9 +13,10 @@ fi
 
 # セットアップスクリプトに実行権限を付与
 echo "セットアップスクリプトに実行権限を付与します..."
-find "$SCRIPT_DIR/scripts" -name "*.sh" -exec chmod +x {} \; 2>/dev/null || true
+find "$SCRIPT_DIR/installer" -name "*.sh" -exec chmod +x {} \; 2>/dev/null || true
+find "$SCRIPT_DIR/macos" -name "*.sh" -exec chmod +x {} \; 2>/dev/null || true
 echo "スクリプトディレクトリの内容:"
-find "$SCRIPT_DIR/scripts" -type f -name "*.sh" | sort
+find "$SCRIPT_DIR/installer" -type f -name "*.sh" | sort
 
 # エラー発生時に即座に終了する設定
 set -e
@@ -30,16 +31,15 @@ main() {
     
     # セットアップスクリプトの実行
     declare -a scripts=(
-        "shell:$SCRIPT_ROOT_DIR/scripts/shell.sh"
-        "homebrew:$SCRIPT_ROOT_DIR/scripts/homebrew.sh"
-        "mac:$SCRIPT_ROOT_DIR/scripts/macos.sh"
-        "git:$SCRIPT_ROOT_DIR/scripts/git.sh"
-        "vscode:$SCRIPT_ROOT_DIR/scripts/vscode.sh"
-        "ruby:$SCRIPT_ROOT_DIR/scripts/ruby.sh"
-        "python:$SCRIPT_ROOT_DIR/scripts/python.sh"
-        "java:$SCRIPT_ROOT_DIR/scripts/java.sh"
-        "flutter:$SCRIPT_ROOT_DIR/scripts/flutter.sh"
-        "node:$SCRIPT_ROOT_DIR/scripts/node.sh"
+        "shell:$SCRIPT_ROOT_DIR/installer/shell.sh"
+        "homebrew:$SCRIPT_ROOT_DIR/installer/homebrew.sh"
+        "git:$SCRIPT_ROOT_DIR/installer/git.sh"
+        "vscode:$SCRIPT_ROOT_DIR/installer/vscode.sh"
+        "ruby:$SCRIPT_ROOT_DIR/installer/ruby.sh"
+        "python:$SCRIPT_ROOT_DIR/installer/python.sh"
+        "java:$SCRIPT_ROOT_DIR/installer/java.sh"
+        "flutter:$SCRIPT_ROOT_DIR/installer/flutter.sh"
+        "node:$SCRIPT_ROOT_DIR/installer/node.sh"
     )
     
     for script_entry in "${scripts[@]}"; do
