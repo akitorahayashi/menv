@@ -16,7 +16,8 @@ set -euo pipefail
 #
 # Directory where the settings files are stored.
 # ---
-SETTINGS_DIR="$(dirname "$0")/default"
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+SETTINGS_DIR="$SCRIPT_DIR/macos/default"
 
 # ---
 # Main processing

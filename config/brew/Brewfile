@@ -1,13 +1,13 @@
 ## Version Control
-# brew "git" # installed by scripts/git.sh
-# brew "gh" # installed by scripts/git.sh
+# brew "git" # installed by installer/git.sh
+# brew "gh" # installed by installer/git.sh
 
 ## Development Tools
-# brew "nvm" # installed by scripts/node.sh
-# brew "jq"   # installed by scripts/node.sh
+# brew "nvm" # installed by installer/node.sh
+# brew "jq"   # installed by installer/node.sh
 brew "go"
-# tap "leoafarias/fvm" # installed by scripts/flutter.sh
-# brew "leoafarias/fvm/fvm" # installed by scripts/flutter.sh
+# tap "leoafarias/fvm" # installed by installer/flutter.sh
+# brew "leoafarias/fvm/fvm" # installed by installer/flutter.sh
 
 ## Xcode & Swift Development
 brew "xcodes"
@@ -16,20 +16,20 @@ brew "mint"
 brew "cocoapods"
 
 ## Ruby
-# brew "rbenv" # installed by scripts/ruby.sh
-# brew "ruby-build" # installed by scripts/ruby.sh
+# brew "rbenv" # installed by installer/ruby.sh
+# brew "ruby-build" # installed by installer/ruby.sh
 
 ## Python
-# brew "pyenv" # installed by scripts/python.sh
+# brew "pyenv" # installed by installer/python.sh
 
 ## Utility
 brew "yamllint"
 brew "poppler"
 brew "ollama"
-# brew "displayplacer" # installed by scripts/macos.sh
+# brew "displayplacer" # installed by installer/homebrew.sh
 
 ## Cask
-# cask "visual-studio-code" # installed by scripts/vscode.sh
+# cask "visual-studio-code" # installed by installer/vscode.sh
 cask "android-studio"
 cask "android-commandlinetools"
 cask "google-chrome"
