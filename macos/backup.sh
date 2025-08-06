@@ -46,6 +46,9 @@ BACKUP_DIR="$(dirname "$0")/default"
 # Main processing
 # ---
 main() {
+  # Ensure backup directory exists
+  mkdir -p "$BACKUP_DIR"
+
   # Clear existing backup files
   echo "Clearing old backup files from $BACKUP_DIR..."
   rm -f "$BACKUP_DIR"/*.plist
