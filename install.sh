@@ -31,7 +31,6 @@ main() {
     
     # セットアップスクリプトの実行
     declare -a scripts=(
-        "shell:$SCRIPT_ROOT_DIR/installer/shell.sh"
         "homebrew:$SCRIPT_ROOT_DIR/installer/homebrew.sh"
         "git:$SCRIPT_ROOT_DIR/installer/git.sh"
         "vscode:$SCRIPT_ROOT_DIR/installer/vscode.sh"

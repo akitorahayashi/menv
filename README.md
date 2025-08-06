@@ -7,34 +7,47 @@ This repository provides a streamlined way to automate the setup of a developmen
 The repository is organized based on the principle of "separation of concerns".
 
 -   **`install.sh`**: The main script for installing applications and command-line tools.
--   **`apply.sh`**: A dedicated script to apply macOS-specific system settings.
--   **`macos/backup.sh`**: A script to back up your current macOS settings.
--   **`config/`**: Contains configuration files for various tools (e.g., `Brewfile`, `.gitconfig`).
--   **`installer/`**: Contains the individual scripts that are called by `install.sh`.
--   **`macos/default/`**: Stores the backed-up macOS settings as `.plist` files.
+-   **`apply.sh`**: A dedicated script to apply all macOS-specific environment settings, including system preferences and shell configurations.
+-   **`macos/`**: A directory containing all scripts and configuration files related to the macOS environment.
+-   **`config/`**: Contains configuration files for tools that are installed by `install.sh` (e.g., `Brewfile`, `.gitconfig`).
+-   **`installer/`**: Contains the individual installation scripts called by `install.sh`.
 
 ### Directory Structure
 
 ```
 .
-├── apply.sh              # Applies macOS system settings
-├── install.sh            # Installs tools and applications
-│
-├── config/               # Configuration files for tools and shells
+├── apply.sh
+├── install.sh
+├── initial-setup.sh
+├── config/
 │   ├── brew/
 │   │   └── Brewfile
-│   └── ...
-│
-├── installer/            # Scripts to install tools and apply settings
-│   ├── brew.sh
-│   └── ...
-│
-├── macos/                # Manages macOS-specific settings
-│   ├── backup.sh         # Script to export all system settings
-│   └── default/          # Stores exported settings as *.plist files
-│       ├── com.apple.dock.plist
-│       └── ...
-│
+│   ├── gems/
+│   │   ├── global-gems.rb
+│   │   └── global-gems.rb.lock
+│   ├── git/
+│   ├── node/
+│   │   └── global-packages.json
+│   └── vscode/
+│       ├── extensions/
+│       │   ├── backup-extensions.sh
+│       │   └── extensions.txt
+│       ├── keybindings.json
+│       └── settings.json
+├── installer/
+│   ├── flutter.sh
+│   ├── git.sh
+│   ├── homebrew.sh
+│   ├── java.sh
+│   ├── node.sh
+│   ├── python.sh
+│   ├── ruby.sh
+│   └── vscode.sh
+├── macos/
+│   ├── backup.sh
+│   ├── shell.sh
+│   ├── default/
+│   └── shell/
 ├── .github/
 └── README.md
 ```
@@ -44,7 +57,7 @@ The repository is organized based on the principle of "separation of concerns".
 There are two main scripts to use:
 
 1.  **`install.sh`**: For installing tools and applications.
-2.  **`apply.sh`**: For applying your custom macOS settings.
+2.  **`apply.sh`**: For applying your custom macOS environment settings.
 
 ### 1. Back Up Your macOS Settings (Optional)
 
@@ -56,20 +69,15 @@ If you want to save your current system settings, run the backup script. This wi
 
 ### 2. Install Tools and Applications
 
-Run the `install.sh` script to install everything defined in your `config/` files (like the `Brewfile`).
+Run `install.sh` to install everything defined in your `config/` files (like the `Brewfile`).
 
 ```sh
 ./install.sh
 ```
 
-This script handles the installation of:
-- Homebrew and command-line tools
-- Packages, casks, and App Store apps
-- Shell, Git, VS Code, Ruby, Python, Node.js, etc.
+### 3. Apply macOS Environment Settings
 
-### 3. Apply macOS Settings
-
-After the installation is complete, run `apply.sh` to configure your macOS system settings based on the files in `macos/default/`.
+After the installation is complete, run `apply.sh`. This script now handles both applying system preferences from `.plist` files and setting up your shell configuration (`.zshrc`, etc.).
 
 ```sh
 ./apply.sh

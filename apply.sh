@@ -34,6 +34,14 @@ main() {
 
   echo "Settings import complete."
   echo "Note: Some settings may require a restart to take effect."
+
+  echo ""
+  echo "Applying shell configuration..."
+  if [ -f "$SCRIPT_DIR/macos/shell.sh" ]; then
+    bash "$SCRIPT_DIR/macos/shell.sh"
+  else
+    echo "Warning: macos/shell.sh not found."
+  fi
 }
 
 # ---
