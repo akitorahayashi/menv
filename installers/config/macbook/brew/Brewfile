@@ -1,0 +1,9 @@
+## Document Processing (MacBook only)
+brew "poppler"
+brew "pandoc"
+
+## Cask - Development & Communication
+cask "slack"
+cask "zoom"
+cask "obsidian"
+cask "mactex"

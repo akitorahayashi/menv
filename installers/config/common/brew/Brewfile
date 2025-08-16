@@ -22,8 +22,6 @@ brew "mint"
 # brew "pyenv" # installed by scripts/python.sh
 
 ## Utility
-brew "poppler"
-brew "pandoc"
 brew "ollama"
 # brew "displayplacer" # installed by scripts/macos.sh
 
@@ -32,8 +30,3 @@ brew "ollama"
 cask "android-studio"
 cask "android-commandlinetools"
 cask "google-chrome"
-cask "slack"
-cask "docker"
-cask "zoom"
-cask "obsidian"
-cask "mactex"
