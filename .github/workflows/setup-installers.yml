@@ -23,6 +23,19 @@ jobs:
           machine_type=$(echo ${{ matrix.config }} | sed 's/only-//')
           bash installers/scripts/ensure-configs.sh "$machine_type"
 
+      - name: Debug Environment
+        run: |
+          echo "--- DEBUGGING ---"
+          echo "Current directory: $(pwd)"
+          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
+          echo "--- File Listing (root) ---"
+          ls -la
+          echo "--- File Listing (installers) ---"
+          ls -la installers
+          echo "--- File Listing (installers/scripts) ---"
+          ls -la installers/scripts
+          echo "--- END DEBUGGING ---"
+
       - name: Run ${{ matrix.config }}-${{ matrix.component }} setup
         id: setup
         run: make -C installers ${{ matrix.config }}-${{ matrix.component }}
