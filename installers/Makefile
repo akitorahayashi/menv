@@ -40,8 +40,19 @@ only-$(1)-$(2): ## Setup $(2) for $(1) (specific only)
 
 endef
 
+# Template for generating rules for common components
+define COMMON_COMPONENT_template
+.PHONY: only-common-$(1)
+only-common-$(1): ## Setup $(1) for common config only
+	@echo "🚀 Running $(1) setup for common (specific only)..."
+	@$(SHELL) -euo pipefail "$(SCRIPT_DIR)/$(1).sh" "$(CONFIG_DIR)/common"
+
+endef
+
 # Instantiate the template for each machine and component
 $(foreach machine,$(MACHINES),$(foreach component,$(COMPONENTS),$(eval $(call COMPONENT_template,$(machine),$(component)))))
+# Instantiate the template for each common component
+$(foreach component,$(COMPONENTS),$(eval $(call COMMON_COMPONENT_template,$(component))))
 
 # === Aggregate Targets ===
 
