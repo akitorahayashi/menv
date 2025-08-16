@@ -6,8 +6,8 @@ SHELL := /bin/bash
 
 # Directories
 REPO_ROOT ?= $(patsubst %/,%,$(dir $(CURDIR)))
-SCRIPT_DIR := $(REPO_ROOT)/scripts
-CONFIG_DIR := $(REPO_ROOT)/config
+SCRIPT_DIR := $(REPO_ROOT)/installers/scripts
+CONFIG_DIR := $(REPO_ROOT)/installers/config
 
 # Configuration
 MACHINES := macbook mac-mini
