@@ -5,9 +5,8 @@ SHELL := /bin/bash
 .SHELLFLAGS := -euo pipefail -c
 
 # Directories
-REPO_ROOT ?= $(patsubst %/,%,$(dir $(CURDIR)))
-SCRIPT_DIR := $(REPO_ROOT)/installers/scripts
-CONFIG_DIR := $(REPO_ROOT)/installers/config
+SCRIPT_DIR := ./scripts
+CONFIG_DIR := ./config
 
 # Configuration
 MACHINES := macbook mac-mini
