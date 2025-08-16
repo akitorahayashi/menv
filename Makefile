@@ -5,8 +5,9 @@ SHELL := /bin/bash
 .SHELLFLAGS := -euo pipefail -c
 
 # Define script directory
-SCRIPT_DIR := $(CURDIR)/installers/scripts
-MACOS_SCRIPT_DIR := $(CURDIR)/macos/scripts
+export REPO_ROOT := $(CURDIR)
+SCRIPT_DIR := $(REPO_ROOT)/installers/scripts
+MACOS_SCRIPT_DIR := $(REPO_ROOT)/macos/scripts
 
 # Default target
 .DEFAULT_GOAL := help
@@ -30,7 +31,7 @@ sync-common: ## Synchronize all common tools and configurations
 .PHONY: macbook
 macbook: ## Setup for MacBook
 	@echo "🚀 Setting up for MacBook..."
-	@$(MAKE) -C installers all
+	@$(MAKE) -C installers macbook-all
 	@$(MAKE) link-shell
 	@$(MAKE) apply-defaults
 	@echo "✅ MacBook setup completed successfully."
@@ -38,7 +39,7 @@ macbook: ## Setup for MacBook
 .PHONY: mac-mini
 mac-mini: ## Setup for Mac mini
 	@echo "🚀 Setting up for Mac mini..."
-	@$(MAKE) -C installers all
+	@$(MAKE) -C installers mac-mini-all
 	@$(MAKE) link-shell
 	@$(MAKE) apply-defaults
 	@echo "✅ Mac mini setup completed successfully."

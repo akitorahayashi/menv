@@ -5,13 +5,18 @@ SHELL := /bin/bash
 .SHELLFLAGS := -euo pipefail -c
 
 # Directories
-export REPO_ROOT := $(CURDIR)
+REPO_ROOT ?= $(patsubst %/,%,$(dir $(CURDIR)))
 SCRIPT_DIR := $(REPO_ROOT)/scripts
 CONFIG_DIR := $(REPO_ROOT)/config
 
 # Configuration
 MACHINES := macbook mac-mini
-COMPONENTS := brew git vscode ruby python java flutter node
+# Components that have machine-specific configurations
+MACHINE_COMPONENTS := brew vscode ruby python java flutter node
+# Common components
+COMMON_COMPONENTS := git
+
+COMPONENTS := $(MACHINE_COMPONENTS) $(COMMON_COMPONENTS)
 
 # Default target
 .DEFAULT_GOAL := help
@@ -50,14 +55,20 @@ only-common-$(1): ## Setup $(1) for common config only
 endef
 
 # Instantiate the template for each machine and component
-$(foreach machine,$(MACHINES),$(foreach component,$(COMPONENTS),$(eval $(call COMPONENT_template,$(machine),$(component)))))
+$(foreach machine,$(MACHINES),$(foreach component,$(MACHINE_COMPONENTS),$(eval $(call COMPONENT_template,$(machine),$(component)))))
 # Instantiate the template for each common component
 $(foreach component,$(COMPONENTS),$(eval $(call COMMON_COMPONENT_template,$(component))))
+
+# === Static Targets for Common Components ===
+.PHONY: git
+git: ## Configure Git settings (common)
+	@echo "🚀 Running Git setup..."
+	@$(SHELL) -euo pipefail "$(SCRIPT_DIR)/git.sh" "$(CONFIG_DIR)/common"
 
 # === Aggregate Targets ===
 
 # Generate 'all' target for each machine
-$(foreach machine,$(MACHINES),$(eval .PHONY: $(machine)-all) $(eval $(machine)-all: $(addprefix $(machine)-,$(COMPONENTS))))
+$(foreach machine,$(MACHINES),$(eval .PHONY: $(machine)-all) $(eval $(machine)-all: git $(addprefix $(machine)-,$(MACHINE_COMPONENTS))))
 $(foreach machine,$(MACHINES),$(eval $(machine)-all: ## Setup all components for $(machine)))
 
 # A new default 'all' target that runs the setup for a specific machine (e.g., macbook)
@@ -65,5 +76,5 @@ $(foreach machine,$(MACHINES),$(eval $(machine)-all: ## Setup all components for
 all: macbook-all ## Run all setup scripts for MacBook by default
 
 # For backward compatibility, create simple targets that default to macbook
-$(foreach component,$(COMPONENTS),$(eval .PHONY: $(component)) $(eval $(component): macbook-$(component)))
-$(foreach component,$(COMPONENTS),$(eval $(component): ## Setup $(component) for MacBook (default)))
+$(foreach component,$(MACHINE_COMPONENTS),$(eval .PHONY: $(component)) $(eval $(component): macbook-$(component)))
+$(foreach component,$(MACHINE_COMPONENTS),$(eval $(component): ## Setup $(component) for MacBook (default)))
