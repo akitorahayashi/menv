@@ -2,10 +2,6 @@
 
 unset PYENV_VERSION
 
-# 現在のスクリプトディレクトリを取得
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-REPO_ROOT="$( cd "$SCRIPT_DIR/../.." && pwd )"
-
 changed=false
  # 依存関係をインストール
 echo "[INFO] 依存関係をチェック・インストールします: pyenv"
@@ -20,19 +16,25 @@ if command -v pyenv 1>/dev/null 2>&1; then
     eval "$(pyenv init -)"
 fi
 
-# .python-versionファイルからPythonのバージョンを読み込む
-PYTHON_VERSION_FILE="$REPO_ROOT/installers/config/common/python/.python-version"
-if [ ! -f "$PYTHON_VERSION_FILE" ]; then
-    echo "[ERROR] .python-versionファイルが見つかりません: $PYTHON_VERSION_FILE"
-    exit 1
-fi
-PYTHON_VERSION="$(tr -d '[:space:]' < "$PYTHON_VERSION_FILE")"
-readonly PYTHON_VERSION
+# .python-versionファイルからPythonのバージョンを決定
+PYTHON_VERSION=""
+for config_dir in "$@"; do
+    version_file="$config_dir/python/.python-version"
+    if [ -f "$version_file" ]; then
+        echo "[INFO] .python-version を読み込みます: $version_file"
+        version_from_file=$(tr -d '[:space:]' < "$version_file")
+        if [ -n "$version_from_file" ]; then
+            PYTHON_VERSION="$version_from_file"
+            echo "[INFO] Pythonのバージョンを ${PYTHON_VERSION} に設定します"
+        fi
+    fi
+done
+
 if [ -z "$PYTHON_VERSION" ]; then
-    echo "[ERROR] .python-versionファイルからバージョンの読み込みに失敗しました。"
+    echo "[ERROR] .python-versionファイルが見つからないか、バージョンが指定されていません。"
     exit 1
 fi
-echo "[INFO] .python-versionで指定されたPythonのバージョンは ${PYTHON_VERSION} です。"
+readonly PYTHON_VERSION
 
 # 指定されたバージョンのPythonがインストールされていなければインストール
 if ! pyenv versions --bare | grep -q "^${PYTHON_VERSION}$"; then
@@ -85,38 +87,44 @@ if [ "$python_version_changed" = true ] && command -v pipx &> /dev/null; then
 fi
 
 # pipxで管理するツールをインストール
-PIPX_TOOLS_FILE="$REPO_ROOT/installers/config/common/python/pipx-tools.txt"
-if [ ! -f "$PIPX_TOOLS_FILE" ]; then
-    echo "[ERROR] pipx-tools.txt が見つかりません: $PIPX_TOOLS_FILE"
-    exit 1
-fi
-
-echo "[INFO] $PIPX_TOOLS_FILE からツールをインストールします"
-installed_tools_output=$(pipx list)
-
-while IFS= read -r tool_package_raw || [ -n "$tool_package_raw" ]; do
-    # 行末コメントを除去し、前後空白をトリム
-    tool_package="${tool_package_raw%%#*}"
-    tool_package="$(echo "$tool_package" | xargs)"
-    # 空行はスキップ
-    if [[ -z "$tool_package" ]]; then
-        continue
+pipx_tool_files=()
+for config_dir in "$@"; do
+    tool_file="$config_dir/python/pipx-tools.txt"
+    if [ -f "$tool_file" ]; then
+        pipx_tool_files+=("$tool_file")
     fi
+done
 
-    # すでにインストールされているかチェック
-    if echo "$installed_tools_output" | grep -q "package $tool_package "; then
-        echo "[INFO] $tool_package はすでにインストールされています"
-    else
-        echo "[INSTALL] $tool_package"
-        if ! pipx install "$tool_package" --python "$(pyenv which python)"; then
-            echo "[ERROR] $tool_package のインストールに失敗しました" >&2
-            exit 1
+if [ ${#pipx_tool_files[@]} -eq 0 ]; then
+    echo "[WARN] pipx-tools.txt が見つかりませんでした。パッケージのインストールをスキップします。"
+else
+    echo "[INFO] pipx-tools.txt からツールをインストールします"
+    installed_tools_output=$(pipx list)
+
+    # すべてのツールファイルを結合して処理
+    cat "${pipx_tool_files[@]}" | while IFS= read -r tool_package_raw || [ -n "$tool_package_raw" ]; do
+        # 行末コメントを除去し、前後空白をトリム
+        tool_package="${tool_package_raw%%#*}"
+        tool_package="$(echo "$tool_package" | xargs)"
+        # 空行はスキップ
+        if [[ -z "$tool_package" ]]; then
+            continue
         fi
-        changed=true
-        echo "IDEMPOTENCY_VIOLATION" >&2
-    fi
-done < "$PIPX_TOOLS_FILE"
 
+        # すでにインストールされているかチェック
+        if echo "$installed_tools_output" | grep -q "package $tool_package "; then
+            echo "[INFO] $tool_package はすでにインストールされています"
+        else
+            echo "[INSTALL] $tool_package"
+            if ! pipx install "$tool_package" --python "$(pyenv which python)"; then
+                echo "[ERROR] $tool_package のインストールに失敗しました" >&2
+                exit 1
+            fi
+            changed=true
+            echo "IDEMPOTENCY_VIOLATION" >&2
+        fi
+    done
+fi
 
 # 最終的な環境情報を表示
 echo "[INFO] Python環境: $(python -V)"
@@ -132,8 +140,6 @@ if ! command -v pyenv >/dev/null 2>&1; then
     echo "[ERROR] pyenvコマンドが見つかりません"
     exit 1
 fi
-
-
 
 echo "[SUCCESS] pyenv: $(pyenv --version)"
 
@@ -153,31 +159,24 @@ fi
 echo "[SUCCESS] pipx: $(pipx --version)"
 
 # pipxで管理するツールを検証
-if [ ! -f "$PIPX_TOOLS_FILE" ]; then
-    echo "[ERROR] pipx-tools.txt が見つかりません: $PIPX_TOOLS_FILE"
-    exit 1
+if [ ${#pipx_tool_files[@]} -gt 0 ]; then
+    echo "[INFO] pipx-tools.txt に記載のツールを検証します"
+    installed_tools_output_verify=$(pipx list)
+
+    cat "${pipx_tool_files[@]}" | while IFS= read -r tool_package_raw || [ -n "$tool_package_raw" ]; do
+        tool_package="${tool_package_raw%%#*}"
+        tool_package="$(echo "$tool_package" | xargs)"
+        if [[ -z "$tool_package" ]]; then
+            continue
+        fi
+
+        if echo "$installed_tools_output_verify" | grep -q "package $tool_package "; then
+            echo "[SUCCESS] $tool_package は正常にインストールされています"
+        else
+            echo "[ERROR] $tool_package がインストールされていません"
+            exit 1
+        fi
+    done
 fi
-
-echo "[INFO] $PIPX_TOOLS_FILE に記載のツールを検証します"
-# 検証のたびに最新のリストを取得
-installed_tools_output_verify=$(pipx list)
-
-while IFS= read -r tool_package_raw || [ -n "$tool_package_raw" ]; do
-    # 行末コメントを除去し、前後空白をトリム
-    tool_package="${tool_package_raw%%#*}"
-    tool_package="$(echo "$tool_package" | xargs)"
-    # 空行はスキップ
-    if [[ -z "$tool_package" ]]; then
-        continue
-    fi
-
-    # インストールされているかチェック
-    if echo "$installed_tools_output_verify" | grep -q "package $tool_package "; then
-        echo "[SUCCESS] $tool_package は正常にインストールされています"
-    else
-        echo "[ERROR] $tool_package がインストールされていません"
-        exit 1
-    fi
-done < "$PIPX_TOOLS_FILE"
 
 echo "[SUCCESS] Python環境の検証が完了しました"

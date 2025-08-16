@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# 現在のスクリプトディレクトリを取得
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-REPO_ROOT="$( cd "$SCRIPT_DIR/../.." && pwd )"
 
 # 依存関係をインストール
 echo "[INFO] 依存関係をチェック・インストールします: git, gh"
@@ -20,29 +17,46 @@ if [ "$changed" = true ]; then
     echo "IDEMPOTENCY_VIOLATION" >&2
 fi
 
-# Gitの設定ファイルのセットアップ
-echo "[Start] Gitの設定ファイルのセットアップを開始します..."
-
-mkdir -p "$HOME/.config/git"
-src="$REPO_ROOT/installers/config/common/git/.gitconfig"
-dest="$HOME/.config/git/config"
-
-# Only apply if missing or different
-if [ ! -f "$dest" ] || ! cmp -s "$src" "$dest"; then
-    if [ -f "$dest" ] || [ -L "$dest" ]; then
-        echo "[INFO] 既存の設定ファイルを削除します: $dest"
-        rm -f "$dest"
+# Gitの設定ファイルのパスを決定
+gitconfig_src=""
+gitignore_src=""
+for config_dir in "$@"; do
+    if [ -f "$config_dir/git/.gitconfig" ]; then
+        gitconfig_src="$config_dir/git/.gitconfig"
+        echo "[INFO] .gitconfigのソースとして $gitconfig_src を使用します"
     fi
-    echo "[INFO] Gitの設定ファイルをコピーします..."
-    if cp "$src" "$dest"; then
-        echo "[SUCCESS] Gitの設定ファイルをコピーしました。"
+    if [ -f "$config_dir/git/.gitignore_global" ]; then
+        gitignore_src="$config_dir/git/.gitignore_global"
+        echo "[INFO] .gitignore_globalのソースとして $gitignore_src を使用します"
+    fi
+done
+
+# Gitの設定ファイルのセットアップ
+if [ -n "$gitconfig_src" ]; then
+    echo "[Start] Gitの設定ファイルのセットアップを開始します..."
+    mkdir -p "$HOME/.config/git"
+    dest="$HOME/.config/git/config"
+
+    # Only apply if missing or different
+    if [ ! -f "$dest" ] || ! cmp -s "$gitconfig_src" "$dest"; then
+        if [ -f "$dest" ] || [ -L "$dest" ]; then
+            echo "[INFO] 既存の設定ファイルを削除します: $dest"
+            rm -f "$dest"
+        fi
+        echo "[INFO] Gitの設定ファイルをコピーします..."
+        if cp "$gitconfig_src" "$dest"; then
+            echo "[SUCCESS] Gitの設定ファイルをコピーしました。"
+        else
+            echo "[ERROR] Gitの設定ファイルのコピーに失敗しました。"
+            exit 1
+        fi
     else
-        echo "[ERROR] Gitの設定ファイルのコピーに失敗しました。"
-        exit 1
+        echo "[INFO] Gitの設定ファイルは最新です。スキップします。"
     fi
 else
-    echo "[INFO] Gitの設定ファイルは最新です。スキップします。"
+    echo "[WARN] .gitconfigファイルがどの設定ディレクトリにも見つかりませんでした。"
 fi
+
 
 # .envファイルからGitユーザー情報を設定
 env_file="$REPO_ROOT/.env"
@@ -67,26 +81,30 @@ fi
 echo "[SUCCESS] Git の設定適用完了"
 
 # gitignore_globalのセットアップ
-echo ""
-echo "==== Start: gitignore_globalのセットアップを開始します... ===="
+if [ -n "$gitignore_src" ]; then
+    echo ""
+    echo "==== Start: gitignore_globalのセットアップを開始します... ===="
 
-ignore_file="$HOME/.gitignore_global"
+    ignore_file="$HOME/.gitignore_global"
 
-# シンボリックリンクの作成
-echo "[INFO] gitignore_global のシンボリックリンクを作成します..."
-if ln -sf "$REPO_ROOT/installers/config/common/git/.gitignore_global" "$ignore_file"; then
-    echo "[SUCCESS] gitignore_global のシンボリックリンクを作成しました。"
+    # シンボリックリンクの作成
+    echo "[INFO] gitignore_global のシンボリックリンクを作成します..."
+    if ln -sf "$gitignore_src" "$ignore_file"; then
+        echo "[SUCCESS] gitignore_global のシンボリックリンクを作成しました。"
+    else
+        echo "[ERROR] gitignore_global のシンボリックリンク作成に失敗しました。"
+        exit 1
+    fi
+
+    # Git に global gitignore を設定
+    echo "[INFO] Git の core.excludesfile を更新しています..."
+    git config --global core.excludesfile "$ignore_file"
+    echo "[SUCCESS] Git の core.excludesfile に global gitignore を設定しました。"
+
+    echo "[SUCCESS] gitignore_global の設定完了"
 else
-    echo "[ERROR] gitignore_global のシンボリックリンク作成に失敗しました。"
-    exit 1
+    echo "[WARN] .gitignore_globalファイルがどの設定ディレクトリにも見つかりませんでした。"
 fi
-
-# Git に global gitignore を設定
-echo "[INFO] Git の core.excludesfile を更新しています..."
-git config --global core.excludesfile "$ignore_file"
-echo "[SUCCESS] Git の core.excludesfile に global gitignore を設定しました。"
-
-echo "[SUCCESS] gitignore_global の設定完了"
 
 # SSH エージェントとキーの確認
 echo ""

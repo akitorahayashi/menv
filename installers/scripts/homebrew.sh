@@ -1,21 +1,18 @@
 #!/bin/bash
 
-# 現在のスクリプトディレクトリを取得
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-REPO_ROOT="$( cd "$SCRIPT_DIR/.." && pwd )"
-
 # Function to verify brew/cask items
 verify_items() {
   local type=$1
+  local brewfile_path=$2
   local cmd=(brew info)
   [[ $type == "cask" ]] && cmd+=(--cask)
 
   while read -r item; do
     if ! "${cmd[@]}" "$item" &>/dev/null; then
-      echo "[ERROR] CI: ${type}パッケージ '$item' が見つかりません。"
+      echo "[ERROR] CI: ${type}パッケージ '$item' が見つかりません。（$brewfile_path）"
       verification_failed=true
     else
-      echo "[SUCCESS] CI: ${type}パッケージ '$item' はインストール可能です。"
+      echo "[SUCCESS] CI: ${type}パッケージ '$item' はインストール可能です。（$brewfile_path）"
     fi
   done < <(grep "^$type " "$brewfile_path" | awk -F'"' '{print $2}')
 }
@@ -47,30 +44,40 @@ fi
 # Brewfileのインストール
 echo ""
 echo "[Start] Homebrew パッケージのインストールを開始します..."
-brewfile_path="$REPO_ROOT/config/common/brew/Brewfile"
 
-if [ -f "$brewfile_path" ]; then
-    if [ "${CI:-false}" = "true" ]; then
-        # CI環境ではインストールせず存在確認のみ
-        echo "[INFO] CI: Brewfileのパッケージがインストール可能か確認します..."
-        verification_failed=false
+if [ $# -eq 0 ]; then
+    echo "[WARN] 設定ディレクトリが指定されていません。Brewfileのインストールをスキップします。"
+else
+    for config_dir in "$@"; do
+        brewfile_path="$config_dir/brew/Brewfile"
+        echo "[INFO] 処理中のBrewfile: $brewfile_path"
 
-        verify_items "brew"
-        verify_items "cask"
+        if [ -f "$brewfile_path" ]; then
+            if [ "${CI:-false}" = "true" ]; then
+                # CI環境ではインストールせず存在確認のみ
+                echo "[INFO] CI: Brewfileのパッケージがインストール可能か確認します..."
+                verification_failed=false
 
-        if [ "$verification_failed" = "true" ]; then
-            echo "[ERROR] CI: Brewfileの検証に失敗しました。"
-            exit 1
+                verify_items "brew" "$brewfile_path"
+                verify_items "cask" "$brewfile_path"
+
+                if [ "$verification_failed" = "true" ]; then
+                    echo "[ERROR] CI: Brewfileの検証に失敗しました: $brewfile_path"
+                    exit 1
+                else
+                    echo "[SUCCESS] CI: すべてのパッケージがインストール可能です: $brewfile_path"
+                fi
+            else
+                if ! brew bundle --file "$brewfile_path"; then
+                    echo "[ERROR] Brewfileからのパッケージインストールに失敗しました: $brewfile_path"
+                    exit 1
+                fi
+                echo "[OK] Homebrew パッケージのインストール/アップグレードが完了しました: $brewfile_path"
+            fi
         else
-            echo "[SUCCESS] CI: すべてのパッケージがインストール可能です。"
+            echo "[WARN] Brewfileが見つかりません。スキップします: $brewfile_path"
         fi
-    else
-        if ! brew bundle --file "$brewfile_path"; then
-            echo "[ERROR] Brewfileからのパッケージインストールに失敗しました"
-            exit 1
-        fi
-        echo "[OK] Homebrew パッケージのインストール/アップグレードが完了しました"
-    fi
+    done
 fi
 
 echo "[SUCCESS] Homebrewのセットアップが完了しました"
@@ -93,16 +100,22 @@ if [ "${CI:-false}" != "true" ]; then
     fi
 
     # パッケージの確認
-    if [ -f "$brewfile_path" ]; then
-        if ! brew bundle check --file="$brewfile_path"; then
-            echo "[ERROR] Brewfileで定義されたパッケージの一部がインストールされていません。"
-            verification_failed=true
-        else
-            echo "[SUCCESS] すべてのパッケージがインストールされています"
-        fi
+    if [ $# -eq 0 ]; then
+        echo "[INFO] 設定ディレクトリの指定がないため、パッケージチェックをスキップします。"
     else
-        echo "[WARN] Brewfileが見つかりません: $brewfile_path"
+        for config_dir in "$@"; do
+            brewfile_path="$config_dir/brew/Brewfile"
+            if [ -f "$brewfile_path" ]; then
+                if ! brew bundle check --file="$brewfile_path"; then
+                    echo "[ERROR] Brewfileで定義されたパッケージの一部がインストールされていません: $brewfile_path"
+                    verification_failed=true
+                else
+                    echo "[SUCCESS] すべてのパッケージがインストールされています: $brewfile_path"
+                fi
+            fi
+        done
     fi
+
 
     if [ "$verification_failed" = "true" ]; then
         echo "[ERROR] Homebrew環境の検証に失敗しました"

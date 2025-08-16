@@ -4,11 +4,17 @@
 SHELL := /bin/bash
 .SHELLFLAGS := -euo pipefail -c
 
-# Define script directory
-SCRIPT_DIR := $(CURDIR)/scripts
+# Directories
+export REPO_ROOT := $(CURDIR)
+SCRIPT_DIR := $(REPO_ROOT)/scripts
+CONFIG_DIR := $(REPO_ROOT)/config
+
+# Configuration
+MACHINES := macbook mac-mini
+COMPONENTS := brew git vscode ruby python java flutter node
 
 # Default target
-.DEFAULT_GOAL := all
+.DEFAULT_GOAL := help
 
 # Help command to display available targets
 .PHONY: help
@@ -16,58 +22,37 @@ help: ## Show this help message
 	@echo "Usage: make [target]"
 	@echo ""
 	@echo "Available targets:"
-	@awk 'BEGIN {FS=":.*## "; OFS=" "} /^[A-Za-z0-9_-]+:.*## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@awk 'BEGIN {FS=":.*## "; OFS=" "} /^[a-zA-Z0-9_-]+:.*## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-# Main setup target
+# === Dynamic Target Generation ===
+
+# Template for generating rules for a single machine and component
+define COMPONENT_template
+.PHONY: $(1)-$(2)
+$(1)-$(2): ## Setup $(2) for $(1) (common + specific)
+	@echo "🚀 Running $(2) setup for $(1)..."
+	@$(SHELL) -euo pipefail "$(SCRIPT_DIR)/$(2).sh" "$(CONFIG_DIR)/common" "$(CONFIG_DIR)/$(1)"
+
+.PHONY: only-$(1)-$(2)
+only-$(1)-$(2): ## Setup $(2) for $(1) (specific only)
+	@echo "🚀 Running $(2) setup for $(1) (specific only)..."
+	@$(SHELL) -euo pipefail "$(SCRIPT_DIR)/$(2).sh" "$(CONFIG_DIR)/$(1)"
+
+endef
+
+# Instantiate the template for each machine and component
+$(foreach machine,$(MACHINES),$(foreach component,$(COMPONENTS),$(eval $(call COMPONENT_template,$(machine),$(component)))))
+
+# === Aggregate Targets ===
+
+# Generate 'all' target for each machine
+$(foreach machine,$(MACHINES),$(eval .PHONY: $(machine)-all) $(eval $(machine)-all: $(addprefix $(machine)-,$(COMPONENTS))))
+$(foreach machine,$(MACHINES),$(eval $(machine)-all: ## Setup all components for $(machine)))
+
+# A new default 'all' target that runs the setup for a specific machine (e.g., macbook)
 .PHONY: all
-all: ## Run all setup scripts
-	@$(MAKE) brew
-	@$(MAKE) git
-	@$(MAKE) vscode
-	@$(MAKE) ruby
-	@$(MAKE) python
-	@$(MAKE) java
-	@$(MAKE) flutter
-	@$(MAKE) node
-	@echo "✅ All installer scripts completed successfully."
+all: macbook-all ## Run all setup scripts for MacBook by default
 
-# Individual setup targets
-.PHONY: brew
-brew: ## Setup Homebrew and install packages from Brewfile
-	@echo "🚀 Running Homebrew setup..."
-	@$(SHELL) -euo pipefail "$(SCRIPT_DIR)/homebrew.sh"
-
-.PHONY: git
-git: ## Configure Git settings
-	@echo "🚀 Running Git setup..."
-	@$(SHELL) -euo pipefail "$(SCRIPT_DIR)/git.sh"
-
-.PHONY: vscode
-vscode: ## Setup VS Code settings and extensions
-	@echo "🚀 Running VS Code setup..."
-	@$(SHELL) -euo pipefail "$(SCRIPT_DIR)/vscode.sh"
-
-.PHONY: ruby
-ruby: ## Setup Ruby environment with rbenv
-	@echo "🚀 Running Ruby setup..."
-	@$(SHELL) -euo pipefail "$(SCRIPT_DIR)/ruby.sh"
-
-.PHONY: python
-python: ## Setup Python environment with pyenv
-	@echo "🚀 Running Python setup..."
-	@$(SHELL) -euo pipefail "$(SCRIPT_DIR)/python.sh"
-
-.PHONY: java
-java: ## Setup Java environment
-	@echo "🚀 Running Java setup..."
-	@$(SHELL) -euo pipefail "$(SCRIPT_DIR)/java.sh"
-
-.PHONY: flutter
-flutter: ## Setup Flutter environment
-	@echo "🚀 Running Flutter setup..."
-	@$(SHELL) -euo pipefail "$(SCRIPT_DIR)/flutter.sh"
-
-.PHONY: node
-node: ## Setup Node.js environment with nvm
-	@echo "🚀 Running Node.js setup..."
-	@$(SHELL) -euo pipefail "$(SCRIPT_DIR)/node.sh"
+# For backward compatibility, create simple targets that default to macbook
+$(foreach component,$(COMPONENTS),$(eval .PHONY: $(component)) $(eval $(component): macbook-$(component)))
+$(foreach component,$(COMPONENTS),$(eval $(component): ## Setup $(component) for MacBook (default)))

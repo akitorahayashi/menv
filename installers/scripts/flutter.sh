@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# 現在のスクリプトディレクトリを取得
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-REPO_ROOT="$( cd "$SCRIPT_DIR/.." && pwd )"
 
 # 依存関係をインストール
 echo "[INFO] 依存関係をチェック・インストールします: fvm"

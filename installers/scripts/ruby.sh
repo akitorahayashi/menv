@@ -2,10 +2,6 @@
 
 unset RBENV_VERSION
 
-# 現在のスクリプトディレクトリを取得
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-REPO_ROOT="$( cd "$SCRIPT_DIR/../.." && pwd )"
-
 # 依存関係をインストール
 echo "[INFO] 依存関係をチェック・インストールします: openssl, rbenv"
 changed=false
@@ -41,19 +37,25 @@ echo "==== Start: Ruby環境のセットアップを開始します..."
 # rbenvを初期化して、以降のコマンドでrbenvのRubyが使われるようにする
 eval "$(rbenv init -)"
 
-# .ruby-versionファイルからRubyのバージョンを読み込む
-RUBY_VERSION_FILE="$REPO_ROOT/installers/config/common/ruby/.ruby-version"
-if [ ! -f "$RUBY_VERSION_FILE" ]; then
-    echo "[ERROR] .ruby-versionファイルが見つかりません: $RUBY_VERSION_FILE"
-    exit 1
-fi
-RUBY_VERSION="$(tr -d '[:space:]' < "$RUBY_VERSION_FILE")"
-readonly RUBY_VERSION
+# .ruby-versionファイルからRubyのバージョンを決定
+RUBY_VERSION=""
+for config_dir in "$@"; do
+    version_file="$config_dir/ruby/.ruby-version"
+    if [ -f "$version_file" ]; then
+        echo "[INFO] .ruby-version を読み込みます: $version_file"
+        version_from_file=$(tr -d '[:space:]' < "$version_file")
+        if [ -n "$version_from_file" ]; then
+            RUBY_VERSION="$version_from_file"
+            echo "[INFO] Rubyのバージョンを ${RUBY_VERSION} に設定します"
+        fi
+    fi
+done
+
 if [ -z "$RUBY_VERSION" ]; then
-    echo "[ERROR] .ruby-versionファイルからバージョンの読み込みに失敗しました。"
+    echo "[ERROR] .ruby-versionファイルが見つからないか、バージョンが指定されていません。"
     exit 1
 fi
-echo "[INFO] .ruby-versionで指定されたRubyのバージョンは ${RUBY_VERSION} です。"
+readonly RUBY_VERSION
 
 # 指定されたバージョンのRubyがインストールされていなければインストール
 if ! rbenv versions --bare | grep -q "^${RUBY_VERSION}$"; then
@@ -85,8 +87,16 @@ else
 fi
 
 # gemのインストール処理
-gem_file="${REPO_ROOT:-.}/installers/config/common/ruby/global-gems.rb"
-if [ ! -f "$gem_file" ]; then
+gem_file_path=""
+for config_dir in "$@"; do
+    if [ -f "$config_dir/ruby/global-gems.rb" ]; then
+        gem_file_path="$config_dir/ruby/global-gems.rb"
+        echo "[INFO] gem設定ファイルとして $gem_file_path を使用します"
+        break # 最初に見つかったものを使用
+    fi
+done
+
+if [ -z "$gem_file_path" ]; then
     echo "[INFO] global-gems.rbが見つかりません。gemのインストールをスキップします"
 else
     readonly BUNDLER_VERSION="2.5.22"
@@ -138,19 +148,21 @@ else
 fi
 
 # bundlerチェック
-if ! command -v bundle >/dev/null 2>&1; then
-    echo "[ERROR] bundlerコマンドが見つかりません"
-    exit 1
-fi
+if [ -n "$gem_file_path" ]; then
+    if ! command -v bundle >/dev/null 2>&1; then
+        echo "[ERROR] bundlerコマンドが見つかりません"
+        exit 1
+    fi
 
-# bundlerのバージョンが指定通りであることを確認
-current_version=$(bundle -v | grep -oE '[0-9]+\.[0-9]+\.[0-9]+(\.[a-zA-Z0-9]+)*' || echo "not-installed")
+    # bundlerのバージョンが指定通りであることを確認
+    current_version=$(bundle -v | grep -oE '[0-9]+\.[0-9]+\.[0-9]+(\.[a-zA-Z0-9]+)*' || echo "not-installed")
 
-if [ "$current_version" != "$BUNDLER_VERSION" ]; then
-    echo "[ERROR] bundlerのバージョンが異なります。期待: ${BUNDLER_VERSION}, 現在: ${current_version}"
-    exit 1
-else
-    echo "[SUCCESS] bundler: $(bundle -v)"
+    if [ "$current_version" != "$BUNDLER_VERSION" ]; then
+        echo "[ERROR] bundlerのバージョンが異なります。期待: ${BUNDLER_VERSION}, 現在: ${current_version}"
+        exit 1
+    else
+        echo "[SUCCESS] bundler: $(bundle -v)"
+    fi
 fi
 
 echo "[SUCCESS] Ruby環境の検証が完了しました"

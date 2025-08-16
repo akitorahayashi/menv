@@ -1,11 +1,5 @@
 #!/bin/bash
 
-# 現在のスクリプトディレクトリを取得
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-REPO_ROOT="$( cd "$SCRIPT_DIR/../.." && pwd )"
-
-
-
 # 依存関係をインストール
 echo "[INFO] 依存関係をチェック・インストールします: nvm, jq"
 dependencies_changed=false
@@ -33,24 +27,26 @@ fi
 
 echo "[Start] Node.js のセットアップを開始します..."
 
-# .nvmrcファイルからNode.jsのバージョンを読み込む
-NODE_VERSION_FILE="$REPO_ROOT/installers/config/common/node/.nvmrc"
-if [ ! -f "$NODE_VERSION_FILE" ]; then
-    echo "[ERROR] .nvmrcファイルが見つかりません: $NODE_VERSION_FILE"
-    exit 1
-fi
+# .nvmrcからNode.jsのバージョンを決定
 NODE_VERSION=""
-if ! read -r NODE_VERSION < "$NODE_VERSION_FILE"; then
-    echo "[ERROR] .nvmrcファイルからバージョンの読み込みに失敗しました。"
-    exit 1
-fi
-NODE_VERSION="${NODE_VERSION//[[:space:]]/}"
-readonly NODE_VERSION
+for config_dir in "$@"; do
+    nvmrc_path="$config_dir/node/.nvmrc"
+    if [ -f "$nvmrc_path" ]; then
+        echo "[INFO] .nvmrc を読み込みます: $nvmrc_path"
+        # shellcheck disable=SC2002
+        version_from_file=$(cat "$nvmrc_path" | tr -d '[:space:]')
+        if [ -n "$version_from_file" ]; then
+            NODE_VERSION="$version_from_file"
+            echo "[INFO] Node.jsのバージョンを ${NODE_VERSION} に設定します"
+        fi
+    fi
+done
+
 if [ -z "$NODE_VERSION" ]; then
-    echo "[ERROR] .nvmrcファイルからバージョンの読み込みに失敗しました。"
+    echo "[ERROR] .nvmrcファイルが見つからないか、バージョンが指定されていません。"
     exit 1
 fi
-echo "[INFO] .nvmrcで指定されたNode.jsのバージョンは ${NODE_VERSION} です。"
+readonly NODE_VERSION
 
 # nvm経由でNode.jsをインストール・設定
 node_changed=false
@@ -104,49 +100,57 @@ if [ "$node_changed" = true ]; then
 fi
 
 # グローバルパッケージのインストール
-packages_file="$REPO_ROOT/installers/config/common/node/global-packages.json"
-if [ ! -f "$packages_file" ]; then
-    echo "[ERROR] global-packages.json が見つかりません: $packages_file"
-    exit 1
-fi
+package_files=()
+for config_dir in "$@"; do
+    packages_file="$config_dir/node/global-packages.json"
+    if [ -f "$packages_file" ]; then
+        package_files+=("$packages_file")
+    fi
+done
 
-echo "[INFO] グローバルパッケージをチェック中..."
-packages_json=$(jq -r '.globalPackages | to_entries[] | "\(.key)@\(.value)"' "$packages_file" 2>/dev/null)
-if [ -z "$packages_json" ]; then
-    echo "[WARN] global-packages.json にパッケージが定義されていません"
+if [ ${#package_files[@]} -eq 0 ]; then
+    echo "[WARN] global-packages.json が見つかりませんでした。パッケージのインストールをスキップします。"
 else
-    packages_changed=false
-    while IFS= read -r entry; do
-        pkg_full="$entry"
-        pkg_name="${entry%@*}"
-        installed_version=$(npm list -g --depth=0 "$pkg_name" | grep -E "$pkg_name@[0-9]" | awk -F'@' '{print $NF}' || true)
-        required_version=$(echo "$pkg_full" | awk -F'@' '{print $NF}')
-        if [ "$required_version" == "latest" ]; then
-            if [ -z "$installed_version" ]; then
+    echo "[INFO] グローバルパッケージをチェック中..."
+    # jqを使用してすべてのファイルからパッケージをマージ
+    packages_json=$(jq -s 'map(.globalPackages) | add | to_entries[] | "\(.key)@\(.value)"' "${package_files[@]}")
+
+    if [ -z "$packages_json" ]; then
+        echo "[WARN] global-packages.json にパッケージが定義されていません"
+    else
+        packages_changed=false
+        while IFS= read -r entry; do
+            pkg_full="$entry"
+            pkg_name="${entry%@*}"
+            installed_version=$(npm list -g --depth=0 "$pkg_name" 2>/dev/null | grep -E "$pkg_name@[0-9]" | awk -F'@' '{print $NF}' || true)
+            required_version=$(echo "$pkg_full" | awk -F'@' '{print $NF}')
+            if [ "$required_version" == "latest" ]; then
+                if [ -z "$installed_version" ]; then
+                    if npm install -g "$pkg_full"; then
+                        echo "[SUCCESS] $pkg_name のインストールが完了しました"
+                        packages_changed=true
+                    else
+                        echo "[ERROR] $pkg_name のインストールに失敗しました"
+                        exit 1
+                    fi
+                else
+                    echo "[INSTALLED] $pkg_name (latest)"
+                fi
+            elif [ "$installed_version" != "$required_version" ]; then
                 if npm install -g "$pkg_full"; then
-                    echo "[SUCCESS] $pkg_name のインストールが完了しました"
+                    echo "[SUCCESS] $pkg_name の更新が完了しました"
                     packages_changed=true
                 else
-                    echo "[ERROR] $pkg_name のインストールに失敗しました"
+                    echo "[ERROR] $pkg_name の更新に失敗しました"
                     exit 1
                 fi
             else
-                echo "[INSTALLED] $pkg_name (latest)"
+                echo "[INSTALLED] $pkg_name"
             fi
-        elif [ "$installed_version" != "$required_version" ]; then
-            if npm install -g "$pkg_full"; then
-                echo "[SUCCESS] $pkg_name の更新が完了しました"
-                packages_changed=true
-            else
-                echo "[ERROR] $pkg_name の更新に失敗しました"
-                exit 1
-            fi
-        else
-            echo "[INSTALLED] $pkg_name"
+        done <<< "$packages_json"
+        if [ "$packages_changed" = true ]; then
+            echo "IDEMPOTENCY_VIOLATION" >&2
         fi
-    done <<< "$packages_json"
-    if [ "$packages_changed" = true ]; then
-        echo "IDEMPOTENCY_VIOLATION" >&2
     fi
 fi
 
@@ -157,57 +161,37 @@ echo ""
 echo "==== Start: Node.js 環境を検証中... ===="
 verification_failed=false
 
-# .nvmrcから期待されるバージョンを再度読み込む
-NODE_VERSION_FILE_VERIFY="$REPO_ROOT/installers/config/common/node/.nvmrc"
-if [ ! -f "$NODE_VERSION_FILE_VERIFY" ]; then
-    echo "[ERROR] .nvmrcファイルが見つかりません: $NODE_VERSION_FILE_VERIFY"
-    exit 1
-fi
-EXPECTED_NODE_VERSION_VERIFY=""
-if ! read -r EXPECTED_NODE_VERSION_VERIFY < "$NODE_VERSION_FILE_VERIFY"; then
-    echo "[ERROR] .nvmrcファイルからバージョンの読み込みに失敗しました: $NODE_VERSION_FILE_VERIFY"
-    exit 1
-fi
-EXPECTED_NODE_VERSION_VERIFY="${EXPECTED_NODE_VERSION_VERIFY//[[:space:]]/}"
-readonly EXPECTED_NODE_VERSION_VERIFY
-if [ -z "$EXPECTED_NODE_VERSION_VERIFY" ]; then
-    echo "[ERROR] .nvmrcファイルは空か、読み取りに失敗しました: $NODE_VERSION_FILE_VERIFY"
-    exit 1
-fi
-
-# nvmが示す現在のバージョンが期待通りか確認
-# 'nvm version'はエイリアスを解決してくれる
-EXPECTED_VERSION_STRING=$(nvm version "$EXPECTED_NODE_VERSION_VERIFY")
+# 期待されるバージョンがインストール時に決定した`NODE_VERSION`であるべき
+EXPECTED_VERSION_STRING=$(nvm version "$NODE_VERSION")
 CURRENT_VERSION_STRING=$(nvm current)
 
 if [ "$CURRENT_VERSION_STRING" != "$EXPECTED_VERSION_STRING" ]; then
-    echo "[ERROR] Node.jsのバージョンが期待値と異なります。期待: ${EXPECTED_NODE_VERSION_VERIFY} (${EXPECTED_VERSION_STRING}), 現在: ${CURRENT_VERSION_STRING}"
+    echo "[ERROR] Node.jsのバージョンが期待値と異なります。期待: ${NODE_VERSION} (${EXPECTED_VERSION_STRING}), 現在: ${CURRENT_VERSION_STRING}"
     verification_failed=true
 else
     echo "[SUCCESS] Node.js: $(node --version)"
     echo "[SUCCESS] npm: $(npm --version)"
 fi
 
-packages_file="$REPO_ROOT/installers/config/common/node/global-packages.json"
-if [ ! -f "$packages_file" ]; then
-    echo "[ERROR] global-packages.json が見つかりません: $packages_file"
-    exit 1
-fi
-
-packages_json=$(jq -r '.globalPackages | keys[]' "$packages_file" 2>/dev/null)
-missing=0
-if [ -n "$packages_json" ]; then
-    while IFS= read -r package; do
-        if ! npm list -g "$package" &>/dev/null; then
-            echo "[ERROR] グローバルパッケージ $package がインストールされていません"
-            ((missing++))
-        else
-            echo "[SUCCESS] グローバルパッケージ $package がインストールされています"
-        fi
-    done <<< "$packages_json"
-fi
-if [ "$missing" -gt 0 ]; then
-    verification_failed=true
+# グローバルパッケージの検証
+if [ ${#package_files[@]} -gt 0 ]; then
+    # jqを使用してすべてのファイルからパッケージ名をマージ
+    packages_to_check=$(jq -s 'map(.globalPackages) | add | keys[]' "${package_files[@]}")
+    missing=0
+    if [ -n "$packages_to_check" ]; then
+        while IFS= read -r pkg; do
+            package_name=$(echo "$pkg" | tr -d '"') # remove quotes
+            if ! npm list -g "$package_name" &>/dev/null; then
+                echo "[ERROR] グローバルパッケージ $package_name がインストールされていません"
+                ((missing++))
+            else
+                echo "[SUCCESS] グローバルパッケージ $package_name がインストールされています"
+            fi
+        done <<< "$packages_to_check"
+    fi
+    if [ "$missing" -gt 0 ]; then
+        verification_failed=true
+    fi
 fi
 
 if [ "$verification_failed" = "true" ]; then
