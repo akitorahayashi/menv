@@ -79,7 +79,7 @@ cmn-brew:
 # Configure GitHub CLI (gh) settings
 cmn-gh:
   @echo "🚀 Running common GitHub CLI setup..."
-  @just _run_ansible "gh" "{{config_common}}"
+  @just _run_ansible "git" "{{config_common}}"
 
 # Configure Git settings
 cmn-git:
@@ -196,7 +196,7 @@ mmn-nodejs-tools:
 # Install Mac Mini-specific Python tools
 mmn-python-tools:
   @echo "🚀 Installing Mac Mini-specific Python tools from config: {{config_mac_mini}}"
-  @just _run_ansible "python-toolsa" "{{config_mac_mini}}"
+  @just _run_ansible "python-tools" "{{config_mac_mini}}"
 
 # Install Mac Mini-specific GUI applications (casks)
 mmn-apps:
