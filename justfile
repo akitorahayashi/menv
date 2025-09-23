@@ -57,6 +57,7 @@ common:
   @just cmn-cld
   @just cmn-gm
   @just cmn-mcp
+  @just cmn-slash
   @just cmn-cursor
   @just cmn-ruby
   @just cmn-java
@@ -150,6 +151,14 @@ cmn-gm:
 cmn-mcp:
   @echo "🚀 Running common MCP setup..."
   @just _run_ansible "mcp" "{{config_common}}"
+
+# Generate both Claude and Gemini slash commands
+cmn-slash:
+  @echo "🚀 Generating unified slash commands..."
+  @echo "🚀 Generating Claude Code slash commands..."
+  @{{config_common}}/slash/claude.sh
+  @echo "🚀 Generating Gemini CLI slash commands..."
+  @{{config_common}}/slash/gemini.sh
 
 # Install common GUI applications (casks)
 cmn-apps:
