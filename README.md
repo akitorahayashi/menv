@@ -192,25 +192,21 @@ This project uses Ansible to automate the setup of a complete development enviro
 12.  **Claude Code Environment (`claude` role)**
     -   Creates the `~/.claude` directory for Claude Code configuration.
     -   Symlinks configuration files (`CLAUDE.md`, `settings.json`, `mcp-servers.json`) from `config/common/claude/` to `~/.claude/`.
+    -   Generates slash commands from unified configuration in `config/common/slash/`.
     -   Installs MCP servers using the Claude CLI based on the configuration in `mcp-servers.json`, using environment variables for API tokens (`GITHUB_PERSONAL_ACCESS_TOKEN`, `OBSIDIAN_API_KEY`).
 
 13.  **Gemini CLI Environment (`gemini` role)**
     -   Creates the `~/.gemini` directory for Gemini CLI configuration.
     -   Symlinks configuration files (`GEMINI.md`, `settings.json`) from `config/common/gemini/` to `~/.gemini/`.
+    -   Generates slash commands from unified configuration in `config/common/slash/`.
     -   Configures MCP servers via the symlinked `settings.json` file, using environment variables for API tokens.
 
-14.  **Unified Slash Commands (`slash` role)**
-    -   Generates Claude Code and Gemini CLI slash commands from unified configuration.
-    -   Uses `config/common/slash/config.json` for command metadata and `config/common/slash/commands/` for prompt content.
-    -   Automatically creates platform-specific command files in `~/.claude/commands/` and `~/.gemini/commands/`.
-    -   Provides centralized management of AI assistant commands with DRY principle.
-
-15.  **MCP Servers Configuration (`mcp` role)**
+14.  **MCP Servers Configuration (`mcp` role)**
     -   Configures Model Context Protocol (MCP) servers for enhanced AI capabilities.
     -   Sets up Context7, Serena, VOICEVOX, and other MCP servers with proper authentication.
     -   Manages server configurations and API token integration for Claude Code and Gemini CLI.
 
-16.  **Docker Environment (`docker` role)**
+15.  **Docker Environment (`docker` role)**
     -   Pulls and manages Docker images listed in `config/common/docker/images.txt`.
     -   Ensures consistent containerized development environment across machines.
     -   Provides foundation for containerized development workflows.
