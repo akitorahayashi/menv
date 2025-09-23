@@ -22,7 +22,6 @@
     - { role: cursor, tags: ['cursor'] }
     - { role: claude, tags: ['claude'] }
     - { role: gemini, tags: ['gemini'] }
-    - { role: slash, tags: ['slash'] }
     - { role: mcp, tags: ['mcp'] }
     - { role: system, tags: ['system'] }
     - { role: docker, tags: ['docker'] }
