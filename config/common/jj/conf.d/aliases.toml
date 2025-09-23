@@ -1,0 +1,6 @@
+# JJ (Jujutsu) command aliases configuration
+# This file defines custom aliases for commonly used jj commands
+
+# Diff aliases
+# df-r: Show diff with -r flag for recursive comparison
+df-r = ["diff", "-r"]
