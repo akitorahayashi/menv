@@ -151,6 +151,7 @@ cmn-mcp:
   @echo "🚀 Running common MCP setup..."
   @just _run_ansible "mcp" "{{config_common}}"
 
+
 # Install common GUI applications (casks)
 cmn-apps:
   @echo "🚀 Installing common GUI applications..."
