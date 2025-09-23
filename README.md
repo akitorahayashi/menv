@@ -81,7 +81,7 @@ This project automates the setup of a consistent development environment across 
     - Install Ansible if not already installed
     - Install the `just` command runner
 
-    **Important**: After running `make base`, edit the `.env` file to set your `GIT_USERNAME` and `GIT_EMAIL` before proceeding to the next step.
+    **Important**: After running `make base`, edit the `.env` file to set your `PERSONAL_VCS_NAME`, `PERSONAL_VCS_EMAIL`, `WORK_VCS_NAME`, and `WORK_VCS_EMAIL` before proceeding to the next step.
 
 2.  **Install Various Tools and Packages**
 
@@ -109,6 +109,15 @@ These commands are recommended to be run manually once after initial setup:
 - **Install common GUI applications**: `just cmn-apps` - Installs common GUI applications via Homebrew Cask.
 - **Install Mac Mini-specific GUI applications**: `just mmn-apps` - Installs Mac Mini-specific GUI applications via Homebrew Cask.
 - **Pull Docker images**: `just cmn-docker-images` - Pulls Docker images listed in `config/common/docker/images.txt`.
+
+### VCS User Profile Switching
+
+After setup, you can easily switch between personal and work configurations for Git and JJ (Jujutsu):
+
+- **Switch to personal configuration**: `just sw-p` - Sets personal VCS user name and email.
+- **Switch to work configuration**: `just sw-w` - Sets work VCS user name and email.
+
+These commands update both Git and JJ global configurations simultaneously using the environment variables defined in `.env`.
 
 ## Implemented Features
 
