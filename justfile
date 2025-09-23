@@ -2,6 +2,8 @@
 # justfile for macOS Environment Setup
 # ==============================================================================
 
+set dotenv-load
+
 # ------------------------------------------------------------------------------
 # Variables
 # ------------------------------------------------------------------------------
@@ -16,6 +18,27 @@ config_mac_mini := "config/mac-mini-only"
 default: help
 
 # ------------------------------------------------------------------------------
+# User Profile Switching
+# ------------------------------------------------------------------------------
+# Switch to personal Git/JJ configuration
+sw-p:
+  @echo "🔄 Switching to personal configuration..."
+  @git config --global user.name "{{env('PERSONAL_VCS_NAME')}}"
+  @git config --global user.email "{{env('PERSONAL_VCS_EMAIL')}}"
+  @jj config set --user user.name "{{env('PERSONAL_VCS_NAME')}}"
+  @jj config set --user user.email "{{env('PERSONAL_VCS_EMAIL')}}"
+  @echo "✅ Switched to personal configuration ({{env('PERSONAL_VCS_NAME')}} <{{env('PERSONAL_VCS_EMAIL')}}>)"
+
+# Switch to work Git/JJ configuration
+sw-w:
+  @echo "🔄 Switching to work configuration..."
+  @git config --global user.name "{{env('WORK_VCS_NAME')}}"
+  @git config --global user.email "{{env('WORK_VCS_EMAIL')}}"
+  @jj config set --user user.name "{{env('WORK_VCS_NAME')}}"
+  @jj config set --user user.email "{{env('WORK_VCS_EMAIL')}}"
+  @echo "✅ Switched to work configuration ({{env('WORK_VCS_NAME')}} <{{env('WORK_VCS_EMAIL')}}>)"
+
+# ------------------------------------------------------------------------------
 # Common Setup Recipes
 # ------------------------------------------------------------------------------
 # Run all common setup tasks
@@ -24,6 +47,7 @@ common:
   @just cmn-shell
   @just cmn-apply-system
   @just cmn-git
+  @just cmn-jj
   @just cmn-gh
   @just cmn-vscode
   @just cmn-python-platform
@@ -61,6 +85,11 @@ cmn-gh:
 cmn-git:
   @echo "🚀 Running common Git setup..."
   @just _run_ansible "git" "{{config_common}}"
+
+# Configure JJ (Jujutsu) settings
+cmn-jj:
+  @echo "🚀 Running common JJ setup..."
+  @just _run_ansible "jj" "{{config_common}}"
 
 # Setup Java environment
 cmn-java:
@@ -155,7 +184,7 @@ mbk-python-tools:
 # ------------------------------------------------------------------------------
 # Install specific Homebrew packages
 mmn-brew:
-  @echo "  -> Running Homebrew setup with config: {{config_mac_mini}}"
+  @echo "🚀 Running Homebrew setup with config: {{config_mac_mini}}"
   @just _run_ansible "brew" "{{config_mac_mini}}"
 
 # Install Mac Mini-specific Node.js tools
