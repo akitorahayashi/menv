@@ -1,19 +1,18 @@
 [aliases]
-# Common aliases for easier use
-l = ["log"]
-lg = ["log", "--graph"]
-s = ["status"]
-d = ["diff"]
-co = ["checkout"]
+l = ["log", "--reversed"]
+st = ["status"]
+df = ["diff"]
+df-r = ["diff -r"]
 n = ["new"]
+n-m = ["new", "-m"]
+ds = ["describe"]
 e = ["edit"]
-sp = ["split"]
 sq = ["squash"]
+sp = ["split"]
+ev = ["evolog"]
 
 [revset-aliases]
-# Useful revset aliases
 "recent()" = "heads(::@- ~ ..main-)"
 
 [template-aliases]
-# Template for better log output
 'format_timestamp(timestamp)' = 'timestamp.format("%Y-%m-%d %H:%M")'
