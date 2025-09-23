@@ -2,7 +2,7 @@
 l = ["log", "--reversed"]
 st = ["status"]
 df = ["diff"]
-df-r = ["diff -r"]
+df-r = ["diff, -r"]
 n = ["new"]
 n-m = ["new", "-m"]
 ds = ["describe"]
