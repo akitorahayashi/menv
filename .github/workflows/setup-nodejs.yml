@@ -32,3 +32,6 @@ jobs:
 
       - name: Run gemini setup
         run: just cmn-gm
+
+      - name: Run gemini setup
+        run: just cmn-slash
