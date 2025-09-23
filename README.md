@@ -147,13 +147,11 @@ This project uses Ansible to automate the setup of a complete development enviro
     -   Installs `git` and the GitHub CLI (`gh`) via Homebrew.
     -   Copies the `.gitconfig` file to `~/.config/git/config`.
     -   Symlinks the `.gitignore_global` file to the home directory.
-    -   Sets the `user.name` and `user.email` in the global Git configuration from environment variables (`PERSONAL_VCS_NAME`, `PERSONAL_VCS_EMAIL`).
     -   Configures the GitHub CLI by symlinking the `ghconfig.yml` from `config/common/git/`.
 
 5.  **JJ (Jujutsu VCS) Configuration (`jj` role)**
     -   Installs JJ (Jujutsu) via Homebrew.
     -   Copies JJ configuration files (`config.toml`, `aliases.toml`) to `~/.jjconfig/`.
-    -   Sets user configuration (`user.name`, `user.email`) from environment variables.
     -   Enables version control systems to work alongside Git for next-generation VCS workflows.
 
 6.  **macOS System Settings (`system` role)**
