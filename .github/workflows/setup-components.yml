@@ -18,6 +18,7 @@ jobs:
           - java
           - cursor
           - mcp
+          - ssh
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

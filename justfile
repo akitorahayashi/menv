@@ -45,6 +45,7 @@ sw-w:
 common:
   @echo "🚀 Starting all common setup tasks..."
   @just cmn-shell
+  @just cmn-ssh
   @just cmn-apply-system
   @just cmn-git
   @just cmn-jj
@@ -119,6 +120,11 @@ cmn-ruby:
 cmn-shell:
   @echo "🚀 Linking common shell configuration..."
   @just _run_ansible "shell" "{{config_common}}"
+
+# Setup SSH configuration
+cmn-ssh:
+  @echo "🚀 Running common SSH setup..."
+  @just _run_ansible "ssh" "{{config_common}}"
 
 # Setup VS Code settings and extensions
 cmn-vscode:
@@ -226,4 +232,4 @@ _run_ansible tags config_dir:
   @if [ ! -f .env ]; then echo "❌ Error: .env file not found. Please run 'make base' first."; exit 1; fi && \
   export $(grep -v '^#' .env | xargs) && \
   export ANSIBLE_CONFIG={{repo_root}}/ansible/ansible.cfg && \
-  ~/.local/pipx/venvs/ansible/bin/ansible-playbook -i {{inventory}} {{playbook}} --tags "{{tags}}" -e "config_dir_abs_path={{repo_root}}/{{config_dir}}"
+  ~/.local/pipx/venvs/ansible/bin/ansible-playbook -i {{inventory}} {{playbook}} --tags "{{tags}}" -e "config_dir_abs_path={{repo_root}}/{{config_dir}}" -e "repo_root_path={{repo_root}}" -e "repo_root_path={{repo_root}}"
