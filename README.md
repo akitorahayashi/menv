@@ -151,7 +151,7 @@ This project uses Ansible to automate the setup of a complete development enviro
 
 5.  **JJ (Jujutsu VCS) Configuration (`jj` role)**
     -   Installs JJ (Jujutsu) via Homebrew.
-    -   Copies JJ configuration files (`config.toml`, `aliases.toml`) to `~/.jjconfig/`.
+    -   Copies `.jjconfig.toml` to `~/.jjconfig.toml` (highest priority configuration).
     -   Enables version control systems to work alongside Git for next-generation VCS workflows.
 
 6.  **macOS System Settings (`system` role)**
