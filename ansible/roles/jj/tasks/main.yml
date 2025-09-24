@@ -4,10 +4,16 @@
     name: jj
     state: present
 
-- name: "Copy jj .jjconfig.toml to $HOME (highest priority)"
+- name: "Ensure .jj directory exists"
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.jj"
+    state: directory
+    mode: '0755'
+
+- name: "Copy jj config.toml to $HOME/.jj/ (user-level config)"
   ansible.builtin.copy:
     src: "{{ config_dir_abs_path }}/jj/.jjconfig.toml"
-    dest: "{{ ansible_env.HOME }}/.jjconfig.toml"
+    dest: "{{ ansible_env.HOME }}/.jj/config.toml"
     force: true
     mode: '0644'
 

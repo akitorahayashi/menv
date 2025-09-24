@@ -25,18 +25,24 @@ sw-p:
   @echo "🔄 Switching to personal configuration..."
   @git config --global user.name "{{env('PERSONAL_VCS_NAME')}}"
   @git config --global user.email "{{env('PERSONAL_VCS_EMAIL')}}"
-  @jj config set --user user.name "{{env('PERSONAL_VCS_NAME')}}"
-  @jj config set --user user.email "{{env('PERSONAL_VCS_EMAIL')}}"
-  @echo "✅ Switched to personal configuration ({{env('PERSONAL_VCS_NAME')}} <{{env('PERSONAL_VCS_EMAIL')}}>)"
+  @echo '[user]' > ~/.jjconfig.toml
+  @echo 'name = "{{env('PERSONAL_VCS_NAME')}}"' >> ~/.jjconfig.toml
+  @echo 'email = "{{env('PERSONAL_VCS_EMAIL')}}"' >> ~/.jjconfig.toml
+  @echo "✅ Switched to personal configuration."
+  @echo "Git user: `git config --get user.name` <`git config --get user.email`>"
+  @echo "jj  user: `jj config get user.name` <`jj config get user.email`>"
 
 # Switch to work Git/JJ configuration
 sw-w:
   @echo "🔄 Switching to work configuration..."
   @git config --global user.name "{{env('WORK_VCS_NAME')}}"
   @git config --global user.email "{{env('WORK_VCS_EMAIL')}}"
-  @jj config set --user user.name "{{env('WORK_VCS_NAME')}}"
-  @jj config set --user user.email "{{env('WORK_VCS_EMAIL')}}"
-  @echo "✅ Switched to work configuration ({{env('WORK_VCS_NAME')}} <{{env('WORK_VCS_EMAIL')}}>)"
+  @echo '[user]' > ~/.jjconfig.toml
+  @echo 'name = "{{env('WORK_VCS_NAME')}}"' >> ~/.jjconfig.toml
+  @echo 'email = "{{env('WORK_VCS_EMAIL')}}"' >> ~/.jjconfig.toml
+  @echo "✅ Switched to work configuration."
+  @echo "Git user: `git config --get user.name` <`git config --get user.email`>"
+  @echo "jj  user: `jj config get user.name` <`jj config get user.email`>"
 
 # ------------------------------------------------------------------------------
 # Common Setup Recipes
