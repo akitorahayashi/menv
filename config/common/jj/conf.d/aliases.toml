@@ -1,5 +1,6 @@
 [aliases]
 l = ["log", "--reversed"]
+lg = ["l"]
 st = ["status"]
 df = ["diff"]
 df-r = ["diff", "-r"]

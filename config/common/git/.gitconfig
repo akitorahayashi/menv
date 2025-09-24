@@ -53,7 +53,8 @@
     tg-d-rm = push --delete origin
 
     mr = merge
-    lg = log --oneline --graph --decorate --all -n 15
+    l = log --oneline --graph --decorate --all -n 15
+    lg = l
 
 [core]
 	excludesfile = ~/.gitignore_global
