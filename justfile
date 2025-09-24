@@ -48,7 +48,6 @@ common:
   @just cmn-apply-system
   @just cmn-git
   @just cmn-jj
-  @just cmn-gh
   @just cmn-vscode
   @just cmn-python-platform
   @just cmn-python-tools
@@ -75,11 +74,6 @@ cmn-apply-system:
 cmn-brew:
   @echo "  -> Running Homebrew setup with config: {{config_common}}"
   @just _run_ansible "brew" "{{config_common}}"
-
-# Configure GitHub CLI (gh) settings
-cmn-gh:
-  @echo "🚀 Running common GitHub CLI setup..."
-  @just _run_ansible "git" "{{config_common}}"
 
 # Configure Git settings
 cmn-git:
