@@ -1,4 +1,3 @@
-# git
 alias g="git"
 alias gi="git"
 
