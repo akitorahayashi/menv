@@ -3,15 +3,20 @@
 
 from __future__ import annotations
 
-import argparse
 import os
 import re
 import subprocess
-import sys
 from pathlib import Path
+
+import typer
+from rich.console import Console
+from rich.table import Table
 
 VALID_KEY_TYPES = ("ed25519", "rsa", "ecdsa")
 HOST_PATTERN = re.compile(r"^[A-Za-z0-9._-]+$")
+
+app = typer.Typer(help="Manage SSH keys and per-host configuration snippets.")
+console = Console()
 
 
 def _home() -> Path:
@@ -56,70 +61,96 @@ def _write_host_config(host: str, key_type: str, config_path: Path) -> None:
     os.chmod(config_path, 0o600)
 
 
-def _handle_generate_key(args: argparse.Namespace) -> int:
-    host = args.host
-    key_type = args.type
-
-    if key_type not in VALID_KEY_TYPES:
-        print(
-            f"Error: Unsupported key type '{key_type}' (allowed: {('|'.join(VALID_KEY_TYPES))}).",
-            file=sys.stderr,
+def _validate_host(host: str) -> None:
+    if not HOST_PATTERN.fullmatch(host):
+        console.print(
+            f"[bold red]Error[/]: Invalid host '{host}' (allowed: [A-Za-z0-9._-]+)."
         )
-        return 1
+        raise typer.Exit(1)
 
-    if not HOST_PATTERN.match(host):
-        print(
-            f"Error: Invalid host '{host}' (allowed: [A-Za-z0-9._-]+).",
-            file=sys.stderr,
+
+def _ensure_new_paths(*paths: Path) -> None:
+    for path in paths:
+        if path.exists():
+            console.print(
+                f"[bold red]Error[/]: {path} already exists. Refusing to overwrite."
+            )
+            raise typer.Exit(1)
+
+
+@app.command("gk")
+def generate_key(
+    key_type: str = typer.Argument(..., help="SSH key type", metavar="TYPE"),
+    host: str = typer.Argument(..., help="Host alias", metavar="HOST"),
+) -> None:
+    """Generate a key and config snippet for a host."""
+
+    normalized_type = key_type.lower()
+    if normalized_type not in VALID_KEY_TYPES:
+        console.print(
+            "[bold red]Error[/]: Unsupported key type '",
+            normalized_type,
+            "' (allowed: ",
+            "|".join(VALID_KEY_TYPES),
+            ").",
+            sep="",
         )
-        return 1
+        raise typer.Exit(1)
+
+    _validate_host(host)
 
     ssh_dir = _ssh_dir()
     conf_dir = _conf_dir()
     ssh_dir.mkdir(parents=True, exist_ok=True)
     conf_dir.mkdir(parents=True, exist_ok=True)
 
-    key_path = ssh_dir / f"id_{key_type}_{host}"
+    key_path = ssh_dir / f"id_{normalized_type}_{host}"
+    pub_key_path = Path(str(key_path) + ".pub")
     config_path = conf_dir / f"{host}.conf"
 
-    if config_path.exists():
-        print(f"Error: Config for host '{host}' already exists.", file=sys.stderr)
-        return 1
+    _ensure_new_paths(key_path, pub_key_path, config_path)
 
-    if key_path.exists() or Path(str(key_path) + ".pub").exists():
-        print(f"Error: Key files already exist: '{key_path}'(.pub).", file=sys.stderr)
-        return 1
+    _run_ssh_keygen(normalized_type, key_path, host)
+    _write_host_config(host, normalized_type, config_path)
 
-    _run_ssh_keygen(key_type, key_path, host)
-    _write_host_config(host, key_type, config_path)
-
-    pub_key_path = Path(str(key_path) + ".pub")
-    print(f"✅ SSH key and config for '{host}' created.")
+    console.print(f"[bold green]✅[/] SSH key and config for '{host}' created.")
     if pub_key_path.exists():
-        print("🔑 Public key:")
-        print(pub_key_path.read_text().strip())
-    return 0
+        console.print("[bold]🔑 Public key:[/]")
+        console.print(pub_key_path.read_text().strip())
 
 
-def _handle_list(_: argparse.Namespace) -> int:
+@app.command("ls")
+def list_hosts() -> None:
+    """List configured hosts."""
+
     conf_dir = _conf_dir()
     if not conf_dir.exists():
-        return 0
+        console.print("[italic]No SSH hosts configured yet.[/]")
+        return
+
+    table = Table(title="SSH Hosts", show_lines=False)
+    table.add_column("Host", justify="left", style="cyan", no_wrap=True)
 
     for conf_file in sorted(conf_dir.glob("*.conf")):
-        print(conf_file.stem)
-    return 0
+        table.add_row(conf_file.stem)
+
+    console.print(table)
 
 
-def _handle_remove(args: argparse.Namespace) -> int:
-    host = args.host
+@app.command("rm")
+def remove_host(
+    host: str = typer.Argument(..., help="Host alias to remove", metavar="HOST"),
+) -> None:
+    """Remove a host configuration and associated keys."""
+
+    _validate_host(host)
     config_path = _conf_dir() / f"{host}.conf"
 
     if not config_path.exists():
-        print(f"Error: Config for host '{host}' not found.", file=sys.stderr)
-        return 1
+        console.print(f"[bold red]Error[/]: Config for host '{host}' not found.")
+        raise typer.Exit(1)
 
-    identity_file = None
+    identity_file: Path | None = None
     for line in config_path.read_text().splitlines():
         stripped = line.strip()
         if stripped.lower().startswith("identityfile"):
@@ -134,45 +165,15 @@ def _handle_remove(args: argparse.Namespace) -> int:
         for path in (priv_path, pub_path):
             if path.exists():
                 path.unlink()
-        print(f"🗑️ Removed key files for {host}.")
+        console.print(f"[bold yellow]🗑️[/] Removed key files for {host}.")
 
     config_path.unlink()
-    print(f"🗑️ Removed config file for '{host}'.")
-    return 0
+    console.print(f"[bold yellow]🗑️[/] Removed config file for '{host}'.")
 
 
-def _build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
-        description="Manage SSH keys and host configurations."
-    )
-    subparsers = parser.add_subparsers(dest="command", required=True)
-
-    parser_gk = subparsers.add_parser(
-        "gk", help="Generate a key and config snippet for a host."
-    )
-    parser_gk.add_argument("type", help="SSH key type", choices=list(VALID_KEY_TYPES))
-    parser_gk.add_argument("host", help="Host alias")
-
-    parser_ls = subparsers.add_parser("ls", help="List configured hosts.")
-    parser_ls.set_defaults(func=_handle_list)
-
-    parser_rm = subparsers.add_parser(
-        "rm", help="Remove a host configuration and associated keys."
-    )
-    parser_rm.add_argument("host", help="Host alias")
-
-    parser_gk.set_defaults(func=_handle_generate_key)
-    parser_rm.set_defaults(func=_handle_remove)
-
-    return parser
-
-
-def main(argv: list[str] | None = None) -> int:
-    parser = _build_parser()
-    args = parser.parse_args(argv)
-    handler = args.func
-    return handler(args)
+def main() -> None:  # pragma: no cover - CLI entry
+    app()
 
 
 if __name__ == "__main__":  # pragma: no cover - CLI entry
-    sys.exit(main())
+    main()

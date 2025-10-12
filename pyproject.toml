@@ -4,6 +4,11 @@ version = "0.1.0"
 description = "Ansible playbook for my entire MacOS environment."
 authors = [{ name = "akitorahayashi" }]
 requires-python = ">=3.12,<4.0"
+dependencies = [
+    "typer>=0.12.0,<0.20.0",
+    "rich>=14.0,<15.0",
+    "pydantic>=2.0,<3.0",
+]
 
 [dependency-groups]
 dev = [

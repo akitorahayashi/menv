@@ -1,38 +1,66 @@
 #!/usr/bin/env python3
 """Delete a git submodule completely."""
+
+from __future__ import annotations
+
 import subprocess
-import sys
+from pathlib import Path
 
-if len(sys.argv) != 2:
-    print("Usage: delete_git_submodule.py <submodule_path>", file=sys.stderr)
-    sys.exit(1)
+import typer
+from rich.console import Console
 
-submodule_path = sys.argv[1]
-# Security: Prevent path traversal. The path should be a simple relative path.
-if ".." in submodule_path or submodule_path.startswith("/"):
-    print(
-        f"Error: Invalid submodule path '{submodule_path}'. Must be a relative path without '..'.",
-        file=sys.stderr,
-    )
-    sys.exit(1)
-print(f"Deleting submodule {submodule_path}...")
+app = typer.Typer(help="Delete a git submodule and its metadata.")
+console = Console()
 
-subprocess.run(["git", "submodule", "deinit", "-f", submodule_path], check=True)
-subprocess.run(["git", "rm", "-f", "-r", submodule_path], check=True)
-subprocess.run(["rm", "-rf", f".git/modules/{submodule_path}"], check=True)
 
-# Ensure .git/config entry is removed
-try:
-    subprocess.run(
-        ["git", "config", "--remove-section", f"submodule.{submodule_path}"],
-        check=True,
-        capture_output=True,
-    )
-except subprocess.CalledProcessError as e:
-    if b"No such section" not in e.stderr:
-        print(
-            f"Warning: Could not remove config section: {e.stderr.decode()}",
-            file=sys.stderr,
+def _validate_submodule_path(path: str) -> str:
+    submodule_path = Path(path)
+    if submodule_path.is_absolute() or ".." in submodule_path.parts:
+        console.print(
+            f"[bold red]Error[/]: Invalid submodule path '{path}'. Must be a relative path without '..'."
         )
+        raise typer.Exit(1)
+    return str(submodule_path)
 
-print(f"✅ Submodule {submodule_path} deleted successfully.")
+
+def _run(command: list[str]) -> None:
+    try:
+        subprocess.run(command, check=True)
+    except subprocess.CalledProcessError as exc:
+        console.print(f"[bold red]Error[/]: Command {' '.join(command)} failed: {exc}")
+        raise typer.Exit(exc.returncode or 1) from exc
+
+
+@app.command()
+def delete(submodule_path: str = typer.Argument(..., help="Relative path to the submodule.")) -> None:
+    """Remove a git submodule, including git metadata."""
+
+    validated = _validate_submodule_path(submodule_path)
+    console.print(f"Deleting submodule {validated}...")
+
+    _run(["git", "submodule", "deinit", "-f", validated])
+    _run(["git", "rm", "-f", "-r", validated])
+    _run(["rm", "-rf", f".git/modules/{validated}"])
+
+    try:
+        subprocess.run(
+            ["git", "config", "--remove-section", f"submodule.{validated}"],
+            check=True,
+            capture_output=True,
+        )
+    except subprocess.CalledProcessError as exc:
+        stderr = exc.stderr.decode() if exc.stderr else ""
+        if "No such section" not in stderr:
+            console.print(
+                f"[bold yellow]Warning[/]: Could not remove config section: {stderr.strip()}"
+            )
+
+    console.print(f"[bold green]✅[/] Submodule {validated} deleted successfully.")
+
+
+def main() -> None:  # pragma: no cover - CLI entry
+    app()
+
+
+if __name__ == "__main__":  # pragma: no cover - CLI entry
+    main()

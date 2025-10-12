@@ -7,7 +7,43 @@ import json
 import sys
 from typing import Any, Dict, List, Optional
 
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
+
 Command = List[str]
+
+
+class PullRequestAuthor(BaseModel):
+    """Minimal author representation from GitHub."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    login: Optional[str] = None
+
+
+class PullRequest(BaseModel):
+    """Pull request details returned by the GitHub CLI."""
+
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
+
+    number: int
+    title: Optional[str] = None
+    author: Optional[PullRequestAuthor] = None
+    head_ref_name: str = Field(alias="headRefName")
+    state: Optional[str] = None
+    mergeable: Optional[str] = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def _coerce_author(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+        author = values.get("author")
+        if isinstance(author, str):
+            values["author"] = {"login": author}
+        return values
+
+    def author_login(self) -> Optional[str]:
+        if self.author:
+            return self.author.login
+        return None
 
 
 def _print_error(message: str) -> None:
@@ -62,17 +98,6 @@ async def run_command(
             return default
         return _parse_json(output, desc)
     return output
-
-
-def _extract_author(pr: Dict[str, Any]) -> Optional[str]:
-    author = pr.get("author")
-    if isinstance(author, dict):
-        login = author.get("login")
-        if isinstance(login, str):
-            return login
-    if isinstance(author, str):
-        return author
-    return None
 
 
 async def _actions_in_progress(branch: str) -> str:
@@ -150,58 +175,45 @@ async def gather_pull_requests(limit: int = 20) -> List[Dict[str, Any]]:
         _print_error("Unexpected response from 'gh pr list'")
         raise SystemExit(1)
 
-    results: List[Dict[str, Any]] = []
-    # Collect all branches for parallel execution
-    branches = []
-    pr_entries = []
-
+    pull_requests: List[PullRequest] = []
     for pr in prs_raw:
         if not isinstance(pr, dict):
             continue
-        number = pr.get("number")
-        branch = pr.get("headRefName")
-        if not isinstance(number, int) or not isinstance(branch, str):
-            continue
+        try:
+            pull_requests.append(PullRequest.model_validate(pr))
+        except ValidationError as exc:
+            _print_error(f"Invalid pull request data: {exc}")
+            raise SystemExit(1) from exc
 
-        entry: Dict[str, Any] = {
-            "number": number,
-            "title": pr.get("title"),
-            "author": _extract_author(pr),
-            "branch": branch,
-            "state": pr.get("state"),
-        }
+    branches = [pr.head_ref_name for pr in pull_requests]
 
-        mergeable = pr.get("mergeable")
-        if isinstance(mergeable, str):
-            entry["mergeable"] = mergeable
-        else:
-            entry["mergeable"] = "UNKNOWN"
+    summaries: List[Dict[str, Any]] = []
+    for pr in pull_requests:
+        summaries.append(
+            {
+                "number": pr.number,
+                "title": pr.title,
+                "author": pr.author_login(),
+                "branch": pr.head_ref_name,
+                "state": pr.state,
+                "mergeable": pr.mergeable or "UNKNOWN",
+            }
+        )
 
-        pr_entries.append(entry)
-        branches.append(branch)
+    if not branches:
+        return summaries
 
-    # Execute actions and CI status checks in parallel
-    if branches:
-        actions_tasks = [
-            asyncio.create_task(_actions_in_progress(branch)) for branch in branches
-        ]
-        ci_tasks = [
-            asyncio.create_task(_latest_ci_status(branch)) for branch in branches
-        ]
+    actions_tasks = [asyncio.create_task(_actions_in_progress(branch)) for branch in branches]
+    ci_tasks = [asyncio.create_task(_latest_ci_status(branch)) for branch in branches]
 
-        actions_results = await asyncio.gather(*actions_tasks)
-        ci_results = await asyncio.gather(*ci_tasks)
+    actions_results = await asyncio.gather(*actions_tasks)
+    ci_results = await asyncio.gather(*ci_tasks)
 
-        for entry, actions_result, ci_result in zip(
-            pr_entries, actions_results, ci_results
-        ):
-            entry["actions_in_progress"] = actions_result
-            entry["ci_status"] = ci_result
-            results.append(entry)
-    else:
-        results = pr_entries
+    for summary, actions_result, ci_result in zip(summaries, actions_results, ci_results):
+        summary["actions_in_progress"] = actions_result
+        summary["ci_status"] = ci_result
 
-    return results
+    return summaries
 
 
 async def main() -> int:
