@@ -16,6 +16,7 @@ This project automates the setup of a consistent development environment across 
 │   ├── roles/
 │   ├── scripts/
 │   ├── utils/
+│   ├── ansible.cfg
 │   ├── hosts
 │   └── playbook.yml
 ├── tests/
