@@ -1,9 +1,8 @@
 # ansible/ansible.just
 
 # Determine project root (fixed regardless of caller)
-# justfile_directory() returns the directory of THIS file (ansible/)
-# so ../ goes to repo root.
-root_dir := justfile_directory() + "/.."
+# When imported into the root justfile, justfile_directory() returns the root directory.
+root_dir := justfile_directory()
 
 # Common: Ansible Playbook execution wrapper
 # @hidden
