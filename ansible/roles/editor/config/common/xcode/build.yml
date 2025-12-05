@@ -1,0 +1,17 @@
+# Show build duration in the toolbar after build completes
+- key: ShowBuildOperationDuration
+  type: bool
+  value: true
+  domain: com.apple.dt.Xcode
+
+# Show indexer progress as a numeric percentage
+- key: IDEIndexerActivityShowNumericProgress
+  type: bool
+  value: true
+  domain: com.apple.dt.Xcode
+
+# Limit parallel build tasks to prevent memory shortage (uncomment if needed)
+# - key: IDEBuildOperationMaxNumberOfConcurrentCompileTasks
+#   type: int
+#   value: 4
+#   domain: com.apple.dt.Xcode

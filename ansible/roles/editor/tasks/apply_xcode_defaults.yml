@@ -1,0 +1,8 @@
+- name: Apply settings from {{ definition_file | basename }}
+  community.general.osx_defaults:
+    domain: "{{ item.domain }}"
+    key: "{{ item.key }}"
+    type: "{{ item.type }}"
+    value: "{{ item.value }}"
+    state: present
+  loop: "{{ lookup('file', definition_file) | from_yaml }}"

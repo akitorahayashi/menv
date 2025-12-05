@@ -1,0 +1,15 @@
+---
+- name: Ensure Xcode is not running (prevent defaults caching issues)
+  ansible.builtin.shell: pkill Xcode || true
+  changed_when: false
+  tags: always
+
+- name: Load all Xcode definition files
+  ansible.builtin.set_fact:
+    xcode_definitions: "{{ lookup('fileglob', role_path + '/config/common/xcode/*.yml', wantlist=True) }}"
+
+- name: Apply Xcode preferences from definitions
+  include_tasks: apply_xcode_defaults.yml
+  loop: "{{ xcode_definitions }}"
+  loop_control:
+    loop_var: definition_file
