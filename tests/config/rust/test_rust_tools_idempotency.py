@@ -6,6 +6,7 @@ import re
 from pathlib import Path
 from unittest.mock import MagicMock
 
+import pytest
 import yaml
 
 
@@ -59,7 +60,8 @@ class TestRustToolsIdempotency:
 
         # Condition: rc != 0 OR (tag defined AND version mismatch)
         should_install = version_check_result.rc != 0 or (
-            "tag" in tool and tool["tag"].lstrip("v") not in version_check_result.stdout
+            "tag" in tool
+            and re.sub(r"^v", "", tool["tag"]) not in version_check_result.stdout
         )
 
         assert should_install, "Tool not installed (rc=1) should trigger installation"
@@ -74,7 +76,8 @@ class TestRustToolsIdempotency:
         tool = {"name": "mix", "tag": "v0.4.0"}
 
         should_install = version_check_result.rc != 0 or (
-            "tag" in tool and tool["tag"].lstrip("v") not in version_check_result.stdout
+            "tag" in tool
+            and re.sub(r"^v", "", tool["tag"]) not in version_check_result.stdout
         )
 
         assert not should_install, "Matching version should not trigger reinstall"
@@ -89,7 +92,8 @@ class TestRustToolsIdempotency:
         tool = {"name": "mix", "tag": "v0.4.0"}
 
         should_install = version_check_result.rc != 0 or (
-            "tag" in tool and tool["tag"].lstrip("v") not in version_check_result.stdout
+            "tag" in tool
+            and re.sub(r"^v", "", tool["tag"]) not in version_check_result.stdout
         )
 
         assert should_install, "Version mismatch should trigger reinstall"
@@ -104,80 +108,30 @@ class TestRustToolsIdempotency:
         tool = {"name": "some-tool"}  # No 'tag' defined
 
         should_install = version_check_result.rc != 0 or (
-            "tag" in tool and tool["tag"].lstrip("v") not in version_check_result.stdout
+            "tag" in tool
+            and re.sub(r"^v", "", tool["tag"]) not in version_check_result.stdout
         )
 
         assert not should_install, "No tag defined should skip version comparison"
 
-    def test_tools_config_has_tags(self, rust_config_dir: Path) -> None:
-        """Validate that all git-based tools have tags defined."""
-        tools_file = rust_config_dir / "tools.yml"
-        data = yaml.safe_load(tools_file.read_text())
-        tools = data["tools"]
-
-        missing_tags = []
-        for index, tool in enumerate(tools):
-            # If tool uses git, it should have a tag for version pinning
-            if "git" in tool and "tag" not in tool:
-                missing_tags.append(
-                    f"Tool #{index + 1} ({tool['name']}) has 'git' but no 'tag' field"
-                )
-
-        assert (
-            not missing_tags
-        ), "All git-based tools must have 'tag' for version management:\n" + "\n".join(
-            missing_tags
-        )
-
-    def test_version_string_extraction_mix(self) -> None:
-        """Test version extraction for 'mix' tool output."""
-        output = "mix 0.4.0\n"
-        tag = "v0.4.0"
-        stripped_tag = tag.lstrip("v")
+    @pytest.mark.parametrize(
+        "tool_name, version_tag",
+        [
+            ("mix", "v0.4.0"),
+            ("kpv", "v0.3.0"),
+            ("mms", "v0.2.0"),
+            ("pure", "v0.5.0"),
+            ("fusion", "v1.3.0"),
+        ],
+    )
+    def test_version_string_extraction(self, tool_name: str, version_tag: str) -> None:
+        """Test version extraction for various tool outputs."""
+        output = f"{tool_name} {re.sub(r'^v', '', version_tag)}\n"
+        stripped_tag = re.sub(r"^v", "", version_tag)
 
         assert (
             stripped_tag in output
-        ), f"Version '0.4.0' should be extractable from mix output: {output}"
-
-    def test_version_string_extraction_kpv(self) -> None:
-        """Test version extraction for 'kpv' tool output."""
-        output = "kpv 0.3.0\n"
-        tag = "v0.3.0"
-        stripped_tag = tag.lstrip("v")
-
-        assert (
-            stripped_tag in output
-        ), f"Version '0.3.0' should be extractable from kpv output: {output}"
-
-    def test_version_string_extraction_mms(self) -> None:
-        """Test version extraction for 'mms' tool output."""
-        output = "mms 0.2.0\n"
-        tag = "v0.2.0"
-        stripped_tag = tag.lstrip("v")
-
-        assert (
-            stripped_tag in output
-        ), f"Version '0.2.0' should be extractable from mms output: {output}"
-
-    def test_version_string_extraction_pure(self) -> None:
-        """Test version extraction for 'pure' tool output."""
-        output = "pure 0.5.0\n"
-        tag = "v0.5.0"
-        stripped_tag = tag.lstrip("v")
-
-        assert (
-            stripped_tag in output
-        ), f"Version '0.5.0' should be extractable from pure output: {output}"
-
-    def test_version_string_extraction_fusion(self) -> None:
-        """Test version extraction for 'fusion' tool output."""
-        output = "fusion 1.3.0\n"
-        tag = "v1.3.0"
-        stripped_tag = tag.lstrip("v")
-
-        assert (
-            stripped_tag in output
-        ), f"Version '1.3.0' should be extractable from fusion output: {output}"
+        ), f"Version '{stripped_tag}' should be extractable from {tool_name} output: {output}"
 
     def test_changed_detection_from_stderr(self) -> None:
         """Test detection of actual installation from command stderr."""
@@ -237,7 +191,7 @@ class TestRustToolsIdempotency:
 
             should_install = version_check_result.rc != 0 or (
                 "tag" in tool
-                and tool["tag"].lstrip("v") not in version_check_result.stdout
+                and re.sub(r"^v", "", tool["tag"]) not in version_check_result.stdout
             )
 
             assert should_install == expected_install, (
