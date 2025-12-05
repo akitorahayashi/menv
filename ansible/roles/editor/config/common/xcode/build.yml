@@ -9,10 +9,11 @@
 - key: IDEIndexerActivityShowNumericProgress
   type: bool
   value: true
+  domain: com.apple.dt.xcode
+
+# Show detailed progress for indexing
+- key: IDEIndexerActivityShowNumericProgress
+  type: bool
+  value: true
   domain: com.apple.dt.Xcode
 
-# Limit parallel build tasks to prevent memory shortage (uncomment if needed)
-# - key: IDEBuildOperationMaxNumberOfConcurrentCompileTasks
-#   type: int
-#   value: 4
-#   domain: com.apple.dt.Xcode
