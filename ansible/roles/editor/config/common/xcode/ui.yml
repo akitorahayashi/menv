@@ -10,7 +10,7 @@
   type: bool
   value: true
   domain: com.apple.dt.Xcode
-  
+
 # Always show file extensions in the project navigator
 - key: IDEFileExtensionDisplayMode
   type: int
