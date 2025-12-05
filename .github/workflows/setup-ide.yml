@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup base environment
-        uses: ./.github/acti  ons/setup-base
+        uses: ./.github/actions/setup-base
 
       - name: Setup VSCode configuration
         run: just vscode
