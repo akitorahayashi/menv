@@ -84,7 +84,7 @@ fix:
   @uv run ansible-lint ansible/ --fix
 
 # Lint code with black check, ruff, shellcheck, and ansible-lint
-check:
+check: fix
   @echo "Linting code with black check, ruff, shellcheck, and ansible-lint..."
   @uv run black --check tests/ ansible/
   @uv run ruff check tests/ ansible/
