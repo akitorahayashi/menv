@@ -1,3 +1,4 @@
+---
 # Show build number on Dock icon for easy version identification
 - key: DVTEnableDockIconVersionNumber
   type: bool

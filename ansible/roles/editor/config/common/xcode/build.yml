@@ -1,3 +1,4 @@
+---
 # Show build duration in the toolbar after build completes
 - key: ShowBuildOperationDuration
   type: bool

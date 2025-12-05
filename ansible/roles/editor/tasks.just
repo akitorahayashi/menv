@@ -11,8 +11,9 @@ cursor:
   @just _run_ansible "editor" "common" "cursor"
 
 # Setup Xcode configuration only
-setup-xcode:
-    ansible-playbook {{ playbook_dir }}/playbook.yml --tags xcode
+xcode:
+  @echo "🚀 Running common Xcode setup..."
+  @just _run_ansible "editor" "common" "xcode"
 
 # Backup current VSCode extensions
 backup-vscode-extensions:

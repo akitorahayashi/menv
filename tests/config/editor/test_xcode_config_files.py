@@ -1,5 +1,3 @@
-import glob
-import os
 from pathlib import Path
 
 import pytest
@@ -13,13 +11,13 @@ def xcode_config_path(editor_config_base: Path) -> Path:
 
 
 @pytest.fixture(scope="session")
-def xcode_yml_files(xcode_config_path: Path) -> list[str]:
+def xcode_yml_files(xcode_config_path: Path) -> list[Path]:
     """Discover all .yml files in the Xcode config directory."""
-    return glob.glob(os.path.join(xcode_config_path, "*.yml"))
+    return list(xcode_config_path.glob("*.yml"))
 
 
 class TestXcodeConfigs:
-    def test_xcode_definitions(self, xcode_yml_files: list[str]) -> None:
+    def test_xcode_definitions(self, xcode_yml_files: list[Path]) -> None:
         """
         Verify syntax and schema for all Xcode definition .yml files.
         """
@@ -27,8 +25,8 @@ class TestXcodeConfigs:
             pytest.fail("No Xcode .yml config files found to test.")
 
         for yaml_file_path in xcode_yml_files:
-            file_basename = os.path.basename(yaml_file_path)
-            with open(yaml_file_path, "r") as f:
+            file_basename = yaml_file_path.name
+            with yaml_file_path.open("r") as f:
                 try:
                     data = yaml.safe_load(f)
                 except yaml.YAMLError as e:
@@ -54,5 +52,6 @@ class TestXcodeConfigs:
 
                 # Verify type validity
                 valid_types = ["bool", "int", "string", "float"]
-                assert definition["type"] in valid_types, \
-                    f"Invalid type '{definition['type']}' in definition #{i+1} in {file_basename}. Must be one of {valid_types}."
+                assert (
+                    definition["type"] in valid_types
+                ), f"Invalid type '{definition['type']}' in definition #{i+1} in {file_basename}. Must be one of {valid_types}."

@@ -1,3 +1,4 @@
+---
 # Disable accent menu on key hold, enable key repeat
 - key: ApplePressAndHoldEnabled
   type: bool

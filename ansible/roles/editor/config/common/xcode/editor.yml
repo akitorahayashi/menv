@@ -1,3 +1,4 @@
+---
 # Show line numbers to make code positions easier to grasp
 - key: DVTTextShowLineNumbers
   type: bool
