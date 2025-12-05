@@ -10,7 +10,7 @@
   ansible.builtin.command:
     cmd: "{{ ansible_env.HOME }}/.cargo/bin/{{ item.name }} --version"
   loop: "{{ cargo_tools_config.tools }}"
-  register: cargo_tools_version_check
+  register: rust_cargo_tools_version_check
   changed_when: false
   failed_when: false
   check_mode: false
@@ -31,24 +31,14 @@
     label: "{{ item.name }}"
   register: rust_cargo_install_result
   changed_when: "'Installing' in rust_cargo_install_result.stderr"
+  notify: "Clean up cargo cache after installation"
   # Condition explanation:
   # 1. Command failed (rc != 0) = not installed -> needs installation
   # 2. Tag is defined and the CLI output does not contain that version number -> needs update
   #    (Note: Remove 'v' from git tag like 'v0.2.0' to compare with '0.2.0')
   when: >
-    cargo_tools_version_check.results[idx].rc != 0 or
+    rust_cargo_tools_version_check.results[idx].rc != 0 or
     (
       item.tag is defined and
-      item.tag | regex_replace('^v', '') not in cargo_tools_version_check.results[idx].stdout
+      item.tag | regex_replace('^v', '') not in rust_cargo_tools_version_check.results[idx].stdout
     )
-
-- name: "Clean up cargo cache after installation"
-  ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/.cargo/{{ item }}"
-    state: absent
-  loop:
-    - registry/cache
-    - registry/src
-    - git/checkouts
-  # Only run cleanup if any installation occurred
-  when: rust_cargo_install_result.changed

@@ -73,7 +73,9 @@ class TestRustConfigs:
         if not tools:
             pytest.skip("No tools defined in tools.yml to validate further.")
 
-    def test_tools_require_tag_for_version_management(self, rust_config_dir: Path) -> None:
+    def test_tools_require_tag_for_version_management(
+        self, rust_config_dir: Path
+    ) -> None:
         """Validate that all git-based tools have 'tag' field for version pinning.
 
         The idempotent installation logic relies on 'tag' to determine if a tool's
