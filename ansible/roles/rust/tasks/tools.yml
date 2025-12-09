@@ -53,5 +53,5 @@
     label: "{{ item.item.name }}"
   when:
     - item.failed is defined
-    - item.failed == true
+    - item.failed
     - not ansible_check_mode
