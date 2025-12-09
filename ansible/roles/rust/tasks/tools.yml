@@ -21,10 +21,14 @@
     # --force is needed to overwrite existing binaries, but execution is controlled by 'when'
     cmd: >
       {{ ansible_env.HOME }}/.cargo/bin/cargo install --force
-      {% if item.git is defined %}--git {{ item.git }}{% endif %}
+      {% if item.git is defined %}
+      --git {{ ('ssh://' + item.git.replace(':', '/')) if item.git.startswith('git@') else item.git }}
+      {% endif %}
       {% if item.tag is defined %}--tag {{ item.tag }}{% endif %}
       {{ item.name }}
       {{ item.options | default('') }}
+  environment:
+    CARGO_NET_GIT_FETCH_WITH_CLI: "true"
   loop: "{{ cargo_tools_config.tools }}"
   loop_control:
     index_var: idx
