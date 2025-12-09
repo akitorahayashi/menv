@@ -32,6 +32,8 @@
   register: rust_cargo_install_result
   changed_when: "'Installing' in rust_cargo_install_result.stderr"
   notify: "Clean up cargo cache after installation"
+  # Add error handling: Continue even if it fails (assuming SSH keys are missing, etc.)
+  ignore_errors: true
   # Condition explanation:
   # 1. Command failed (rc != 0) = not installed -> needs installation
   # 2. Tag is defined and the CLI output does not contain that version number -> needs update
@@ -42,3 +44,14 @@
       item.tag is defined and
       item.tag | regex_replace('^v', '') not in rust_cargo_tools_version_check.results[idx].stdout
     )
+
+- name: "Warn about failed installations (likely due to missing SSH keys)"
+  ansible.builtin.debug:
+    msg: "WARNING: Failed to install {{ item.item.name }}. Ensure SSH keys are loaded if this is a private repo."
+  loop: "{{ rust_cargo_install_result.results }}"
+  loop_control:
+    label: "{{ item.item.name }}"
+  when:
+    - item.failed is defined
+    - item.failed == true
+    - not ansible_check_mode
