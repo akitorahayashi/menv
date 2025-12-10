@@ -1,12 +1,10 @@
 ---
-- name: "Install @anthropic-ai/claude-code via pnpm"
+- name: "Install @anthropic-ai/claude-code via npm"
   ansible.builtin.shell:
-    cmd: "source $(brew --prefix nvm)/nvm.sh && nvm use default && pnpm install -g @anthropic-ai/claude-code@latest"
+    cmd: "source $(brew --prefix nvm)/nvm.sh && nvm use default && npm install -g @anthropic-ai/claude-code@latest"
   changed_when: false
   environment:
     NVM_DIR: "{{ ansible_env.HOME }}/.nvm"
-    PNPM_HOME: "{{ ansible_env.HOME }}/Library/pnpm"
-    PATH: "{{ ansible_env.HOME }}/Library/pnpm:{{ ansible_env.PATH }}"
 
 - name: "Ensure Claude configuration directory exists"
   ansible.builtin.file:
@@ -34,14 +32,12 @@
     state: directory
     mode: "0755"
 
-- name: "Install @google/gemini-cli via pnpm"
+- name: "Install @google/gemini-cli via npm"
   ansible.builtin.shell:
-    cmd: "source $(brew --prefix nvm)/nvm.sh && nvm use default && pnpm install -g @google/gemini-cli@latest"
+    cmd: "source $(brew --prefix nvm)/nvm.sh && nvm use default && npm install -g @google/gemini-cli@latest"
   changed_when: false
   environment:
     NVM_DIR: "{{ ansible_env.HOME }}/.nvm"
-    PNPM_HOME: "{{ ansible_env.HOME }}/Library/pnpm"
-    PATH: "{{ ansible_env.HOME }}/Library/pnpm:{{ ansible_env.PATH }}"
 
 - name: "Ensure Gemini configuration directory exists"
   ansible.builtin.file:
@@ -80,14 +76,12 @@
     state: directory
     mode: "0755"
 
-- name: "Install @openai/codex via pnpm"
+- name: "Install @openai/codex via npm"
   ansible.builtin.shell:
-    cmd: "source $(brew --prefix nvm)/nvm.sh && nvm use default && pnpm install -g @openai/codex@latest"
+    cmd: "source $(brew --prefix nvm)/nvm.sh && nvm use default && npm install -g @openai/codex@latest"
   changed_when: false
   environment:
     NVM_DIR: "{{ ansible_env.HOME }}/.nvm"
-    PNPM_HOME: "{{ ansible_env.HOME }}/Library/pnpm"
-    PATH: "{{ ansible_env.HOME }}/Library/pnpm:{{ ansible_env.PATH }}"
 
 - name: "Ensure Codex configuration directories exist"
   ansible.builtin.file:
