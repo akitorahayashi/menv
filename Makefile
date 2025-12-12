@@ -39,11 +39,11 @@ brew: ## Install Homebrew and setup .env (Requires Terminal Restart)
 
 	@if ! command -v brew &> /dev/null; then \
 		echo "[INSTALL] Homebrew ..."; \
-		echo "[INFO] Homebrewインストールスクリプトを実行します..."; \
+		echo "[INFO] Executing the Homebrew install script..."; \
 		/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; \
 		echo "⚠️  Please restart your terminal to activate Homebrew."; \
 	else \
-		echo "✅ Homebrew is already installed."; \
+		echo "[SUCCESS] Homebrew is already installed."; \
 	fi
 
 # --- Step 2: Python Runtime ---
