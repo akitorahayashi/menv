@@ -3,9 +3,9 @@
 # This Makefile has several steps for initial setup:
 # 1. `make brew`: Installs Homebrew and sets up .env (Requires Terminal Restart)
 # 2. `make python`: Installs Pyenv, Python 3.12, Pipx (Requires Terminal Restart)
-# 3. `make rust`: Installs Rust toolchain and tools (including ssv)
-# 4. `make tools`: Installs uv, just (Requires Terminal Restart)
-# 5. `make deps`: Installs project dependencies (Ansible via uv)
+# 3. `make tools`: Installs uv, just (Requires Terminal Restart)
+# 4. `make deps`: Installs project dependencies (Ansible via uv)
+# 5. `make rust`: Installs Rust toolchain and tools (including ssv)
 # 6. `make macbook` or `make mac-mini`: Runs the actual setup using Just.
 
 .DEFAULT_GOAL := help
@@ -110,14 +110,14 @@ tools: ## Install uv, just (Requires Terminal Restart)
 .PHONY: deps
 deps: ## Install project dependencies (Ansible) via uv
 	@echo "🚀 [Step 4] Installing Dependencies..."
-	@eval "$$(pyenv init -)" && uv sync
+	@export PATH="$$HOME/.local/bin:$$PATH"; eval "$$(pyenv init -)" && uv sync
 	@echo "✅ Dependencies installed."
 
 # --- Step 5: Rust & SSV ---
 .PHONY: rust
 rust: ## Install Rust toolchain and cargo tools (includes ssv)
 	@echo "🚀 [Step 5] Setting up Rust and installing ssv..."
-	@just rust
+	@eval "$$(brew shellenv)" && just rust
 	@echo "✅ Rust setup completed. You can now use 'ssv' to configure SSH."
 	@echo "➡️ Next: Run 'make macbook' or 'make mac-mini'"
 
