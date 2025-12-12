@@ -3,9 +3,9 @@
 # This Makefile has several steps for initial setup:
 # 1. `make brew`: Installs Homebrew and sets up .env (Requires Terminal Restart)
 # 2. `make python`: Installs Pyenv, Python 3.12, Pipx (Requires Terminal Restart)
-# 3. `make tools`: Installs uv, just (Requires Terminal Restart)
-# 4. `make deps`: Installs project dependencies (Ansible via uv)
-# 5. `make rust`: Installs Rust toolchain and tools (including ssv)
+# 3. `make rust`: Installs Rust toolchain and tools (including ssv)
+# 4. `make tools`: Installs uv, just (Requires Terminal Restart)
+# 5. `make deps`: Installs project dependencies (Ansible via uv)
 # 6. `make macbook` or `make mac-mini`: Runs the actual setup using Just.
 
 .DEFAULT_GOAL := help
