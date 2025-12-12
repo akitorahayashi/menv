@@ -51,7 +51,6 @@
 - { key: "spans-displays", domain: "com.apple.spaces", type: "bool", value: false }
 # Mouse
 - { key: "com.apple.mouse.scaling", domain: ".GlobalPreferences", type: "float", value: 1.0 }
-- { key: "FocusFollowsMouse", domain: "com.apple.Terminal", type: "bool", value: true }
 # Screenshots
 - { key: "location", domain: "com.apple.screencapture", type: "string", value: "$HOME/Desktop" }
 - { key: "disable-shadow", domain: "com.apple.screencapture", type: "bool", value: false }
@@ -80,6 +79,7 @@
 - { key: "Startup Window Settings", domain: "com.apple.Terminal", type: "string", value: "Basic" }
 - { key: "SecureKeyboardEntry", domain: "com.apple.Terminal", type: "bool", value: true }
 - { key: "ShowLineMarks", domain: "com.apple.Terminal", type: "int", value: 0 }
+- { key: "FocusFollowsMouse", domain: "com.apple.Terminal", type: "bool", value: true }
 # Trackpad
 - { key: "com.apple.trackpad.scaling", type: "float", value: 1.5 }
 - { key: "Clicking", domain: "com.apple.AppleMultitouchTrackpad", type: "int", value: 1 }
