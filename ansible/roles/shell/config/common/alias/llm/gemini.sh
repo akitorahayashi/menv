@@ -20,7 +20,22 @@ gm_ini() {
 
 	# Generate initial configuration file
 	echo '{}' >.gemini/settings.json
-	touch .gemini/GEMINI.md
+
+    # Link AGENTS.md immediately
+    gm_ln
 
 	echo "✅ Initialized project-specific .gemini configuration"
+}
+
+# Link AGENTS.md to .gemini/GEMINI.md
+alias gm-ln=gm_ln
+gm_ln() {
+    # Ensure directory exists
+    mkdir -p .gemini
+
+    # Create relative symlink (force overwrite)
+    # Target: ../AGENTS.md (relative from .gemini/GEMINI.md)
+    ln -sf ../AGENTS.md .gemini/GEMINI.md
+
+    echo "🔗 Linked .gemini/GEMINI.md -> ../AGENTS.md"
 }

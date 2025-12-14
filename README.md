@@ -26,8 +26,6 @@ This project automates the setup of a consistent development environment across 
 └── uv.lock
 ```
 
-**Note**: Additional directories like `.claude/`, `.codex/`, `.gemini/` are created at runtime by the respective Ansible roles during setup.
-
 ## How to Use
 
 This project automates the setup of a consistent development environment across different Macs. Use cases include:
@@ -133,7 +131,15 @@ These commands are recommended to be run manually once after initial setup (Ansi
 ### LLM Tools Configuration
 
 - Run `just llm` to configure Node.js-based LLM tools (Claude, Gemini, Codex).
-- This ensures necessary configuration directories and files are created and symlinked from `ansible/roles/nodejs/config/common`.
+- This ensures necessary configuration directories and files are created and symlinked from `ansible/roles/nodejs/config/common` to your home directory.
+
+**Project Context Initialization**
+
+For this repository, context files are managed dynamically. Run the following aliases to link the project's `AGENTS.md` to the respective tool's configuration directory:
+
+- `cld-ln`: Initialize/Link for Claude (`.claude/CLAUDE.md`)
+- `gm-ln`: Initialize/Link for Gemini (`.gemini/GEMINI.md`)
+- `cpt-ln`: Initialize/Link for Copilot (`.github/copilot-instructions.md`)
 
 ### VCS User Profile Switching
 
