@@ -19,6 +19,7 @@ dev = [
     "pytest-xdist>=3.8.0,<4.0.0",
     "ruff>=0.12.10,<1.0.0",
     "ansible-lint>=25.0.0",
+    "types-PyYAML>=6.0.0",
 ]
 mlx = [
     "mlx-lm>=0.28.3",
