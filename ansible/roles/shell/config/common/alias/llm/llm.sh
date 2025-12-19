@@ -28,15 +28,12 @@ cld_ln() {
 	echo "🔗 Linked .claude/CLAUDE.md -> ../AGENTS.md"
 }
 
-#!/bin/bash
 alias cdx="codex"
 
-#!/bin/bash
 alias cpt="copilot"
 
-#!/bin/sh
 # Generate Gemini model aliases
 eval "$(gen_gemini_aliases.py)"
 
-# Basic gm alias (defaults to flash model)
+# Basic gm alias
 alias gm="gemini"
