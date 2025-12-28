@@ -47,7 +47,7 @@
 
 # 3. Run post-install commands (e.g., playwright install)
 - name: "Run post-install commands for pipx tools"
-  ansible.builtin.shell: "{{ item.post_install }}"
+  ansible.builtin.command: "{{ item.post_install }}"
   loop: "{{ pipx_tools_config.tools }}"
   loop_control:
     index_var: idx
