@@ -53,9 +53,7 @@
     index_var: idx
     label: "{{ item.name }}"
   changed_when: true
-  when:
-    - item.post_install is defined
-    - python_pipx_install_result.results[idx].changed | default(false)
+  when: item.post_install is defined
 
 - name: "Ensure menv venv directory exists"
   ansible.builtin.file:

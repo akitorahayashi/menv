@@ -13,4 +13,4 @@ tools:
   - name: dcv
     git: https://github.com/akitorahayashi/dcv.git
     tag: v0.3.0
-    post_install: "~/.local/pipx/venvs/dcv/bin/playwright install chromium"
+    post_install: "pipx inject dcv playwright && pipx runpip dcv install playwright && pipx run playwright --spec dcv install chromium"

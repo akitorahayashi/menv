@@ -248,16 +248,14 @@ class TestPipxToolsIdempotency:
         """Test post-install command path construction."""
         tool_with_post_install = {
             "name": "dcv",
-            "post_install": "~/.local/pipx/venvs/dcv/bin/playwright install chromium",
+            "post_install": "pipx inject dcv playwright && pipx run playwright --spec dcv install chromium",
         }
 
         post_cmd = tool_with_post_install.get("post_install")
         assert post_cmd is not None
-        assert "~/.local/pipx/venvs/dcv/bin/" in post_cmd
-        assert "playwright install chromium" in post_cmd
-
-        # Verify pattern: venv should match tool name
-        assert f"venvs/{tool_with_post_install['name']}/bin/" in post_cmd
+        assert "pipx" in post_cmd
+        assert "playwright" in post_cmd
+        assert "chromium" in post_cmd
 
     def test_python_version_path_construction(self) -> None:
         """Test pyenv Python version path construction."""
@@ -329,9 +327,10 @@ class TestPipxToolsConfiguration:
         # Validate tag format
         assert dcv_tool["tag"].startswith("v"), "dcv tag should start with 'v'"
 
-        # Validate post_install references correct venv
-        assert "pipx/venvs/dcv/bin/" in dcv_tool["post_install"]
-        assert "playwright install chromium" in dcv_tool["post_install"]
+        # Validate post_install uses pipx commands
+        assert "pipx" in dcv_tool["post_install"]
+        assert "playwright" in dcv_tool["post_install"]
+        assert "chromium" in dcv_tool["post_install"]
 
     def test_python_version_defaults(self, python_config_dir: Path) -> None:
         """Test Python version default behavior."""
