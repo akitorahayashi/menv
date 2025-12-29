@@ -84,8 +84,12 @@ def create(
         )
         if exit_code != 0:
             console.print()
-            console.print(f"[bold red]✗ Failed at '{tag}' with exit code {exit_code}[/]")
+            console.print(
+                f"[bold red]✗ Failed at '{tag}' with exit code {exit_code}[/]"
+            )
             raise typer.Exit(code=exit_code)
 
     console.print()
-    console.print(f"[bold green]✅ {resolved_profile} full setup completed successfully![/]")
+    console.print(
+        f"[bold green]✅ {resolved_profile} full setup completed successfully![/]"
+    )

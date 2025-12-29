@@ -103,7 +103,9 @@ def backup(
             console.print("[bold green]✓ Backup completed successfully![/]")
         else:
             console.print()
-            console.print(f"[bold red]✗ Backup failed with exit code {process.returncode}[/]")
+            console.print(
+                f"[bold red]✗ Backup failed with exit code {process.returncode}[/]"
+            )
             raise typer.Exit(code=process.returncode)
 
     except FileNotFoundError:

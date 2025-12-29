@@ -124,7 +124,9 @@ def switch(
         raise typer.Exit(code=1)
 
     if not identity["name"] or not identity["email"]:
-        console.print(f"[red]Error:[/] {resolved_profile.capitalize()} identity is not configured.")
+        console.print(
+            f"[red]Error:[/] {resolved_profile.capitalize()} identity is not configured."
+        )
         console.print("Run [cyan]menv config set[/] to configure.")
         raise typer.Exit(code=1)
 

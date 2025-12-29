@@ -39,7 +39,9 @@ class TestConfigPaths:
 class TestConfigSaveLoad:
     """Tests for saving and loading configuration."""
 
-    def test_save_and_load_config(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_save_and_load_config(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Test that config can be saved and loaded."""
         # Mock config directory to use temp path
         mock_config_dir = tmp_path / ".config" / "menv"
@@ -68,7 +70,9 @@ class TestConfigSaveLoad:
     ) -> None:
         """Test that load_config returns None when file doesn't exist."""
         mock_config_path = tmp_path / "nonexistent" / "config.toml"
-        monkeypatch.setattr("menv.core.config.get_config_path", lambda: mock_config_path)
+        monkeypatch.setattr(
+            "menv.core.config.get_config_path", lambda: mock_config_path
+        )
 
         result = load_config()
 
@@ -78,7 +82,9 @@ class TestConfigSaveLoad:
 class TestGetIdentity:
     """Tests for get_identity function."""
 
-    def test_get_identity_personal(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_get_identity_personal(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Test getting personal identity."""
         mock_config_dir = tmp_path / ".config" / "menv"
         monkeypatch.setattr("menv.core.config.get_config_dir", lambda: mock_config_dir)
@@ -98,7 +104,9 @@ class TestGetIdentity:
         assert identity["name"] == "Personal"
         assert identity["email"] == "personal@example.com"
 
-    def test_get_identity_work(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_get_identity_work(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Test getting work identity."""
         mock_config_dir = tmp_path / ".config" / "menv"
         monkeypatch.setattr("menv.core.config.get_config_dir", lambda: mock_config_dir)
@@ -143,7 +151,9 @@ class TestGetIdentity:
     ) -> None:
         """Test getting identity when no config exists returns None."""
         mock_config_path = tmp_path / "nonexistent" / "config.toml"
-        monkeypatch.setattr("menv.core.config.get_config_path", lambda: mock_config_path)
+        monkeypatch.setattr(
+            "menv.core.config.get_config_path", lambda: mock_config_path
+        )
 
         identity = get_identity("personal")
 
