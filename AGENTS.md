@@ -1,31 +1,57 @@
-# Environment Setup Project
+# menv - macOS Environment Setup Project
 
 ## Project Overview
-A comprehensive automation project for setting up consistent macOS development environments across different machines (MacBook and Mac mini). This project uses Ansible playbooks to automate the installation and configuration of development tools, system settings, and configurations.
+
+A pipx-installable CLI tool for setting up consistent macOS development environments across different machines (MacBook and Mac mini). This project uses Ansible playbooks (bundled within the Python package) to automate the installation and configuration of development tools, system settings, and configurations.
+
+## Architecture
+
+menv is distributed as a Python package installable via pipx. The CLI provides two main commands:
+
+- `menv create <profile>` (alias: `menv cr`) - Provision environment with Ansible
+- `menv update` (alias: `menv u`) - Self-update via pipx
+
+### Package Structure
+
+```
+src/menv/
+├── main.py           # Typer CLI entry point
+├── commands/
+│   ├── create.py     # create/cr command
+│   └── update.py     # update/u command
+├── core/
+│   ├── paths.py      # importlib.resources path resolution
+│   ├── runner.py     # Ansible subprocess execution
+│   └── version.py    # Version checking via GitHub API
+└── ansible/          # Bundled Ansible playbooks and roles
+    ├── playbook.yml
+    └── roles/
+```
 
 ## Key Components
 
-1. **`Makefile`** - Initial setup entry point (you should not execute)
-   - `make base`: Installs pyenv, Python 3.12, uv, and core dependencies
-   - `make macbook` / `make mac-mini`: Runs full machine-specific setup
+1. **`menv` CLI** - Primary user interface
+   - `menv create macbook` / `menv cr mac-mini`: Provision environment
+   - `menv update` / `menv u`: Self-update to latest version
+   - `menv --version`: Show installed version
 
-2. **`justfile`** - Individual task runner and command orchestrator
-   - Individual component setup commands (e.g., `just python`, `just nodejs`, `just mbk-*`, `just mmn-*`)
-   - Profile switching (`just sw-p` / `just sw-w`)
-   - Backup utilities (e.g., `just backup-system`, `just backup-vscode-extensions`)
-   - Role additions and customizations
+2. **`justfile`** - Development tasks only (not for end users)
+   - `just test`: Run pytest suite
+   - `just fix` / `just check`: Format and lint code
+   - `just run <args>`: Run menv in development mode
+   - `just build`: Build the package
 
 ## Design Rules
 
 ### Configuration Path Resolution
-**Core Principle**: justfile passes only profile name and base paths; Ansible roles handle all path resolution and fallback logic.
+**Core Principle**: CLI passes profile name; Ansible roles handle all path resolution and fallback logic.
 
 **Rules**:
-- **justfile**: Pass `profile`, `config_dir_abs_path`, and `repo_root_path` only
+- **CLI**: Pass `profile`, `config_dir_abs_path`, and `repo_root_path` as Ansible extra vars
 - **Common configs**: Use `{{config_dir_abs_path}}` (e.g., `{{config_dir_abs_path}}/vcs/git/.gitconfig`)
-- **Profile configs**: Use `{{repo_root_path}}/config/profiles/{{profile}}` (e.g., `{{repo_root_path}}/config/profiles/{{profile}}/cask/Brewfile`)
+- **Profile configs**: Use `{{repo_root_path}}/config/profiles/{{profile}}`
 - **Fallback logic**: Roles must implement profile-specific → common fallback for optional overrides
-- **No hardcoded paths**: Avoid embedding specific config subdirectories in justfile
+- **No hardcoded paths**: Path resolution is handled by `menv.core.paths` using `importlib.resources`
 
 ### tests/ Directory Rules
 
