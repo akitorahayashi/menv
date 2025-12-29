@@ -62,40 +62,42 @@ def main(
 
 
 # Register create command (full profile setup) and alias
-app.command(name="create", help="Full environment setup for a profile. [aliases: cr]")(
-    create
-)
+app.command(
+    name="create", help=r"Full environment setup for a profile. \[aliases: cr]"
+)(create)
 app.command(name="cr", hidden=True)(create)
 
 # Register make command (individual tasks) and alias
-app.command(name="make", help="Run individual Ansible task by tag. [aliases: mk]")(make)
+app.command(name="make", help=r"Run individual Ansible task by tag. \[aliases: mk]")(
+    make
+)
 app.command(name="mk", hidden=True)(make)
 
 # Register list command and alias
-app.command(name="list", help="List available tags for make command. [aliases: ls]")(
+app.command(name="list", help=r"List available tags for make command. \[aliases: ls]")(
     list_tags
 )
 app.command(name="ls", hidden=True)(list_tags)
 
 # Register update command and alias
-app.command(name="update", help="Update menv to the latest version. [aliases: u]")(
+app.command(name="update", help=r"Update menv to the latest version. \[aliases: u]")(
     update
 )
 app.command(name="u", hidden=True)(update)
 
 # Register backup command and alias
 app.command(
-    name="backup", help="Backup system settings or configurations. [aliases: bk]"
+    name="backup", help=r"Backup system settings or configurations. \[aliases: bk]"
 )(backup)
 app.command(name="bk", hidden=True)(backup)
 
 # Register config command and alias
-app.command(name="config", help="Manage menv configuration. [aliases: cf]")(config)
+app.command(name="config", help=r"Manage menv configuration. \[aliases: cf]")(config)
 app.command(name="cf", hidden=True)(config)
 
 # Register switch command and alias
 app.command(
-    name="switch", help="Switch VCS identity between personal and work. [aliases: sw]"
+    name="switch", help=r"Switch VCS identity between personal and work. \[aliases: sw]"
 )(switch)
 app.command(name="sw", hidden=True)(switch)
 
