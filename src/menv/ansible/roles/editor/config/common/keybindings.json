@@ -30,5 +30,9 @@
     "key": "ctrl+cmd+s",
     "command": "workbench.action.terminal.split",
     "when": "terminalFocus"
+  },
+  {
+    "key": "cmd+i",
+    "command": "composerMode.agent"
   }
 ]

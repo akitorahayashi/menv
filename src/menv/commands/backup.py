@@ -107,5 +107,5 @@ def backup(
             raise typer.Exit(code=process.returncode)
 
     except FileNotFoundError:
-        console.print(f"[bold red]Error:[/] Python interpreter not found")
+        console.print("[bold red]Error:[/] Python interpreter not found")
         raise typer.Exit(code=1)

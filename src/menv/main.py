@@ -7,8 +7,10 @@ import typer
 from rich.console import Console
 
 from menv.commands.backup import backup
+from menv.commands.config import config
 from menv.commands.create import create
 from menv.commands.make import list_tags, make
+from menv.commands.switch import switch
 from menv.commands.update import update
 
 console = Console()
@@ -78,6 +80,14 @@ app.command(name="u", hidden=True)(update)
 # Register backup command and alias
 app.command(name="backup", help="Backup system settings or configurations. [aliases: bk]")(backup)
 app.command(name="bk", hidden=True)(backup)
+
+# Register config command and alias
+app.command(name="config", help="Manage menv configuration. [aliases: cf]")(config)
+app.command(name="cf", hidden=True)(config)
+
+# Register switch command and alias
+app.command(name="switch", help="Switch VCS identity between personal and work. [aliases: sw]")(switch)
+app.command(name="sw", hidden=True)(switch)
 
 
 if __name__ == "__main__":

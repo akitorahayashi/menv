@@ -73,6 +73,23 @@ menv backup vscode          # Backup VSCode extensions
 menv bk system              # Shorthand
 ```
 
+**Configuration:**
+
+```sh
+menv config set             # Configure VCS identities interactively
+menv config show            # Show current configuration
+menv cf set                 # Shorthand
+```
+
+**Switch VCS identity:**
+
+```sh
+menv switch personal        # Switch to personal identity
+menv switch work            # Switch to work identity
+menv sw p                   # Shorthand for personal
+menv sw w                   # Shorthand for work
+```
+
 **Update menv:**
 
 ```sh
@@ -133,10 +150,13 @@ menv/
 │   ├── main.py           # Typer app definition
 │   ├── commands/
 │   │   ├── backup.py     # backup/bk command
+│   │   ├── config.py     # config/cf command
 │   │   ├── create.py     # create/cr command (full setup)
 │   │   ├── make.py       # make/mk command (individual tasks)
+│   │   ├── switch.py     # switch/sw command
 │   │   └── update.py     # update/u command
 │   ├── core/
+│   │   ├── config.py     # Configuration management
 │   │   ├── paths.py      # Package path resolution
 │   │   ├── runner.py     # Ansible execution wrapper
 │   │   └── version.py    # Version management
@@ -156,4 +176,6 @@ menv/
 | `menv make <tag> [profile]` | `mk` | Run individual Ansible task |
 | `menv list` | `ls` | List available tags |
 | `menv backup <target>` | `bk` | Backup system settings |
+| `menv config <action>` | `cf` | Manage VCS identities configuration |
+| `menv switch <profile>` | `sw` | Switch VCS identity (personal/work) |
 | `menv update` | `u` | Update menv to latest version |

@@ -27,5 +27,6 @@
   "python.defaultInterpreterPath": "/opt/homebrew/bin/python3",
   "editor.renderWhitespace": "all",
   "git.confirmSync": false,
-  "git.replaceTagsWhenPull": true
+  "git.replaceTagsWhenPull": true,
+  "window.commandCenter": true
 }

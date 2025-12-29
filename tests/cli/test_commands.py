@@ -150,3 +150,53 @@ class TestCLIIntegration:
 
         assert result.exit_code != 0
         assert "Unknown backup target" in result.output or "Error" in result.output
+
+    def test_config_help_shows_action_argument(self, cli_runner: CliRunner) -> None:
+        """Test that config --help shows action argument."""
+        result = cli_runner.invoke(app, ["config", "--help"])
+
+        assert result.exit_code == 0
+        assert "ACTION" in result.output or "action" in result.output.lower()
+
+    def test_cf_alias_works(self, cli_runner: CliRunner) -> None:
+        """Test that 'cf' alias for config works."""
+        result = cli_runner.invoke(app, ["cf", "--help"])
+
+        assert result.exit_code == 0
+        assert "ACTION" in result.output or "action" in result.output.lower()
+
+    def test_config_invalid_action_shows_error(self, cli_runner: CliRunner) -> None:
+        """Test that invalid config action shows error."""
+        result = cli_runner.invoke(app, ["config", "invalid-action"])
+
+        assert result.exit_code != 0
+        assert "Unknown action" in result.output or "Error" in result.output
+
+    def test_switch_help_shows_profile_argument(self, cli_runner: CliRunner) -> None:
+        """Test that switch --help shows profile argument."""
+        result = cli_runner.invoke(app, ["switch", "--help"])
+
+        assert result.exit_code == 0
+        assert "PROFILE" in result.output or "profile" in result.output.lower()
+
+    def test_sw_alias_works(self, cli_runner: CliRunner) -> None:
+        """Test that 'sw' alias for switch works."""
+        result = cli_runner.invoke(app, ["sw", "--help"])
+
+        assert result.exit_code == 0
+        assert "PROFILE" in result.output or "profile" in result.output.lower()
+
+    def test_switch_invalid_profile_shows_error(self, cli_runner: CliRunner) -> None:
+        """Test that invalid switch profile shows error."""
+        result = cli_runner.invoke(app, ["switch", "invalid-profile"])
+
+        assert result.exit_code != 0
+        assert "Invalid profile" in result.output or "Error" in result.output
+
+    def test_switch_without_config_shows_error(self, cli_runner: CliRunner) -> None:
+        """Test that switch without config shows error."""
+        # This test assumes no config exists in test environment
+        result = cli_runner.invoke(app, ["switch", "personal"])
+
+        # Should fail if no config exists
+        assert result.exit_code != 0 or "config" in result.output.lower()
