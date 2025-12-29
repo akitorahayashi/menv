@@ -6,9 +6,12 @@ A pipx-installable CLI tool for setting up consistent macOS development environm
 
 ## Architecture
 
-menv is distributed as a Python package installable via pipx. The CLI provides two main commands:
+menv is distributed as a Python package installable via pipx. The CLI provides the following commands:
 
-- `menv create <profile>` (alias: `menv cr`) - Provision environment with Ansible
+- `menv create <profile>` (alias: `menv cr`) - Full environment setup for a profile
+- `menv make <tag> [profile]` (alias: `menv mk`) - Run individual Ansible tasks
+- `menv list` (alias: `menv ls`) - List available tags
+- `menv backup <target>` (alias: `menv bk`) - Backup system settings
 - `menv update` (alias: `menv u`) - Self-update via pipx
 
 ### Package Structure
@@ -17,7 +20,9 @@ menv is distributed as a Python package installable via pipx. The CLI provides t
 src/menv/
 ├── main.py           # Typer CLI entry point
 ├── commands/
-│   ├── create.py     # create/cr command
+│   ├── backup.py     # backup/bk command
+│   ├── create.py     # create/cr command (full profile setup)
+│   ├── make.py       # make/mk command (individual tasks)
 │   └── update.py     # update/u command
 ├── core/
 │   ├── paths.py      # importlib.resources path resolution
@@ -31,7 +36,10 @@ src/menv/
 ## Key Components
 
 1. **`menv` CLI** - Primary user interface
-   - `menv create macbook` / `menv cr mac-mini`: Provision environment
+   - `menv create macbook` / `menv cr mmn`: Full environment setup for a profile
+   - `menv make rust` / `menv mk shell mbk`: Run individual Ansible tasks
+   - `menv list` / `menv ls`: List available tags
+   - `menv backup system` / `menv bk vscode`: Backup settings
    - `menv update` / `menv u`: Self-update to latest version
    - `menv --version`: Show installed version
 

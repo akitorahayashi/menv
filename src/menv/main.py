@@ -60,24 +60,24 @@ def main(
 
 
 # Register create command (full profile setup) and alias
-app.command(name="create", help="Full environment setup for a profile.")(create)
-app.command(name="cr", help="Full environment setup for a profile.")(create)
+app.command(name="create", help="Full environment setup for a profile. [aliases: cr]")(create)
+app.command(name="cr", hidden=True)(create)
 
 # Register make command (individual tasks) and alias
-app.command(name="make", help="Run individual Ansible task by tag.")(make)
-app.command(name="mk", help="Run individual Ansible task by tag.")(make)
+app.command(name="make", help="Run individual Ansible task by tag. [aliases: mk]")(make)
+app.command(name="mk", hidden=True)(make)
 
-# Register make list command
-app.command(name="list", help="List available tags for make command.")(list_tags)
-app.command(name="ls", help="List available tags for make command.")(list_tags)
+# Register list command and alias
+app.command(name="list", help="List available tags for make command. [aliases: ls]")(list_tags)
+app.command(name="ls", hidden=True)(list_tags)
 
 # Register update command and alias
-app.command(name="update", help="Update menv to the latest version.")(update)
-app.command(name="u", help="Update menv to the latest version.")(update)
+app.command(name="update", help="Update menv to the latest version. [aliases: u]")(update)
+app.command(name="u", hidden=True)(update)
 
 # Register backup command and alias
-app.command(name="backup", help="Backup system settings or configurations.")(backup)
-app.command(name="bk", help="Backup system settings or configurations.")(backup)
+app.command(name="backup", help="Backup system settings or configurations. [aliases: bk]")(backup)
+app.command(name="bk", hidden=True)(backup)
 
 
 if __name__ == "__main__":

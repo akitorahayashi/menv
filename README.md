@@ -32,24 +32,45 @@ pipx install git+https://github.com/akitorahayashi/menv.git
 
 ### Usage
 
-**Provision your environment:**
+**Full environment setup:**
 
 ```sh
 # For MacBook
 menv create macbook
 # or shorthand:
-menv cr macbook
+menv cr mbk
 
 # For Mac mini
 menv create mac-mini
 # or shorthand:
-menv cr mac-mini
+menv cr mmn
 ```
 
-**Run specific tags only:**
+**Run individual tasks:**
 
 ```sh
-menv create macbook --tags shell,python,rust
+# List available tags
+menv list
+menv ls
+
+# Run specific task
+menv make rust              # Run rust-platform + rust-tools
+menv make python-tools      # Run python-tools
+menv make brew-cask mmn     # Run brew-cask for mac-mini
+menv mk shell               # Shorthand
+
+# Tag groups are expanded automatically:
+#   rust → rust-platform, rust-tools
+#   python → python-platform, python-tools
+#   nodejs → nodejs-platform, nodejs-tools
+```
+
+**Backup commands:**
+
+```sh
+menv backup system          # Backup macOS defaults
+menv backup vscode          # Backup VSCode extensions
+menv bk system              # Shorthand
 ```
 
 **Update menv:**
@@ -65,6 +86,7 @@ menv u
 ```sh
 menv --help
 menv create --help
+menv make --help
 ```
 
 ## Development
@@ -110,7 +132,9 @@ menv/
 │   ├── __main__.py       # python -m menv
 │   ├── main.py           # Typer app definition
 │   ├── commands/
-│   │   ├── create.py     # create/cr command
+│   │   ├── backup.py     # backup/bk command
+│   │   ├── create.py     # create/cr command (full setup)
+│   │   ├── make.py       # make/mk command (individual tasks)
 │   │   └── update.py     # update/u command
 │   ├── core/
 │   │   ├── paths.py      # Package path resolution
@@ -124,6 +148,12 @@ menv/
 └── pyproject.toml
 ```
 
-## License
+## Commands Summary
 
-MIT
+| Command | Alias | Description |
+|---------|-------|-------------|
+| `menv create <profile>` | `cr` | Full environment setup for a profile |
+| `menv make <tag> [profile]` | `mk` | Run individual Ansible task |
+| `menv list` | `ls` | List available tags |
+| `menv backup <target>` | `bk` | Backup system settings |
+| `menv update` | `u` | Update menv to latest version |
