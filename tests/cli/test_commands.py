@@ -193,10 +193,9 @@ class TestCLIIntegration:
         assert result.exit_code != 0
         assert "Invalid profile" in result.output or "Error" in result.output
 
-    def test_switch_without_config_shows_error(self, cli_runner: CliRunner) -> None:
-        """Test that switch without config shows error."""
-        # This test assumes no config exists in test environment
-        result = cli_runner.invoke(app, ["switch", "personal"])
+    def test_switch_requires_profile_argument(self, cli_runner: CliRunner) -> None:
+        """Test that switch without profile shows error."""
+        result = cli_runner.invoke(app, ["switch"])
 
-        # Should fail if no config exists
-        assert result.exit_code != 0 or "config" in result.output.lower()
+        # Should show error about missing argument
+        assert result.exit_code != 0 or "PROFILE" in result.output
