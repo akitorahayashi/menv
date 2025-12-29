@@ -68,28 +68,13 @@ test:
   @echo "🧪 Running tests..."
   @uv run pytest tests/
 
-# Run tests with coverage
-test-cov:
-  @echo "🧪 Running tests with coverage..."
-  @uv run pytest tests/ --cov=src/menv --cov-report=term-missing
-
 # ==============================================================================
-# BUILD & RUN
+# RUN
 # ==============================================================================
-
-# Build the package
-build:
-  @echo "📦 Building package..."
-  @uv build
 
 # Run menv CLI in development mode
 run *args:
   @uv run menv {{args}}
-
-# Install menv in development mode
-install-dev:
-  @echo "📦 Installing menv in development mode..."
-  @uv pip install -e .
 
 # ==============================================================================
 # CLEANUP

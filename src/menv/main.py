@@ -6,7 +6,9 @@ from typing import Optional
 import typer
 from rich.console import Console
 
+from menv.commands.backup import backup
 from menv.commands.create import create
+from menv.commands.make import list_tags, make
 from menv.commands.update import update
 
 console = Console()
@@ -57,13 +59,25 @@ def main(
     """menv - Provision and manage your macOS development environment."""
 
 
-# Register create command and alias
-app.command(name="create", help="Provision a macOS development environment.")(create)
-app.command(name="cr", help="Provision a macOS development environment.")(create)
+# Register create command (full profile setup) and alias
+app.command(name="create", help="Full environment setup for a profile.")(create)
+app.command(name="cr", help="Full environment setup for a profile.")(create)
+
+# Register make command (individual tasks) and alias
+app.command(name="make", help="Run individual Ansible task by tag.")(make)
+app.command(name="mk", help="Run individual Ansible task by tag.")(make)
+
+# Register make list command
+app.command(name="list", help="List available tags for make command.")(list_tags)
+app.command(name="ls", help="List available tags for make command.")(list_tags)
 
 # Register update command and alias
 app.command(name="update", help="Update menv to the latest version.")(update)
 app.command(name="u", help="Update menv to the latest version.")(update)
+
+# Register backup command and alias
+app.command(name="backup", help="Backup system settings or configurations.")(backup)
+app.command(name="bk", help="Backup system settings or configurations.")(backup)
 
 
 if __name__ == "__main__":

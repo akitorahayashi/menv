@@ -31,6 +31,7 @@ class TestCLIIntegration:
         assert result.exit_code == 0
         assert "menv" in result.output
         assert "create" in result.output
+        assert "make" in result.output
         assert "update" in result.output
 
     def test_no_args_shows_help(self, cli_runner: CliRunner) -> None:
@@ -53,6 +54,33 @@ class TestCLIIntegration:
         assert result.exit_code == 0
         assert "PROFILE" in result.output or "profile" in result.output.lower()
 
+    def test_make_help_shows_tag_argument(self, cli_runner: CliRunner) -> None:
+        """Test that make --help shows tag argument."""
+        result = cli_runner.invoke(app, ["make", "--help"])
+
+        assert result.exit_code == 0
+        assert "TAG" in result.output or "tag" in result.output.lower()
+
+    def test_mk_alias_works(self, cli_runner: CliRunner) -> None:
+        """Test that 'mk' alias for make works."""
+        result = cli_runner.invoke(app, ["mk", "--help"])
+
+        assert result.exit_code == 0
+        assert "TAG" in result.output or "tag" in result.output.lower()
+
+    def test_list_shows_available_tags(self, cli_runner: CliRunner) -> None:
+        """Test that list command shows available tags."""
+        result = cli_runner.invoke(app, ["list"])
+
+        assert result.exit_code == 0
+        assert "rust" in result.output.lower() or "shell" in result.output.lower()
+
+    def test_ls_alias_works(self, cli_runner: CliRunner) -> None:
+        """Test that 'ls' alias for list works."""
+        result = cli_runner.invoke(app, ["ls"])
+
+        assert result.exit_code == 0
+
     def test_update_help_shows_description(self, cli_runner: CliRunner) -> None:
         """Test that update --help shows description."""
         result = cli_runner.invoke(app, ["update", "--help"])
@@ -68,15 +96,29 @@ class TestCLIIntegration:
         assert result.exit_code == 0
 
     def test_create_invalid_profile_shows_error(self, cli_runner: CliRunner) -> None:
-        """Test that invalid profile shows error."""
+        """Test that invalid profile for create shows error."""
         result = cli_runner.invoke(app, ["create", "invalid-profile"])
 
         assert result.exit_code != 0
         assert "Invalid profile" in result.output or "Error" in result.output
 
     def test_create_requires_profile_argument(self, cli_runner: CliRunner) -> None:
-        """Test that create without profile shows help."""
+        """Test that create without profile shows error."""
         result = cli_runner.invoke(app, ["create"])
 
-        # Should either show help or error about missing argument
+        # Should show error about missing argument
         assert result.exit_code != 0 or "PROFILE" in result.output
+
+    def test_make_invalid_profile_shows_error(self, cli_runner: CliRunner) -> None:
+        """Test that invalid profile for make shows error."""
+        result = cli_runner.invoke(app, ["make", "shell", "invalid-profile"])
+
+        assert result.exit_code != 0
+        assert "Invalid profile" in result.output or "Error" in result.output
+
+    def test_make_requires_tag_argument(self, cli_runner: CliRunner) -> None:
+        """Test that make without tag shows error."""
+        result = cli_runner.invoke(app, ["make"])
+
+        # Should show error about missing argument
+        assert result.exit_code != 0 or "TAG" in result.output
