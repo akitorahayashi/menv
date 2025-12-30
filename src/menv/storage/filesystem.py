@@ -62,15 +62,19 @@ class FilesystemConfigStorage:
         """
         self._config_dir.mkdir(parents=True, exist_ok=True)
 
-        # Write TOML manually (simple format, no need for external library)
+        def _escape(value: str) -> str:
+            """Escape special characters for a TOML string."""
+            return value.replace("\\", "\\\\").replace('"', '\\"')
+
+        # Write TOML manually, escaping values to handle special characters.
         lines = [
             "[personal]",
-            f'name = "{config["personal"]["name"]}"',
-            f'email = "{config["personal"]["email"]}"',
+            f'name = "{_escape(config["personal"]["name"])}"',
+            f'email = "{_escape(config["personal"]["email"])}"',
             "",
             "[work]",
-            f'name = "{config["work"]["name"]}"',
-            f'email = "{config["work"]["email"]}"',
+            f'name = "{_escape(config["work"]["name"])}"',
+            f'email = "{_escape(config["work"]["email"])}"',
             "",
         ]
 

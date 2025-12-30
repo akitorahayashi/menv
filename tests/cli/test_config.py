@@ -129,3 +129,35 @@ class TestGetIdentity:
         storage = FilesystemConfigStorage(tmp_path)
         identity = storage.get_identity("personal")
         assert identity is None
+
+
+class TestSpecialCharacters:
+    """Tests for handling special characters in config values."""
+
+    def test_save_and_load_with_quotes(self, tmp_path: Path) -> None:
+        """Test that quotes in names are properly escaped."""
+        storage = FilesystemConfigStorage(tmp_path)
+
+        config = MenvConfig(
+            personal=IdentityConfig(name='Test "Nick" User', email="test@example.com"),
+            work=IdentityConfig(name="Work User", email="work@example.com"),
+        )
+        storage.save(config)
+
+        loaded = storage.load()
+        assert loaded is not None
+        assert loaded["personal"]["name"] == 'Test "Nick" User'
+
+    def test_save_and_load_with_backslash(self, tmp_path: Path) -> None:
+        """Test that backslashes in values are properly escaped."""
+        storage = FilesystemConfigStorage(tmp_path)
+
+        config = MenvConfig(
+            personal=IdentityConfig(name=r"User\Name", email="test@example.com"),
+            work=IdentityConfig(name="Work User", email="work@example.com"),
+        )
+        storage.save(config)
+
+        loaded = storage.load()
+        assert loaded is not None
+        assert loaded["personal"]["name"] == r"User\Name"
