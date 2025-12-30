@@ -4,11 +4,18 @@
     file: "{{ role_path }}/config/common/go-tools.yml"
     name: go_tools_config
 
-# 1. Check currently installed versions
+# 1. Check currently installed versions using `go version -m` for reliable version detection
 # check_mode: false is important to ensure this check command runs even in dry-run mode
 - name: "Check installed versions of Go tools"
-  ansible.builtin.command:
-    cmd: "{{ ansible_env.HOME }}/go/bin/{{ item.name }} --version"
+  ansible.builtin.shell:
+    cmd: |
+      set -o pipefail
+      if [ -f "{{ ansible_env.HOME }}/go/bin/{{ item.name }}" ]; then
+        go version -m "{{ ansible_env.HOME }}/go/bin/{{ item.name }}" 2>/dev/null | grep -E '^\s+mod\s+' | awk '{print $3}'
+      else
+        echo "not-installed"
+      fi
+    executable: /bin/bash
   loop: "{{ go_tools_config.tools }}"
   register: go_tools_version_check
   changed_when: false
@@ -29,18 +36,20 @@
     index_var: idx
     label: "{{ item.name }}"
   register: go_install_result
-  changed_when: go_install_result.rc == 0
+  # changed_when is true only when the when condition triggered installation
+  changed_when: true
   environment:
     PATH: "{{ ansible_env.HOME }}/.goenv/shims:{{ ansible_env.HOME }}/.goenv/bin:/opt/homebrew/bin:{{ ansible_env.PATH }}"
     GOENV_ROOT: "{{ ansible_env.HOME }}/.goenv"
     GOPATH: "{{ ansible_env.HOME }}/go"
     GOBIN: "{{ ansible_env.HOME }}/go/bin"
   # Condition explanation:
-  # 1. Command failed (rc != 0) = not installed -> needs installation
+  # 1. Binary not found = not installed -> needs installation
   # 2. Tag is defined and the version output does not contain that version number -> needs update
   #    (Note: Remove 'v' from git tag like 'v1.62.2' to compare with '1.62.2')
+  # 3. No tag defined but not installed -> install @latest
   when: >
-    go_tools_version_check.results[idx].rc != 0 or
+    go_tools_version_check.results[idx].stdout | trim == 'not-installed' or
     (
       item.tag is defined and
       item.tag | regex_replace('^v', '') not in go_tools_version_check.results[idx].stdout

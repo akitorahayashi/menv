@@ -26,7 +26,7 @@
 - name: "Set global Go version"
   ansible.builtin.command:
     cmd: "goenv global {{ go_version }}"
-  changed_when: "go_current_global.stdout != go_version"
+  changed_when: "go_current_global.stdout | trim != go_version"
   environment:
     PATH: "/opt/homebrew/bin:{{ ansible_env.PATH }}"
     GOENV_ROOT: "{{ ansible_env.HOME }}/.goenv"

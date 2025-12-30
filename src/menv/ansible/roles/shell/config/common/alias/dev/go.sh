@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Go development aliases and functions
 
 # Quick commands

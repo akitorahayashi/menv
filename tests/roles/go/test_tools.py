@@ -54,11 +54,10 @@ class TestGoToolsIdempotency:
             )
 
     def test_version_comparison_logic_tool_not_installed(self) -> None:
-        """Test: tool not installed (rc != 0) should trigger installation."""
-        # Simulate version check command failed (tool not found)
+        """Test: tool not installed should trigger installation."""
+        # Simulate go version -m output when binary doesn't exist
         version_check_result = MagicMock()
-        version_check_result.rc = 1  # Non-zero = command failed
-        version_check_result.stdout = ""
+        version_check_result.stdout = "not-installed\n"
 
         tool = {
             "name": "golangci-lint",
@@ -66,22 +65,19 @@ class TestGoToolsIdempotency:
             "tag": "v1.62.2",
         }
 
-        # Condition: rc != 0 OR (tag defined AND version mismatch)
-        should_install = version_check_result.rc != 0 or (
+        # Condition: not-installed OR (tag defined AND version mismatch)
+        should_install = version_check_result.stdout.strip() == "not-installed" or (
             "tag" in tool
             and re.sub(r"^v", "", tool["tag"]) not in version_check_result.stdout
         )
 
-        assert should_install, "Tool not installed (rc=1) should trigger installation"
+        assert should_install, "Tool not installed should trigger installation"
 
     def test_version_comparison_logic_matching_version(self) -> None:
         """Test: tool installed with matching version should skip installation."""
-        # Simulate version check command succeeded with matching version
+        # Simulate go version -m output showing matching version
         version_check_result = MagicMock()
-        version_check_result.rc = 0
-        version_check_result.stdout = (
-            "golangci-lint has version 1.62.2\n"  # Matches tag 1.62.2
-        )
+        version_check_result.stdout = "v1.62.2\n"  # Matches tag 1.62.2
 
         tool = {
             "name": "golangci-lint",
@@ -89,7 +85,7 @@ class TestGoToolsIdempotency:
             "tag": "v1.62.2",
         }
 
-        should_install = version_check_result.rc != 0 or (
+        should_install = version_check_result.stdout.strip() == "not-installed" or (
             "tag" in tool
             and re.sub(r"^v", "", tool["tag"]) not in version_check_result.stdout
         )
@@ -98,12 +94,9 @@ class TestGoToolsIdempotency:
 
     def test_version_comparison_logic_mismatched_version(self) -> None:
         """Test: tool installed with mismatched version should trigger installation."""
-        # Simulate version check command succeeded but version mismatch
+        # Simulate go version -m output with version mismatch
         version_check_result = MagicMock()
-        version_check_result.rc = 0
-        version_check_result.stdout = (
-            "golangci-lint has version 1.61.0\n"  # Doesn't match tag 1.62.2
-        )
+        version_check_result.stdout = "v1.61.0\n"  # Doesn't match tag 1.62.2
 
         tool = {
             "name": "golangci-lint",
@@ -111,31 +104,50 @@ class TestGoToolsIdempotency:
             "tag": "v1.62.2",
         }
 
-        should_install = version_check_result.rc != 0 or (
+        should_install = version_check_result.stdout.strip() == "not-installed" or (
             "tag" in tool
             and re.sub(r"^v", "", tool["tag"]) not in version_check_result.stdout
         )
 
         assert should_install, "Version mismatch should trigger reinstall"
 
-    def test_version_comparison_logic_no_tag_defined(self) -> None:
-        """Test: tool without tag defined should skip (no version management)."""
-        # Simulate version check command succeeded
+    def test_version_comparison_logic_no_tag_defined_installed(self) -> None:
+        """Test: tool without tag but already installed should skip."""
+        # Simulate go version -m output showing installed version
         version_check_result = MagicMock()
-        version_check_result.rc = 0
-        version_check_result.stdout = "goimports 1.0.0\n"
+        version_check_result.stdout = "v0.24.0\n"
 
         tool = {
             "name": "goimports",
             "package": "golang.org/x/tools/cmd/goimports",
         }  # No 'tag' defined
 
-        should_install = version_check_result.rc != 0 or (
+        should_install = version_check_result.stdout.strip() == "not-installed" or (
             "tag" in tool
             and re.sub(r"^v", "", tool["tag"]) not in version_check_result.stdout
         )
 
-        assert not should_install, "No tag defined should skip version comparison"
+        assert not should_install, "No tag defined and installed should skip"
+
+    def test_version_comparison_logic_no_tag_defined_not_installed(self) -> None:
+        """Test: tool without tag and not installed should trigger installation."""
+        # Simulate binary not found
+        version_check_result = MagicMock()
+        version_check_result.stdout = "not-installed\n"
+
+        tool = {
+            "name": "goimports",
+            "package": "golang.org/x/tools/cmd/goimports",
+        }  # No 'tag' defined
+
+        should_install = version_check_result.stdout.strip() == "not-installed" or (
+            "tag" in tool
+            and re.sub(r"^v", "", tool["tag"]) not in version_check_result.stdout
+        )
+
+        assert should_install, (
+            "Tool not installed should trigger installation even without tag"
+        )
 
     @pytest.mark.parametrize(
         "tool_name, version_tag",
@@ -147,8 +159,9 @@ class TestGoToolsIdempotency:
         ],
     )
     def test_version_string_extraction(self, tool_name: str, version_tag: str) -> None:
-        """Test version extraction for various tool outputs."""
-        output = f"{tool_name} version {re.sub(r'^v', '', version_tag)}\n"
+        """Test version extraction from go version -m output."""
+        # go version -m outputs version with 'v' prefix
+        output = f"{version_tag}\n"
         stripped_tag = re.sub(r"^v", "", version_tag)
 
         assert stripped_tag in output, (
@@ -158,15 +171,14 @@ class TestGoToolsIdempotency:
     def test_installation_condition_comprehensive(self) -> None:
         """Test comprehensive installation condition logic."""
         test_scenarios = [
-            # (tool_config, version_check_rc, version_check_stdout, expected_install)
+            # (tool_config, version_check_stdout, expected_install)
             (
                 {
                     "name": "golangci-lint",
                     "package": "github.com/golangci/golangci-lint/cmd/golangci-lint",
                     "tag": "v1.62.2",
                 },
-                1,
-                "",
+                "not-installed\n",
                 True,
             ),  # Not installed
             (
@@ -175,8 +187,7 @@ class TestGoToolsIdempotency:
                     "package": "github.com/golangci/golangci-lint/cmd/golangci-lint",
                     "tag": "v1.62.2",
                 },
-                0,
-                "golangci-lint has version 1.62.2\n",
+                "v1.62.2\n",
                 False,
             ),  # Installed, version matches
             (
@@ -185,30 +196,32 @@ class TestGoToolsIdempotency:
                     "package": "github.com/golangci/golangci-lint/cmd/golangci-lint",
                     "tag": "v1.62.2",
                 },
-                0,
-                "golangci-lint has version 1.61.0\n",
+                "v1.61.0\n",
                 True,
             ),  # Installed, version mismatch
             (
                 {"name": "goimports", "package": "golang.org/x/tools/cmd/goimports"},
-                0,
-                "goimports 1.0.0\n",
+                "v0.24.0\n",
                 False,
-            ),  # No tag, skip version check
+            ),  # No tag, installed -> skip
+            (
+                {"name": "goimports", "package": "golang.org/x/tools/cmd/goimports"},
+                "not-installed\n",
+                True,
+            ),  # No tag, not installed -> install
         ]
 
-        for tool, rc, stdout, expected_install in test_scenarios:
+        for tool, stdout, expected_install in test_scenarios:
             version_check_result = MagicMock()
-            version_check_result.rc = rc
             version_check_result.stdout = stdout
 
-            should_install = version_check_result.rc != 0 or (
+            should_install = version_check_result.stdout.strip() == "not-installed" or (
                 "tag" in tool
                 and re.sub(r"^v", "", tool["tag"]) not in version_check_result.stdout
             )
 
             assert should_install == expected_install, (
-                f"Tool {tool['name']}: rc={rc}, stdout={stdout!r}, "
+                f"Tool {tool['name']}: stdout={stdout!r}, "
                 f"expected install={expected_install}, got {should_install}"
             )
 
