@@ -107,7 +107,7 @@ app.command(
 app.command(name="sw", hidden=True)(switch)
 
 # Register code command
-app.command(name="code", help="Open current directory in VS Code.")(code)
+app.command(name="code", help="Open menv source code in VS Code.")(code)
 
 
 if __name__ == "__main__":

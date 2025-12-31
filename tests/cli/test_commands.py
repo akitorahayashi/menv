@@ -210,7 +210,7 @@ class TestCLIIntegration:
     def test_code_command_not_found_shows_error(
         self, cli_runner: CliRunner, monkeypatch
     ) -> None:
-        """Test that code command shows error when 'code' CLI is not found."""
+        """Test that code command shows warning when 'code' CLI is not found."""
         import shutil
 
         # Mock shutil.which to return None (command not found)
@@ -218,10 +218,14 @@ class TestCLIIntegration:
 
         result = cli_runner.invoke(app, ["code"])
 
-        assert result.exit_code == 1
-        assert "Error" in result.output
+        # Should warn but not fail
+        assert result.exit_code == 0
+        assert "Warning" in result.output or "warning" in result.output
         assert "not found" in result.output
-        assert "Shell Command: Install" in result.output
+        # Check for key parts of the hint text separately to handle line wrapping
+        assert "Hint" in result.output or "hint" in result.output
+        assert "Command Palette" in result.output
+        assert "Install" in result.output
 
     def test_code_command_success(self, cli_runner: CliRunner, monkeypatch) -> None:
         """Test that code command opens menv project directory successfully."""
