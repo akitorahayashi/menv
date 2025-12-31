@@ -32,19 +32,21 @@ pipx install git+https://github.com/akitorahayashi/menv.git
 
 ### Usage
 
-**Full environment setup:**
+**Interactive setup guide (recommended):**
 
 ```sh
 # For MacBook
-menv create macbook
+menv introduce macbook
 # or shorthand:
-menv cr mbk
+menv itr mbk
 
 # For Mac mini
-menv create mac-mini
+menv introduce mac-mini
 # or shorthand:
-menv cr mmn
+menv itr mmn
 ```
+
+The `introduce` command shows an interactive guide with commands you can run in parallel. Open multiple terminals to speed up setup.
 
 **Run individual tasks:**
 
@@ -98,7 +100,7 @@ menv sw w                   # Shorthand for work
 menv code                   # Open menv project in VS Code
 ```
 
-Opens the menv source code directory in Visual Studio Code. This allows you to edit the menv codebase directly from the pipx installation without needing to clone the repository separately. If the `code` command is not installed, displays installation instructions.
+Clones the menv repository to `~/menv` (if not already present) and opens it in Visual Studio Code. This allows you to edit the menv codebase and create pull requests. Requires SSH access to GitHub to be configured.
 
 **Update menv:**
 
@@ -112,7 +114,7 @@ menv u
 
 ```sh
 menv --help
-menv create --help
+menv introduce --help
 menv make --help
 ```
 
@@ -134,7 +136,7 @@ uv sync
 ```sh
 # Run menv in development mode
 just run --help
-just run create macbook
+just run introduce macbook
 
 # Run tests
 just test
@@ -161,15 +163,14 @@ menv/
 │   ├── commands/
 │   │   ├── backup.py     # backup/bk command
 │   │   ├── config.py     # config/cf command
-│   │   ├── create.py     # create/cr command (full setup)
+│   │   ├── introduce.py  # introduce/itr command (setup guide)
 │   │   ├── make.py       # make/mk command (individual tasks)
 │   │   ├── switch.py     # switch/sw command
 │   │   └── update.py     # update/u command
 │   ├── core/
-│   │   ├── config.py     # Configuration management
-│   │   ├── paths.py      # Package path resolution
-│   │   ├── runner.py     # Ansible execution wrapper
-│   │   └── version.py    # Version management
+│   │   ├── brew_collector.py  # Collect brew dependencies
+│   │   ├── phases.py          # Setup phase definitions
+│   │   └── ...
 │   └── ansible/          # Ansible playbooks and roles
 │       ├── playbook.yml
 │       └── roles/
@@ -182,10 +183,11 @@ menv/
 
 | Command | Alias | Description |
 |---------|-------|-------------|
-| `menv create <profile>` | `cr` | Full environment setup for a profile |
+| `menv introduce <profile>` | `itr` | Interactive setup guide for a profile |
 | `menv make <tag> [profile]` | `mk` | Run individual Ansible task |
 | `menv list` | `ls` | List available tags |
 | `menv backup <target>` | `bk` | Backup system settings |
 | `menv config <action>` | `cf` | Manage VCS identities configuration |
 | `menv switch <profile>` | `sw` | Switch VCS identity (personal/work) |
+| `menv code` | - | Open menv source code in VS Code |
 | `menv update` | `u` | Update menv to latest version |

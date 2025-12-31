@@ -8,13 +8,13 @@ pipx-installable CLI for macOS dev environment setup using bundled Ansible playb
 
 | Command | Alias | Description |
 |---------|-------|-------------|
-| `menv create <profile>` | `cr` | Full setup (macbook/mbk, mac-mini/mmn) |
+| `menv introduce <profile>` | `itr` | Interactive setup guide (macbook/mbk, mac-mini/mmn) |
 | `menv make <tag> [profile]` | `mk` | Run individual task (default: common) |
 | `menv list` | `ls` | List available tags |
 | `menv backup <target>` | `bk` | Backup system/vscode |
 | `menv config <action>` | `cf` | Manage VCS identities (set/show) |
 | `menv switch <profile>` | `sw` | Switch VCS identity (personal/p, work/w) |
-| `menv code` | - | Open menv source code in VS Code |
+| `menv code` | - | Clone ~/menv (if needed) and open in VS Code |
 | `menv update` | `u` | Self-update via pipx |
 
 ## Package Structure
@@ -25,15 +25,17 @@ src/menv/
 ├── commands/
 │   ├── backup.py     # backup/bk command
 │   ├── config.py     # config/cf command
-│   ├── create.py     # create/cr command (full profile setup)
+│   ├── introduce.py  # introduce/itr command (interactive setup guide)
 │   ├── make.py       # make/mk command (individual tasks)
 │   ├── switch.py     # switch/sw command
 │   └── update.py     # update/u command
 ├── core/
-│   ├── config.py     # Configuration management (~/.config/menv/config.toml)
-│   ├── paths.py      # importlib.resources path resolution
-│   ├── runner.py     # Ansible subprocess execution
-│   └── version.py    # Version checking via GitHub API
+│   ├── brew_collector.py  # Collect brew formulae from roles
+│   ├── phases.py          # Setup phase definitions
+│   ├── config.py          # Configuration management (~/.config/menv/config.toml)
+│   ├── paths.py           # importlib.resources path resolution
+│   ├── runner.py          # Ansible subprocess execution
+│   └── version.py         # Version checking via GitHub API
 └── ansible/          # Bundled Ansible playbooks and roles
     ├── playbook.yml
     └── roles/

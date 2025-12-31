@@ -9,4 +9,4 @@ from typer.testing import CliRunner
 @pytest.fixture(scope="module")
 def cli_runner() -> CliRunner:
     """Create a CLI runner for testing Typer commands."""
-    return CliRunner()
+    return CliRunner(mix_stderr=False)

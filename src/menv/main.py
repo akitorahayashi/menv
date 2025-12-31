@@ -9,7 +9,7 @@ from rich.console import Console
 from menv.commands.backup import backup
 from menv.commands.code import code
 from menv.commands.config import config
-from menv.commands.create import create
+from menv.commands.introduce import introduce
 from menv.commands.make import list_tags, make
 from menv.commands.switch import switch
 from menv.commands.update import update
@@ -66,11 +66,12 @@ def main(
     ctx.obj = AppContext(config_storage=FilesystemConfigStorage())
 
 
-# Register create command (full profile setup) and alias
+# Register introduce command (interactive setup guide) and alias
 app.command(
-    name="create", help=r"Full environment setup for a profile. \[aliases: cr]"
-)(create)
-app.command(name="cr", hidden=True)(create)
+    name="introduce",
+    help=r"Interactive setup guide for a profile. \[aliases: itr]",
+)(introduce)
+app.command(name="itr", hidden=True)(introduce)
 
 # Register make command (individual tasks) and alias
 app.command(name="make", help=r"Run individual Ansible task by tag. \[aliases: mk]")(
