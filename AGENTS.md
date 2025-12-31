@@ -11,7 +11,7 @@ pipx-installable CLI for macOS dev environment setup using bundled Ansible playb
 | `menv introduce <profile>` | `itr` | Interactive setup guide (macbook/mbk, mac-mini/mmn); use `-nw` to skip waits |
 | `menv make <tag> [profile]` | `mk` | Run individual task (default: common); profile only needed for brew-deps/brew-cask |
 | `menv list` | `ls` | List available tags |
-| `menv backup <target>` | `bk` | Backup system/vscode |
+| `menv backup <target>` | `bk` | Backup system/VS Code |
 | `menv config <action>` | `cf` | Manage VCS identities (set/show) |
 | `menv switch <profile>` | `sw` | Switch VCS identity (personal/p, work/w) |
 | `menv code` | - | Clone ~/menv (if needed) and open in VS Code |
@@ -19,7 +19,7 @@ pipx-installable CLI for macOS dev environment setup using bundled Ansible playb
 
 ## Package Structure
 
-```
+```text
 src/menv/
 ├── main.py           # Typer CLI entry point
 ├── context.py        # AppContext (DI container)

@@ -34,9 +34,10 @@ def _clone_menv_repo() -> bool:
         subprocess.run(
             ["git", "clone", MENV_REPO_URL, str(MENV_REPO_PATH)],
             check=True,
+            timeout=60,
         )
         return True
-    except subprocess.CalledProcessError:
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
         return False
 
 
@@ -50,7 +51,7 @@ def code() -> None:
     Requirements:
         - SSH access to GitHub must be configured
         - The 'code' command must be installed (VS Code CLI)
-        - ~/menv must not already exist (to avoid conflicts)
+        - ~/menv must not exist, or if it does, it must be a git repository
 
     Examples:
         menv code

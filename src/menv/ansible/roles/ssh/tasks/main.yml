@@ -16,13 +16,13 @@
     src: "{{ role_path }}/config/common/config"
     dest: "{{ ansible_env.HOME }}/.ssh/config"
     force: true
-    mode: "0644"
+    mode: "0600"
 
 - name: Copy individual ssh config files
   ansible.builtin.copy:
     src: "{{ item }}"
     dest: "{{ ansible_env.HOME }}/.ssh/conf.d/{{ item | basename }}"
     force: true
-    mode: "0644"
+    mode: "0600"
   with_fileglob:
     - "{{ role_path }}/config/common/conf.d/*.conf"
