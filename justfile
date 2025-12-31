@@ -63,15 +63,15 @@ check: fix
 # ==============================================================================
 
 # Run all tests
-test: unit intg
+test: unit-test intg-test
 
 # Run unit tests only
-unit:
+unit-test:
   @echo "🧪 Running unit tests..."
   @uv run pytest tests/unit/
 
 # Run integration tests only
-intg:
+intg-test:
   @echo "🔗 Running integration tests..."
   @uv run pytest tests/intg/
 

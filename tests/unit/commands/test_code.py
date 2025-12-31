@@ -46,6 +46,19 @@ class TestCodeCommand:
         # Mock shutil.which to return a path (command found)
         monkeypatch.setattr(shutil, "which", lambda cmd: "/usr/local/bin/code")
 
+        # Mock MENV_REPO_PATH to simulate existing repo (skip SSH check)
+        class MockPath:
+            def exists(self) -> bool:
+                return True
+
+            def __truediv__(self, other: str) -> "MockPath":
+                return MockPath()
+
+            def __str__(self) -> str:
+                return "/Users/test/menv"
+
+        monkeypatch.setattr("menv.commands.code.MENV_REPO_PATH", MockPath())
+
         # Mock subprocess.run to simulate successful execution
         mock_result = MagicMock()
         mock_result.returncode = 0
@@ -68,6 +81,19 @@ class TestCodeCommand:
 
         # Mock shutil.which to return a path
         monkeypatch.setattr(shutil, "which", lambda cmd: "/usr/local/bin/code")
+
+        # Mock MENV_REPO_PATH to simulate existing repo (skip SSH check)
+        class MockPath:
+            def exists(self) -> bool:
+                return True
+
+            def __truediv__(self, other: str) -> "MockPath":
+                return MockPath()
+
+            def __str__(self) -> str:
+                return "/Users/test/menv"
+
+        monkeypatch.setattr("menv.commands.code.MENV_REPO_PATH", MockPath())
 
         # Track what path was passed to subprocess.run
         called_with_path = []

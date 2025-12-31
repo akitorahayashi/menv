@@ -87,9 +87,9 @@ tests/
 - For directories, copy contents by using trailing slashes on `src`/`dest` (e.g. `src: .../dir/`, `dest: .../dir/`)
 
 ### Testing
-- Run via `just test` (runs both unit and intg)
-- `just unit`: Unit tests only (fast, mocks, no external processes)
-- `just intg`: Integration tests only (subprocess, real scripts)
+- Run via `just test` (runs both unit-test and intg-test)
+- `just unit-test`: Unit tests only (fast, mocks, no external processes)
+- `just intg-test`: Integration tests only (subprocess, real scripts)
 - Mocks must be Protocol-compliant for type safety
 - Prefer DI over monkeypatch where possible
 
