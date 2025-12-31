@@ -58,10 +58,15 @@ for role, tags in AVAILABLE_TAGS.items():
 
 def _get_roles_for_tags(tags: list[str]) -> set[str]:
     """Get unique role names for a list of tags."""
+    from menv.services.config_deployer import ConfigDeployer
+
     roles = set()
     for tag in tags:
         if tag in TAG_TO_ROLE:
-            roles.add(TAG_TO_ROLE[tag])
+            role = TAG_TO_ROLE[tag]
+            # Only include roles that have config directories
+            if role in ConfigDeployer.ROLES_WITH_CONFIG:
+                roles.add(role)
     return roles
 
 
