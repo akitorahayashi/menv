@@ -7,7 +7,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
 
-from menv.core.phases import Phase, get_optional_commands, get_phases
+from menv.models.phases import Phase, get_optional_commands, get_phases
 
 console = Console()
 

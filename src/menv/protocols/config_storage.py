@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Protocol
 
 if TYPE_CHECKING:
-    from menv.storage.types import IdentityConfig, MenvConfig
+    from menv.models.config import IdentityConfig, MenvConfig
 
 
 class ConfigStorage(Protocol):

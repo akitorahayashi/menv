@@ -22,23 +22,41 @@ pipx-installable CLI for macOS dev environment setup using bundled Ansible playb
 ```
 src/menv/
 ├── main.py           # Typer CLI entry point
-├── commands/
-│   ├── backup.py     # backup/bk command
-│   ├── config.py     # config/cf command
-│   ├── introduce.py  # introduce/itr command (interactive setup guide)
-│   ├── make.py       # make/mk command (individual tasks)
-│   ├── switch.py     # switch/sw command
-│   └── update.py     # update/u command
-├── core/
-│   ├── phases.py          # Setup phase definitions
-│   ├── config.py          # Configuration management (~/.config/menv/config.toml)
-│   ├── paths.py           # importlib.resources path resolution
-│   ├── runner.py          # Ansible subprocess execution
-│   └── version.py         # Version checking via GitHub API
+├── context.py        # AppContext (DI container)
+├── commands/         # CLI commands (1 command per file)
+├── models/           # Data models (1 file per domain)
+├── services/         # Service classes (1 class per file)
+├── protocols/        # Protocol definitions (1 per service)
 └── ansible/          # Bundled Ansible playbooks and roles
-    ├── playbook.yml
-    └── roles/
+
+tests/
+├── mocks/            # Mock implementations (1 class per file, Protocol-compliant)
 ```
+
+## Architecture Principles
+
+### Directory Naming
+- **No ambiguous names**: `core/`, `utils/`, `helpers/` are forbidden
+- Every file must belong to a clear, specific category
+
+### Services (`services/`)
+- **1 class per file**
+- Each service must have a corresponding Protocol in `protocols/`
+- Example: `services/config_storage.py` ↔ `protocols/config_storage.py`
+
+### Models (`models/`)
+- **1 file per domain** (group related models)
+- Pure data structures (dataclass, TypedDict)
+- No business logic
+
+### Protocols (`protocols/`)
+- Define interface for each service
+- Both real implementations and mocks must satisfy the Protocol
+
+### Mocks (`tests/mocks/`)
+- **1 class per file** (mirror service structure)
+- Must implement corresponding Protocol
+- Never put implementations in `__init__.py`
 
 ## Design Rules
 
@@ -52,9 +70,9 @@ src/menv/
 - Overwrite existing files/links unconditionally
 
 ### Testing
-- Run via `just test` (executes `uv run pytest tests/`)
-- Fixtures in `conftest.py` files at appropriate scope levels
-- No generic helper modules; use properly-scoped fixtures
+- Run via `just test`
+- Mocks must be Protocol-compliant for type safety
+- Prefer DI over monkeypatch where possible
 
 ### Development
 - `just run <args>`: Run menv in dev mode

@@ -6,7 +6,12 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from menv.protocols import ConfigStorage
+    from menv.protocols import (
+        AnsiblePathsProtocol,
+        AnsibleRunnerProtocol,
+        ConfigStorage,
+        VersionCheckerProtocol,
+    )
 
 
 @dataclass
@@ -14,3 +19,6 @@ class AppContext:
     """Application context container for DI."""
 
     config_storage: ConfigStorage
+    ansible_paths: AnsiblePathsProtocol
+    ansible_runner: AnsibleRunnerProtocol
+    version_checker: VersionCheckerProtocol

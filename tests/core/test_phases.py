@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from menv.core.phases import Phase, get_optional_commands, get_phases
+from menv.models.phases import Phase, get_optional_commands, get_phases
 
 
 class TestPhase:

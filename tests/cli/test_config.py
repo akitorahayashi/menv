@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from menv.storage import FilesystemConfigStorage, IdentityConfig, MenvConfig
+from menv.models.config import IdentityConfig, MenvConfig
+from menv.services.config_storage import FilesystemConfigStorage
 
 
 class TestConfigStorage:
