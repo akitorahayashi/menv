@@ -224,7 +224,7 @@ class TestCLIIntegration:
         assert "Shell Command: Install" in result.output
 
     def test_code_command_success(self, cli_runner: CliRunner, monkeypatch) -> None:
-        """Test that code command succeeds when 'code' CLI is available."""
+        """Test that code command opens menv project directory successfully."""
         import shutil
         import subprocess
         from unittest.mock import MagicMock
@@ -241,6 +241,39 @@ class TestCLIIntegration:
 
         assert result.exit_code == 0
         assert "✓" in result.output or "Opened" in result.output
+        assert "menv" in result.output
+
+    def test_code_command_finds_project_root(
+        self, cli_runner: CliRunner, monkeypatch
+    ) -> None:
+        """Test that code command correctly finds menv project root."""
+        import shutil
+        import subprocess
+        from pathlib import Path
+        from unittest.mock import MagicMock
+
+        # Mock shutil.which to return a path
+        monkeypatch.setattr(shutil, "which", lambda cmd: "/usr/local/bin/code")
+
+        # Track what path was passed to subprocess.run
+        called_with_path = []
+
+        def mock_run(cmd_list, *args, **kwargs):
+            called_with_path.append(cmd_list[1])
+            mock_result = MagicMock()
+            mock_result.returncode = 0
+            return mock_result
+
+        monkeypatch.setattr(subprocess, "run", mock_run)
+
+        result = cli_runner.invoke(app, ["code"])
+
+        # Should have found and opened some path
+        assert result.exit_code == 0
+        assert len(called_with_path) == 1
+        # The path should be a valid directory path (not just ".")
+        opened_path = Path(called_with_path[0])
+        assert opened_path.name != "."
 
     def test_code_command_subprocess_error(
         self, cli_runner: CliRunner, monkeypatch
