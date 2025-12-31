@@ -48,6 +48,8 @@ menv itr mmn
 
 The `introduce` command shows an interactive guide with commands you can run in parallel. Open multiple terminals to speed up setup.
 
+menv provisions dotfiles by copying them into your home directory (no symlinks) so pipx upgrades won’t break paths.
+
 **Run individual tasks:**
 
 ```sh
@@ -145,9 +147,6 @@ just test
 just fix
 just check
 
-# Build package
-just build
-
 # Clean temporary files
 just clean
 ```
@@ -160,6 +159,7 @@ menv/
 │   ├── __init__.py
 │   ├── __main__.py       # python -m menv
 │   ├── main.py           # Typer app definition
+│   ├── context.py        # AppContext (DI container)
 │   ├── commands/
 │   │   ├── backup.py     # backup/bk command
 │   │   ├── config.py     # config/cf command
@@ -167,13 +167,14 @@ menv/
 │   │   ├── make.py       # make/mk command (individual tasks)
 │   │   ├── switch.py     # switch/sw command
 │   │   └── update.py     # update/u command
-│   ├── core/
-│   │   ├── phases.py          # Setup phase definitions
-│   │   └── ...
+│   ├── models/           # Data models (domain-grouped)
+│   ├── services/         # Service implementations (1 class per file)
+│   ├── protocols/        # Service protocols (1 per service)
 │   └── ansible/          # Ansible playbooks and roles
 │       ├── playbook.yml
 │       └── roles/
 ├── tests/
+│   └── mocks/            # Mock implementations (1 class per file)
 ├── justfile              # Development tasks
 └── pyproject.toml
 ```

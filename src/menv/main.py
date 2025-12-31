@@ -16,7 +16,7 @@ from menv.commands.update import update
 from menv.context import AppContext
 from menv.services.ansible_paths import AnsiblePaths
 from menv.services.ansible_runner import AnsibleRunner
-from menv.services.config_storage import FilesystemConfigStorage
+from menv.services.config_storage import ConfigStorage
 from menv.services.version_checker import VersionChecker
 
 console = Console()
@@ -68,7 +68,7 @@ def main(
     """menv - Provision and manage your macOS development environment."""
     ansible_paths = AnsiblePaths()
     ctx.obj = AppContext(
-        config_storage=FilesystemConfigStorage(),
+        config_storage=ConfigStorage(),
         ansible_paths=ansible_paths,
         ansible_runner=AnsibleRunner(paths=ansible_paths),
         version_checker=VersionChecker(),

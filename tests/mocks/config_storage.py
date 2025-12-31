@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 from menv.models.config import IdentityConfig, MenvConfig
-from menv.protocols import ConfigStorage
+from menv.protocols import ConfigStorageProtocol
 
 
-class MockConfigStorage(ConfigStorage):
+class MockConfigStorage(ConfigStorageProtocol):
     """In-memory mock configuration storage for testing."""
 
     def __init__(self, config: MenvConfig | None = None) -> None:

@@ -1,4 +1,4 @@
-"""Fixtures for CLI tests."""
+"""Fixtures for unit tests."""
 
 from __future__ import annotations
 

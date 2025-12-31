@@ -30,7 +30,13 @@ src/menv/
 └── ansible/          # Bundled Ansible playbooks and roles
 
 tests/
+├── unit/             # Unit tests (mocks, no external processes)
+│   ├── commands/     # CLI command tests
+│   └── services/     # Service tests
+├── intg/             # Integration tests (subprocess, real scripts)
+│   └── roles/        # Ansible role script tests
 ├── mocks/            # Mock implementations (1 class per file, Protocol-compliant)
+└── conftest.py       # Shared fixtures
 ```
 
 ## Architecture Principles
@@ -39,11 +45,6 @@ tests/
 - **No ambiguous names**: `core/`, `utils/`, `helpers/` are forbidden
 - Every file must belong to a clear, specific category
 
-### Services (`services/`)
-- **1 class per file**
-- Each service must have a corresponding Protocol in `protocols/`
-- Example: `services/config_storage.py` ↔ `protocols/config_storage.py`
-
 ### Models (`models/`)
 - **1 file per domain** (group related models)
 - Pure data structures (dataclass, TypedDict)
@@ -51,7 +52,14 @@ tests/
 
 ### Protocols (`protocols/`)
 - Define interface for each service
+- **Naming**: `XxxProtocol` suffix (e.g., `ConfigStorageProtocol`)
 - Both real implementations and mocks must satisfy the Protocol
+
+### Services (`services/`)
+- **1 class per file**
+- Each service must have a corresponding Protocol in `protocols/`
+- **Naming**: Plain name without suffix (e.g., `ConfigStorage`)
+- Example: `services/config_storage.py` (ConfigStorage) ↔ `protocols/config_storage.py` (ConfigStorageProtocol)
 
 ### Mocks (`tests/mocks/`)
 - **1 class per file** (mirror service structure)
@@ -65,12 +73,16 @@ tests/
 - Roles handle fallback logic (profile-specific → common)
 - Use `importlib.resources` for package path resolution
 
-### Symlink Enforcement
-- Always use `force: true` when creating symlinks
-- Overwrite existing files/links unconditionally
+### Copy Enforcement
+- Never create symlinks for user-facing config (pipx installs must remain stable across upgrades)
+- Use `ansible.builtin.copy` with `force: true`
+- Set `mode: "0644"` for config/text files, `mode: "0755"` for executable scripts
+- For directories, copy contents by using trailing slashes on `src`/`dest` (e.g. `src: .../dir/`, `dest: .../dir/`)
 
 ### Testing
-- Run via `just test`
+- Run via `just test` (runs both unit and intg)
+- `just unit`: Unit tests only (fast, mocks, no external processes)
+- `just intg`: Integration tests only (subprocess, real scripts)
 - Mocks must be Protocol-compliant for type safety
 - Prefer DI over monkeypatch where possible
 

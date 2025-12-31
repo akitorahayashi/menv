@@ -7,7 +7,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
 
-from menv.models.phases import Phase, get_optional_commands, get_phases
+from menv.models.introduction_phases import IntroductionPhase, get_optional_commands, get_phases
 
 console = Console()
 
@@ -81,7 +81,7 @@ def _show_brew_phase(profile: str, no_wait: bool) -> None:
     console.print()
 
 
-def _show_phase(num: int, phase: Phase, no_wait: bool) -> None:
+def _show_phase(num: int, phase: IntroductionPhase, no_wait: bool) -> None:
     """Show a single phase."""
     dep_note = ""
     if phase.dependencies:

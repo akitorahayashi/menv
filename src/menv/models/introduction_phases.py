@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 
 
 @dataclass
-class Phase:
+class IntroductionPhase:
     """A setup phase with commands to run."""
 
     name: str
@@ -16,17 +16,17 @@ class Phase:
     dependencies: list[str] = field(default_factory=list)
 
 
-def get_phases(profile: str) -> list[Phase]:
+def get_phases(profile: str) -> list[IntroductionPhase]:
     """Get all phases for the given profile.
 
     Args:
         profile: The profile name (macbook, mac-mini).
 
     Returns:
-        List of Phase objects defining the setup stages.
+        List of IntroductionPhase objects defining the setup stages.
     """
     return [
-        Phase(
+        IntroductionPhase(
             name="Configuration",
             description="These can run in parallel - open multiple terminals if you want:",
             commands=[
@@ -38,7 +38,7 @@ def get_phases(profile: str) -> list[Phase]:
             ],
             parallel=True,
         ),
-        Phase(
+        IntroductionPhase(
             name="Language Runtimes",
             description="These can run in parallel:",
             commands=[
@@ -50,7 +50,7 @@ def get_phases(profile: str) -> list[Phase]:
             ],
             parallel=True,
         ),
-        Phase(
+        IntroductionPhase(
             name="Tools",
             description="Run after the corresponding runtime is installed:",
             commands=[
@@ -63,7 +63,7 @@ def get_phases(profile: str) -> list[Phase]:
             parallel=True,
             dependencies=["Language Runtimes"],
         ),
-        Phase(
+        IntroductionPhase(
             name="Editors",
             description="Configuration and extensions (apps should be pre-installed):",
             commands=[

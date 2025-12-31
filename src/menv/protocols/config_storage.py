@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from menv.models.config import IdentityConfig, MenvConfig
 
 
-class ConfigStorage(Protocol):
+class ConfigStorageProtocol(Protocol):
     """Configuration storage abstraction."""
 
     def exists(self) -> bool:

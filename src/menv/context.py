@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from menv.protocols import (
         AnsiblePathsProtocol,
         AnsibleRunnerProtocol,
-        ConfigStorage,
+        ConfigStorageProtocol,
         VersionCheckerProtocol,
     )
 
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 class AppContext:
     """Application context container for DI."""
 
-    config_storage: ConfigStorage
+    config_storage: ConfigStorageProtocol
     ansible_paths: AnsiblePathsProtocol
     ansible_runner: AnsibleRunnerProtocol
     version_checker: VersionCheckerProtocol

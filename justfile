@@ -63,9 +63,17 @@ check: fix
 # ==============================================================================
 
 # Run all tests
-test:
-  @echo "🧪 Running tests..."
-  @uv run pytest tests/
+test: unit intg
+
+# Run unit tests only
+unit:
+  @echo "🧪 Running unit tests..."
+  @uv run pytest tests/unit/
+
+# Run integration tests only
+intg:
+  @echo "🔗 Running integration tests..."
+  @uv run pytest tests/intg/
 
 # ==============================================================================
 # RUN
