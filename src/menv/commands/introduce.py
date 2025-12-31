@@ -7,9 +7,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
 
-from menv.core.brew_collector import collect_formulae
 from menv.core.phases import Phase, get_optional_commands, get_phases
-from menv.paths import get_ansible_dir
 
 console = Console()
 
@@ -71,20 +69,12 @@ def introduce(
 
 def _show_brew_phase(profile: str, no_wait: bool) -> None:
     """Show Phase 0: Brew installation."""
-    roles_dir = get_ansible_dir() / "roles"
-    formulae = collect_formulae(roles_dir)
-
-    console.print("[bold]Phase 0: Brew Installation[/]")
+    console.print("[bold]Phase 0: Brew Dependencies[/]")
     console.print("═" * 50)
     console.print()
-    console.print("Install all required formulae first (prevents brew lock conflicts):")
+    console.print("Install all required brew formulae first (prevents lock conflicts):")
     console.print()
-
-    if formulae:
-        console.print(f"  [green]brew install {' '.join(formulae)}[/]")
-    else:
-        console.print("  [dim]No formulae detected (roles will install as needed)[/]")
-
+    console.print(f"  [green]menv make brew-deps -p {profile}[/]")
     console.print()
     if not no_wait:
         console.input("[dim]Press [Enter] when done...[/]")

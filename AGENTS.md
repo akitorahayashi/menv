@@ -30,7 +30,6 @@ src/menv/
 │   ├── switch.py     # switch/sw command
 │   └── update.py     # update/u command
 ├── core/
-│   ├── brew_collector.py  # Collect brew formulae from roles
 │   ├── phases.py          # Setup phase definitions
 │   ├── config.py          # Configuration management (~/.config/menv/config.toml)
 │   ├── paths.py           # importlib.resources path resolution

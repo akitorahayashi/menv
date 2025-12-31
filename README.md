@@ -168,7 +168,6 @@ menv/
 │   │   ├── switch.py     # switch/sw command
 │   │   └── update.py     # update/u command
 │   ├── core/
-│   │   ├── brew_collector.py  # Collect brew dependencies
 │   │   ├── phases.py          # Setup phase definitions
 │   │   └── ...
 │   └── ansible/          # Ansible playbooks and roles
