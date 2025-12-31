@@ -56,16 +56,16 @@ for role, tags in AVAILABLE_TAGS.items():
     TAG_TO_ROLE[role] = role
 
 
-def _get_roles_for_tags(tags: list[str]) -> set[str]:
-    """Get unique role names for a list of tags."""
-    from menv.services.config_deployer import ConfigDeployer
+def _get_roles_for_tags(app_ctx: "AppContext", tags: list[str]) -> set[str]:
+    """Get unique role names for a list of tags that have config directories."""
+    roles_with_config = app_ctx.config_deployer.roles_with_config
 
     roles = set()
     for tag in tags:
         if tag in TAG_TO_ROLE:
             role = TAG_TO_ROLE[tag]
             # Only include roles that have config directories
-            if role in ConfigDeployer.ROLES_WITH_CONFIG:
+            if role in roles_with_config:
                 roles.add(role)
     return roles
 
@@ -154,7 +154,7 @@ def make(
     app_ctx: AppContext = ctx.obj
 
     # Auto-deploy configs for roles that will be executed
-    roles_to_deploy = _get_roles_for_tags(tags_to_run)
+    roles_to_deploy = _get_roles_for_tags(app_ctx, tags_to_run)
     if not _deploy_configs_for_roles(app_ctx, roles_to_deploy):
         raise typer.Exit(code=1)
 

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import shutil
+from functools import cached_property
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -15,23 +16,6 @@ if TYPE_CHECKING:
 class ConfigDeployer:
     """Deploy role configs from package to ~/.config/menv/."""
 
-    # Roles that have config directories
-    ROLES_WITH_CONFIG = [
-        "brew",
-        "docker",
-        "editor",
-        "gh",
-        "go",
-        "nodejs",
-        "python",
-        "ruby",
-        "rust",
-        "shell",
-        "ssh",
-        "system",
-        "vcs",
-    ]
-
     def __init__(self, ansible_paths: AnsiblePathsProtocol) -> None:
         """Initialize ConfigDeployer.
 
@@ -40,6 +24,21 @@ class ConfigDeployer:
         """
         self._ansible_paths = ansible_paths
         self._local_config_root = Path.home() / ".config" / "menv" / "roles"
+
+    @cached_property
+    def roles_with_config(self) -> list[str]:
+        """Dynamically find roles that have a 'config' directory.
+
+        Returns:
+            Sorted list of role names that have config directories.
+        """
+        roles_dir = self._ansible_paths.ansible_dir() / "roles"
+        found_roles = []
+        if roles_dir.is_dir():
+            for role_path in roles_dir.iterdir():
+                if role_path.is_dir() and (role_path / "config").is_dir():
+                    found_roles.append(role_path.name)
+        return sorted(found_roles)
 
     def deploy_role(self, role: str, overlay: bool = False) -> DeployResult:
         """Deploy config for a single role to ~/.config/menv/roles/{role}/.
@@ -51,7 +50,7 @@ class ConfigDeployer:
         Returns:
             DeployResult with success status and message.
         """
-        if role not in self.ROLES_WITH_CONFIG:
+        if role not in self.roles_with_config:
             return DeployResult(
                 role=role,
                 success=False,
@@ -104,7 +103,7 @@ class ConfigDeployer:
             List of DeployResult for each role.
         """
         results = []
-        for role in self.ROLES_WITH_CONFIG:
+        for role in self.roles_with_config:
             result = self.deploy_role(role, overlay=overlay)
             results.append(result)
         return results
@@ -148,4 +147,4 @@ class ConfigDeployer:
         Returns:
             List of role names that have config directories.
         """
-        return self.ROLES_WITH_CONFIG.copy()
+        return list(self.roles_with_config)

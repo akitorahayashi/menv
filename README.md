@@ -109,10 +109,6 @@ menv sw w                   # Shorthand for work
 
 **Update menv:**
 
-Clones the menv repository to `~/menv` (if not already present) and opens it in Visual Studio Code. This allows you to edit the menv codebase and create pull requests. Requires SSH access to GitHub to be configured.
-
-**Update menv:**
-
 ```sh
 menv update
 # or shorthand:

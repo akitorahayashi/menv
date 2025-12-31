@@ -20,6 +20,15 @@ class DeployResult:
 class ConfigDeployerProtocol(Protocol):
     """Config deployment abstraction."""
 
+    @property
+    def roles_with_config(self) -> list[str]:
+        """Get list of roles that have config directories.
+
+        Returns:
+            Sorted list of role names that have config directories.
+        """
+        ...
+
     def deploy_role(self, role: str, overlay: bool = False) -> DeployResult:
         """Deploy config for a single role to ~/.config/menv/roles/{role}/.
 

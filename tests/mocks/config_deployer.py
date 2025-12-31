@@ -10,31 +10,40 @@ from menv.protocols.config_deployer import ConfigDeployerProtocol, DeployResult
 class MockConfigDeployer(ConfigDeployerProtocol):
     """In-memory mock config deployer for testing."""
 
-    ROLES_WITH_CONFIG = [
-        "brew",
-        "docker",
-        "editor",
-        "gh",
-        "go",
-        "nodejs",
-        "python",
-        "ruby",
-        "rust",
-        "shell",
-        "ssh",
-        "system",
-        "vcs",
-    ]
-
-    def __init__(self, deployed_roles: set[str] | None = None) -> None:
+    def __init__(
+        self,
+        deployed_roles: set[str] | None = None,
+        roles_with_config: list[str] | None = None,
+    ) -> None:
         """Initialize mock with optional pre-deployed roles.
 
         Args:
             deployed_roles: Set of role names that are already deployed.
+            roles_with_config: List of roles with config directories.
         """
         self._deployed_roles: set[str] = deployed_roles or set()
+        self._roles_with_config = roles_with_config or [
+            "brew",
+            "docker",
+            "editor",
+            "gh",
+            "go",
+            "nodejs",
+            "python",
+            "ruby",
+            "rust",
+            "shell",
+            "ssh",
+            "system",
+            "vcs",
+        ]
         self._local_config_root = Path("/mock/.config/menv/roles")
         self._package_config_root = Path("/mock/ansible/roles")
+
+    @property
+    def roles_with_config(self) -> list[str]:
+        """Return list of roles with config directories."""
+        return self._roles_with_config
 
     def deploy_role(self, role: str, overlay: bool = False) -> DeployResult:
         """Mock deploy config for a single role.
@@ -46,7 +55,7 @@ class MockConfigDeployer(ConfigDeployerProtocol):
         Returns:
             DeployResult with success status and message.
         """
-        if role not in self.ROLES_WITH_CONFIG:
+        if role not in self.roles_with_config:
             return DeployResult(
                 role=role,
                 success=False,
@@ -81,7 +90,7 @@ class MockConfigDeployer(ConfigDeployerProtocol):
             List of DeployResult for each role.
         """
         results = []
-        for role in self.ROLES_WITH_CONFIG:
+        for role in self.roles_with_config:
             result = self.deploy_role(role, overlay=overlay)
             results.append(result)
         return results
@@ -125,4 +134,4 @@ class MockConfigDeployer(ConfigDeployerProtocol):
         Returns:
             List of role names.
         """
-        return self.ROLES_WITH_CONFIG.copy()
+        return list(self.roles_with_config)

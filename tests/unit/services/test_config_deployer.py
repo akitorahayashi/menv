@@ -54,14 +54,17 @@ class TestConfigDeployer:
         mock_paths = MockAnsiblePaths(ansible_dir=temp_ansible_dir)
         return ConfigDeployer(ansible_paths=mock_paths)
 
-    def test_list_roles_returns_all_roles(self, deployer: ConfigDeployer) -> None:
-        """Test that list_roles returns all expected roles."""
+    def test_list_roles_returns_roles_with_config_dirs(
+        self, deployer: ConfigDeployer
+    ) -> None:
+        """Test that list_roles returns roles that have config directories."""
         roles = deployer.list_roles()
 
+        # Should find the roles we set up in temp_ansible_dir fixture
         assert "rust" in roles
-        assert "python" in roles
-        assert "shell" in roles
-        assert len(roles) == 13  # All 13 roles
+        assert "brew" in roles
+        # Roles without config directories should not be included
+        assert len(roles) == 2
 
     def test_get_local_config_path(
         self, deployer: ConfigDeployer, temp_home: Path
@@ -183,9 +186,7 @@ class TestConfigDeployer:
         assert result.success is False
         assert "does not have a config directory" in result.message
 
-    def test_deploy_all_deploys_all_roles(
-        self, deployer: ConfigDeployer, temp_home: Path
-    ) -> None:
+    def test_deploy_all_deploys_all_roles(self, deployer: ConfigDeployer) -> None:
         """Test that deploy_all deploys all roles."""
         results = deployer.deploy_all()
 
@@ -193,12 +194,12 @@ class TestConfigDeployer:
         successful = [r for r in results if r.success]
         assert len(successful) >= 2  # At least rust and brew should succeed
 
-    def test_deploy_role_fails_when_package_config_missing(
+    def test_deploy_role_fails_for_role_without_config_directory(
         self, deployer: ConfigDeployer
     ) -> None:
-        """Test that deploy_role fails gracefully when package config is missing."""
-        # python role has no config in our test setup
+        """Test that deploy_role fails for a role without a config directory."""
+        # python role has no config directory in our test setup
         result = deployer.deploy_role("python")
 
         assert result.success is False
-        assert "Package config not found" in result.message
+        assert "does not have a config directory" in result.message
