@@ -39,6 +39,7 @@ pipx install git+https://github.com/akitorahayashi/menv.git
 menv introduce macbook
 # or shorthand:
 menv itr mbk
+menv itr mbk -nw  # Skip wait prompts
 
 # For Mac mini
 menv introduce mac-mini
@@ -47,6 +48,8 @@ menv itr mmn
 ```
 
 The `introduce` command shows an interactive guide with commands you can run in parallel. Open multiple terminals to speed up setup.
+
+**Design principle**: Most commands use the `common` profile by default (no profile argument needed). Only `brew-deps` and `brew-cask` require profile specification since they have machine-specific configurations.
 
 menv provisions dotfiles by copying them into your home directory (no symlinks) so pipx upgrades won’t break paths.
 
@@ -57,12 +60,16 @@ menv provisions dotfiles by copying them into your home directory (no symlinks) 
 menv list
 menv ls
 
-# Run specific task
+# Run specific task (uses common profile by default)
 menv make rust              # Run rust-platform + rust-tools
 menv make go                # Run go-platform + go-tools
 menv make python-tools      # Run python-tools
-menv make brew-cask mmn     # Run brew-cask for mac-mini
-menv mk shell               # Shorthand
+menv make shell             # Run shell setup
+menv mk vscode              # Shorthand
+
+# Profile required only for brew-deps and brew-cask
+menv make brew-deps mbk     # Install brew dependencies for macbook
+menv make brew-cask mmn     # Install GUI apps for mac-mini
 
 # Tag groups are expanded automatically:
 #   rust → rust-platform, rust-tools

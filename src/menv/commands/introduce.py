@@ -7,7 +7,11 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
 
-from menv.models.introduction_phases import IntroductionPhase, get_optional_commands, get_phases
+from menv.models.introduction_phases import (
+    IntroductionPhase,
+    get_optional_commands,
+    get_phases,
+)
 
 console = Console()
 
@@ -21,6 +25,7 @@ def introduce(
         False,
         "--no-wait",
         "-n",
+        "-nw",
         help="Don't wait for user input between phases.",
     ),
 ) -> None:
@@ -33,6 +38,7 @@ def introduce(
         menv introduce macbook
         menv itr mbk
         menv itr mmn --no-wait
+        menv itr mbk -nw
     """
     resolved = PROFILE_ALIASES.get(profile, profile)
     if resolved not in VALID_PROFILES:
@@ -69,12 +75,15 @@ def introduce(
 
 def _show_brew_phase(profile: str, no_wait: bool) -> None:
     """Show Phase 0: Brew installation."""
+    # Use short aliases for profile
+    profile_alias = "mbk" if profile == "macbook" else "mmn"
+
     console.print("[bold]Phase 0: Brew Dependencies[/]")
     console.print("═" * 50)
     console.print()
     console.print("Install all required brew formulae first (prevents lock conflicts):")
     console.print()
-    console.print(f"  [green]menv make brew-deps -p {profile}[/]")
+    console.print(f"  [green]menv make brew-deps {profile_alias}[/]")
     console.print()
     if not no_wait:
         console.input("[dim]Press [Enter] when done...[/]")

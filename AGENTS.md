@@ -8,8 +8,8 @@ pipx-installable CLI for macOS dev environment setup using bundled Ansible playb
 
 | Command | Alias | Description |
 |---------|-------|-------------|
-| `menv introduce <profile>` | `itr` | Interactive setup guide (macbook/mbk, mac-mini/mmn) |
-| `menv make <tag> [profile]` | `mk` | Run individual task (default: common) |
+| `menv introduce <profile>` | `itr` | Interactive setup guide (macbook/mbk, mac-mini/mmn); use `-nw` to skip waits |
+| `menv make <tag> [profile]` | `mk` | Run individual task (default: common); profile only needed for brew-deps/brew-cask |
 | `menv list` | `ls` | List available tags |
 | `menv backup <target>` | `bk` | Backup system/vscode |
 | `menv config <action>` | `cf` | Manage VCS identities (set/show) |
@@ -72,6 +72,13 @@ tests/
 - CLI passes `profile`, `config_dir_abs_path`, `repo_root_path` as Ansible extra vars
 - Roles handle fallback logic (profile-specific → common)
 - Use `importlib.resources` for package path resolution
+
+### Profile Design
+- **Common profile by default**: Most roles use `common` profile (no explicit profile argument needed)
+- **Profile-specific configs**: Only `brew` role has profile-specific configs (macbook/mac-mini)
+  - `brew-deps` and `brew-cask` require profile specification (use aliases: mbk, mmn)
+  - All other tasks default to `common` profile
+- Roles store configs in `config/common/` (all roles) and `config/profiles/` (brew only)
 
 ### Copy Enforcement
 - Never create symlinks for user-facing config (pipx installs must remain stable across upgrades)

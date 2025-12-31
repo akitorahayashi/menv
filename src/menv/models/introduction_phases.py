@@ -30,11 +30,11 @@ def get_phases(profile: str) -> list[IntroductionPhase]:
             name="Configuration",
             description="These can run in parallel - open multiple terminals if you want:",
             commands=[
-                f"menv make shell {profile}",
-                f"menv make system {profile}",
-                f"menv make git {profile}",
-                f"menv make jj {profile}",
-                f"menv make gh {profile}",
+                "menv make shell",
+                "menv make system",
+                "menv make git",
+                "menv make jj",
+                "menv make gh",
             ],
             parallel=True,
         ),
@@ -42,11 +42,11 @@ def get_phases(profile: str) -> list[IntroductionPhase]:
             name="Language Runtimes",
             description="These can run in parallel:",
             commands=[
-                f"menv make python-platform {profile}",
-                f"menv make nodejs-platform {profile}",
-                f"menv make ruby {profile}",
-                f"menv make rust-platform {profile}",
-                f"menv make go-platform {profile}",
+                "menv make python-platform",
+                "menv make nodejs-platform",
+                "menv make ruby",
+                "menv make rust-platform",
+                "menv make go-platform",
             ],
             parallel=True,
         ),
@@ -54,11 +54,11 @@ def get_phases(profile: str) -> list[IntroductionPhase]:
             name="Tools",
             description="Run after the corresponding runtime is installed:",
             commands=[
-                f"menv make python-tools {profile}  # requires: python-platform",
-                f"menv make uv {profile}            # requires: python-tools",
-                f"menv make nodejs-tools {profile}  # requires: nodejs-platform",
-                f"menv make rust-tools {profile}    # requires: rust-platform",
-                f"menv make go-tools {profile}      # requires: go-platform",
+                "menv make python-tools  # requires: python-platform",
+                "menv make uv            # requires: python-tools",
+                "menv make nodejs-tools  # requires: nodejs-platform",
+                "menv make rust-tools    # requires: rust-platform",
+                "menv make go-tools      # requires: go-platform",
             ],
             parallel=True,
             dependencies=["Language Runtimes"],
@@ -67,9 +67,9 @@ def get_phases(profile: str) -> list[IntroductionPhase]:
             name="Editors",
             description="Configuration and extensions (apps should be pre-installed):",
             commands=[
-                f"menv make vscode {profile}",
-                f"menv make cursor {profile}",
-                f"menv make coderabbit {profile}",
+                "menv make vscode",
+                "menv make cursor",
+                "menv make coderabbit",
             ],
             parallel=True,
         ),
@@ -85,11 +85,14 @@ def get_optional_commands(profile: str) -> list[str]:
     Returns:
         List of optional command strings.
     """
+    # Use short aliases for profile
+    profile_alias = "mbk" if profile == "macbook" else "mmn"
+
     return [
-        f"menv make brew-formulae {profile}  # Additional CLI tools",
-        f"menv make brew-cask {profile}      # GUI applications",
-        f"menv make ssh {profile}            # SSH configuration",
-        f"menv make docker {profile}         # Docker setup",
-        f"menv make aider {profile}          # Aider AI assistant",
-        f"menv make llm {profile}            # LLM tools",
+        "menv make brew-formulae  # Additional CLI tools",
+        f"menv make brew-cask {profile_alias}      # GUI applications (profile-specific)",
+        "menv make ssh            # SSH configuration",
+        "menv make docker         # Docker setup",
+        "menv make aider          # Aider AI assistant",
+        "menv make llm            # LLM tools",
     ]
