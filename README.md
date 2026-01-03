@@ -32,22 +32,22 @@ pipx install git+https://github.com/akitorahayashi/menv.git
 
 ### Usage
 
-**Interactive setup guide (recommended):**
+**Full environment setup (recommended):**
 
 ```sh
 # For MacBook
-menv introduce macbook
+menv create macbook
 # or shorthand:
-menv itr mbk
-menv itr mbk -nw  # Skip wait prompts
+menv cr mbk
+menv cr mbk -v  # Verbose output
 
 # For Mac mini
-menv introduce mac-mini
+menv create mac-mini
 # or shorthand:
-menv itr mmn
+menv cr mmn
 ```
 
-The `introduce` command shows an interactive guide with commands you can run in parallel. Open multiple terminals to speed up setup.
+The `create` command runs all setup tasks in the correct order to provision a complete macOS development environment. It stops immediately on any failure, making it easy to identify and fix issues.
 
 **Design principle**: Most commands use the `common` profile by default (no profile argument needed). Only `brew-deps` and `brew-cask` require profile specification since they have machine-specific configurations.
 
@@ -166,7 +166,7 @@ menv/
 │   ├── commands/
 │   │   ├── backup.py     # backup/bk command
 │   │   ├── config.py     # config/cf command
-│   │   ├── introduce.py  # introduce/itr command (setup guide)
+│   │   ├── create.py     # create/cr command (full setup)
 │   │   ├── make.py       # make/mk command (individual tasks)
 │   │   ├── switch.py     # switch/sw command
 │   │   └── update.py     # update/u command
@@ -174,7 +174,7 @@ menv/
 │   ├── services/         # Service implementations (1 class per file)
 │   ├── protocols/        # Service protocols (1 per service)
 │   └── ansible/          # Ansible playbooks and roles
-│       ├── playbook.yml
+│       ├── playbook.yml  # Single Source of Truth for tags/roles
 │       └── roles/
 ├── tests/
 │   └── mocks/            # Mock implementations (1 class per file)
@@ -186,7 +186,7 @@ menv/
 
 | Command | Alias | Description |
 |---------|-------|-------------|
-| `menv introduce <profile>` | `itr` | Interactive setup guide for a profile |
+| `menv create <profile>` | `cr` | Create complete environment for a profile |
 | `menv make <tag> [profile]` | `mk` | Run individual Ansible task |
 | `menv list` | `ls` | List available tags |
 | `menv backup <target>` | `bk` | Backup system settings |
