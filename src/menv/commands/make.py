@@ -34,13 +34,12 @@ PROFILE_ALIASES = {
 def _get_roles_for_tags(app_ctx: "AppContext", tags: list[str]) -> set[str]:
     """Get unique role names for a list of tags that have config directories."""
     roles_with_config = set(app_ctx.config_deployer.roles_with_config)
-
-    roles = set()
-    for tag in tags:
-        role = app_ctx.playbook_service.get_role_for_tag(tag)
-        if role and role in roles_with_config:
-            roles.add(role)
-    return roles
+    return {
+        role
+        for tag in tags
+        if (role := app_ctx.playbook_service.get_role_for_tag(tag))
+        and role in roles_with_config
+    }
 
 
 def _deploy_configs_for_roles(app_ctx: "AppContext", roles: set[str]) -> bool:
@@ -136,7 +135,7 @@ def make(
         if t not in all_tags:
             console.print(
                 f"[bold red]Error:[/] Unknown tag '{t}'. "
-                "Use 'menv list' to see available tags."
+                "Use 'menv ls' to see available tags."
             )
             raise typer.Exit(code=1)
 

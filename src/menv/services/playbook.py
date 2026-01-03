@@ -37,7 +37,7 @@ class PlaybookService:
             FileNotFoundError: If playbook.yml doesn't exist.
             yaml.YAMLError: If playbook.yml is invalid YAML.
         """
-        playbook_path = self._ansible_paths.ansible_dir() / "playbook.yml"
+        playbook_path = self._ansible_paths.playbook_path()
         with playbook_path.open() as f:
             return yaml.safe_load(f)
 
@@ -60,7 +60,7 @@ class PlaybookService:
                 if isinstance(role_entry, dict):
                     role_name = role_entry.get("role")
                     tags = role_entry.get("tags", [])
-                    if role_name and tags:
+                    if role_name:
                         tags_map[role_name] = list(tags)
                 elif isinstance(role_entry, str):
                     # Simple role reference without tags

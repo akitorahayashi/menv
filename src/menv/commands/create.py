@@ -96,13 +96,10 @@ def create(
     # Get app context
     app_ctx: AppContext = ctx.obj
 
-    # Validate all tags exist
-    if not app_ctx.playbook_service.validate_tags(FULL_SETUP_TAGS):
-        invalid_tags = [
-            tag
-            for tag in FULL_SETUP_TAGS
-            if app_ctx.playbook_service.get_role_for_tag(tag) is None
-        ]
+    # Validate all tags exist - single pass for efficiency
+    all_known_tags = set(app_ctx.playbook_service.get_all_tags())
+    invalid_tags = [tag for tag in FULL_SETUP_TAGS if tag not in all_known_tags]
+    if invalid_tags:
         console.print(
             f"[bold red]Error:[/] Invalid tags in setup: {', '.join(invalid_tags)}"
         )
@@ -120,27 +117,33 @@ def create(
     console.print()
 
     # Collect all unique roles that need config deployment
-    roles_to_deploy = set()
     roles_with_config = set(app_ctx.config_deployer.roles_with_config)
-    for tag in FULL_SETUP_TAGS:
-        role = app_ctx.playbook_service.get_role_for_tag(tag)
-        if role and role in roles_with_config:
-            roles_to_deploy.add(role)
+    roles_to_deploy = {
+        role
+        for tag in FULL_SETUP_TAGS
+        if (role := app_ctx.playbook_service.get_role_for_tag(tag))
+        and role in roles_with_config
+    }
 
-    # Deploy configs for all roles upfront
+    # Deploy configs for all roles upfront using deploy_multiple_roles
     if roles_to_deploy:
         console.print("[bold]Deploying configurations...[/]")
-        for role in sorted(roles_to_deploy):
-            if not app_ctx.config_deployer.is_deployed(role):
-                result = app_ctx.config_deployer.deploy_role(role, overlay=False)
-                if result.success:
-                    console.print(f"  [dim]Deployed config for {role}[/]")
-                else:
-                    console.print(
-                        f"  [red]Error:[/] Failed to deploy config for {role}"
-                    )
-                    console.print(f"    {result.message}")
-                    raise typer.Exit(code=1)
+        results = app_ctx.config_deployer.deploy_multiple_roles(
+            sorted(list(roles_to_deploy)), overlay=False
+        )
+
+        for result in results:
+            if result.success:
+                # Only print a message for newly deployed configs
+                if "already exists" not in result.message:
+                    console.print(f"  [dim]Deployed config for {result.role}[/]")
+            else:
+                # Failure - which will be the last item in results
+                console.print(
+                    f"  [red]Error:[/] Failed to deploy config for {result.role}"
+                )
+                console.print(f"    {result.message}")
+                raise typer.Exit(code=1)
         console.print()
 
     # Run each tag
