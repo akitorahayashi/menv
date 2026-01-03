@@ -32,7 +32,7 @@ pipx install git+https://github.com/akitorahayashi/menv.git
 
 ### Usage
 
-**Full environment setup (recommended):**
+**Core environment setup (recommended):**
 
 ```sh
 # For MacBook
@@ -47,7 +47,7 @@ menv create mac-mini
 menv cr mmn
 ```
 
-The `create` command runs all setup tasks in the correct order to provision a complete macOS development environment. It stops immediately on any failure, making it easy to identify and fix issues.
+The `create` command runs core setup tasks in the correct order to provision a base macOS development environment. It stops immediately on any failure, making it easy to identify and fix issues.
 
 **Design principle**: Most commands use the `common` profile by default (no profile argument needed). Only `brew-deps` and `brew-cask` require profile specification since they have machine-specific configurations.
 
