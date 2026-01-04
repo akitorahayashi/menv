@@ -67,32 +67,6 @@ OPTIONAL_TASKS: list[OptionalTask] = [
     {
         "tag": "brew-cask",
         "name": "GUI Applications",
-        "description": "Install GUI apps via Homebrew Cask (Non-idempotent, slow)",
-        "profile_specific": True,
-    },
-    # Future extensions can be added here
-    # {
-    #     "tag": "ollama-models",
-    #     "name": "LLM Models",
-    #     "description": "Download large LLM models for Ollama (Requires heavy network usage)",
-    #     "profile_specific": False,
-    # },
-]
-
-
-# Data structure for optional tasks
-class OptionalTask(TypedDict):
-    tag: str
-    name: str
-    description: str
-    profile_specific: bool  # Whether the task requires a profile argument
-
-
-# Optional tasks that are skipped for stability/speed reasons
-OPTIONAL_TASKS: list[OptionalTask] = [
-    {
-        "tag": "brew-cask",
-        "name": "GUI Applications",
         "description": "Install GUI apps via Homebrew Cask",
         "profile_specific": True,
     },
@@ -112,11 +86,13 @@ def _print_optional_tasks_summary(profile: str) -> None:
         return
 
     lines = []
-    lines.append("The following optional components were skipped to ensure stability/speed:\n")
-    
+    lines.append(
+        "The following optional components were skipped to ensure stability/speed:\n"
+    )
+
     for task in OPTIONAL_TASKS:
         cmd_args = f"{task['tag']}"
-            
+
         lines.append(f"[bold cyan]➤ {task['name']}[/]")
         lines.append(f"  Description: {task['description']}")
         lines.append(f"  Command:     [green]menv make {cmd_args}[/]")
