@@ -24,7 +24,8 @@
     UV_PROJECT_ENVIRONMENT={{ ansible_env.HOME }}/.menv/venvs/mlx-lm uv sync --only-group mlx
   args:
     chdir: "{{ repo_root_path }}"
-  changed_when: false
+  register: llm_mlx_sync_result
+  changed_when: "'Installed' in llm_mlx_sync_result.stdout or 'Updated' in llm_mlx_sync_result.stdout"
   when: "('llm' in ansible_run_tags or 'mlx' in ansible_run_tags) and repo_root_path is defined"
 
 # Model download tasks (only for mlx-models tag)
