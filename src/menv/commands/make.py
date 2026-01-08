@@ -53,7 +53,9 @@ def _deploy_configs_for_roles(
         if overlay or not app_ctx.config_deployer.is_deployed(role):
             result = app_ctx.config_deployer.deploy_role(role, overlay=overlay)
             if result.success:
-                console.print(f"[dim]Deployed config for {role}[/]")
+                # Only print a message for newly deployed or overwritten configs
+                if overlay or "already exists" not in result.message:
+                    console.print(f"[dim]Deployed config for {role}[/]")
             else:
                 console.print(f"[red]Error:[/] Failed to deploy config for {role}")
                 console.print(f"  {result.message}")
