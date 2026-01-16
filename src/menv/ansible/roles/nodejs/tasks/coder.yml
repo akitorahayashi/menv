@@ -28,6 +28,7 @@
     dest: "{{ ansible_env.HOME }}/.claude/settings.json"
     state: link
     force: true
+    mode: "0644"
 
 - name: "Symlink Claude AGENTS file"
   ansible.builtin.file:
@@ -35,6 +36,7 @@
     dest: "{{ ansible_env.HOME }}/.claude/CLAUDE.md"
     state: link
     force: true
+    mode: "0644"
 
 - name: "Create Claude commands directory"
   ansible.builtin.file:
@@ -54,6 +56,7 @@
     dest: "{{ ansible_env.HOME }}/.gemini/settings.json"
     state: link
     force: true
+    mode: "0644"
 
 - name: "Symlink Gemini AGENTS file"
   ansible.builtin.file:
@@ -61,6 +64,7 @@
     dest: "{{ ansible_env.HOME }}/.gemini/GEMINI.md"
     state: link
     force: true
+    mode: "0644"
 
 - name: "Check if Gemini CLI is available"
   ansible.builtin.command: which gemini
@@ -96,6 +100,7 @@
     dest: "{{ ansible_env.HOME }}/.codex/config.toml"
     state: link
     force: true
+    mode: "0644"
 
 - name: "Symlink Codex AGENTS file"
   ansible.builtin.file:
@@ -103,3 +108,4 @@
     dest: "{{ ansible_env.HOME }}/.codex/AGENTS.md"
     state: link
     force: true
+    mode: "0644"
