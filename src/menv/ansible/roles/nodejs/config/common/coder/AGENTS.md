@@ -9,8 +9,7 @@
 ## Communication
 
 - When reporting completed work or providing routine responses, avoid unnecessary tokens and keep responses concise and clear.
-- Your answer must be based on the context of the repository.
-Even if the question is in pursuit of general better engineering, the repository at hand is absolutely relevant. Answering immediately without doing research is prohibited. Doing necessary research is always permitted.
+- Your answer must be based on the context of the repository, even for general engineering questions. Research is required before answering; do not answer immediately without it.
 
 ## Documentation
 

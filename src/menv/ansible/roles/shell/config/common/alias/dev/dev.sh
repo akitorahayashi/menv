@@ -43,7 +43,7 @@ dev_alias_as() {
 	alias "${prefix}-r-p=${cmd_prefix} run-prod"
 
 	alias "${prefix}-rp=${cmd_prefix} resolve-packages"
-	
+
 	alias "${prefix}-u=${cmd_prefix} up"
 	alias "${prefix}-u-p=${cmd_prefix} up-prod"
 	alias "${prefix}-d=${cmd_prefix} down"
