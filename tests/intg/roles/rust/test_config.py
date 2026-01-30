@@ -48,7 +48,9 @@ class TestRustConfigs:
             assert isinstance(tool, dict), f"Tool #{index + 1} must be a mapping."
 
             for key in required_keys:
-                assert key in tool, f"Tool #{index + 1} is missing required key '{key}'."
+                assert key in tool, (
+                    f"Tool #{index + 1} is missing required key '{key}'."
+                )
                 assert isinstance(tool[key], str), (
                     f"Tool #{index + 1} has a non-string '{key}' value."
                 )

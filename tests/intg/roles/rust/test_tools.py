@@ -19,8 +19,12 @@ class TestRustToolsConfiguration:
 
         for tool in tools:
             assert "name" in tool, f"Tool missing 'name' field: {tool}"
-            assert "repo" in tool, f"Tool {tool.get('name', 'unknown')} missing 'repo' field"
-            assert "tag" in tool, f"Tool {tool.get('name', 'unknown')} missing 'tag' field"
+            assert "repo" in tool, (
+                f"Tool {tool.get('name', 'unknown')} missing 'repo' field"
+            )
+            assert "tag" in tool, (
+                f"Tool {tool.get('name', 'unknown')} missing 'tag' field"
+            )
 
     def test_tools_config_repo_format(self, rust_config_dir: Path) -> None:
         """Verify repo field follows owner/name format."""
@@ -70,9 +74,7 @@ class TestRustToolsConfiguration:
 
         removed_tools = {"mms", "fs", "tls-rs"}
         present_removed = removed_tools & tool_names
-        assert not present_removed, (
-            f"Removed tools still present: {present_removed}"
-        )
+        assert not present_removed, f"Removed tools still present: {present_removed}"
 
 
 class TestPlatformMapping:
@@ -157,5 +159,7 @@ class TestDownloadUrlConstruction:
         """Verify download URL construction matches expected format."""
         # Simulates the Ansible template:
         # https://github.com/{{ item.repo }}/releases/download/{{ item.tag }}/{{ item.name }}-{{ platform_os }}-{{ platform_arch }}
-        url = f"https://github.com/{repo}/releases/download/{tag}/{tool_name}-{os}-{arch}"
+        url = (
+            f"https://github.com/{repo}/releases/download/{tag}/{tool_name}-{os}-{arch}"
+        )
         assert url == expected_url

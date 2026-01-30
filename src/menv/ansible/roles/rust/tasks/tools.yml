@@ -4,6 +4,11 @@
     file: "{{ local_config_root }}/rust/common/tools.yml"
     name: rust_tools_config
 
+- name: "Load rust toolchain binary allowlist"
+  ansible.builtin.include_vars:
+    file: "{{ local_config_root }}/rust/common/toolchain-binaries.yml"
+    name: rust_toolchain_binaries_config
+
 - name: "Load platform mapping configuration"
   ansible.builtin.include_vars:
     file: "{{ local_config_root }}/rust/common/platforms.yml"
@@ -13,25 +18,94 @@
   ansible.builtin.set_fact:
     platform_os: "{{ platform_config.os_mapping[ansible_system] | default('') }}"
     platform_arch: "{{ platform_config.arch_mapping[ansible_architecture] | default('') }}"
+    rust_tools_bin_dir: "{{ ansible_env.HOME }}/.cargo/bin"
+    rust_tools_allowed_binaries: >-
+      {{
+        (
+          rust_tools_config.tools
+          | map(attribute='name')
+          | list
+        )
+        + (rust_toolchain_binaries_config.binaries | default([]))
+        | unique
+      }}
 
 - name: "Fail if platform is unsupported"
   ansible.builtin.fail:
     msg: "Unsupported platform: {{ ansible_system }}/{{ ansible_architecture }}. Supported: Darwin/Linux with x86_64/aarch64/arm64."
   when: platform_os == '' or platform_arch == ''
 
+- name: "Ensure rust tools directory exists"
+  ansible.builtin.file:
+    path: "{{ rust_tools_bin_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: "List regular files in rust tools directory"
+  ansible.builtin.find:
+    paths: "{{ rust_tools_bin_dir }}"
+    file_type: file
+    recurse: false
+  register: rust_tools_bin_files
+
+- name: "List symlinks in rust tools directory"
+  ansible.builtin.find:
+    paths: "{{ rust_tools_bin_dir }}"
+    file_type: link
+    recurse: false
+  register: rust_tools_bin_links
+
+- name: "Identify unmanaged binaries in rust tools directory"
+  ansible.builtin.set_fact:
+    rust_tools_installed_binaries: >-
+      {{
+        (rust_tools_bin_files.files + rust_tools_bin_links.files)
+        | map(attribute='path')
+        | map('basename')
+        | list
+        | unique
+      }}
+    rust_tools_unmanaged_binaries: >-
+      {{
+        rust_tools_installed_binaries
+        | difference(rust_tools_allowed_binaries)
+      }}
+
+- name: "Remove unmanaged binaries from rust tools directory"
+  ansible.builtin.file:
+    path: "{{ rust_tools_bin_dir }}/{{ item }}"
+    state: absent
+  loop: "{{ rust_tools_unmanaged_binaries }}"
+  when: rust_tools_unmanaged_binaries | length > 0
+
 - name: "Check installed versions of rust tools"
   ansible.builtin.command:
-    cmd: "{{ ansible_env.HOME }}/.cargo/bin/{{ item.name }} --version"
+    cmd: "{{ rust_tools_bin_dir }}/{{ item.name }} --version"
   loop: "{{ rust_tools_config.tools }}"
   register: rust_tools_version_check
   changed_when: false
   failed_when: false
   check_mode: false
 
+- name: "Remove outdated rust tool binaries"
+  ansible.builtin.file:
+    path: "{{ rust_tools_bin_dir }}/{{ item.name }}"
+    state: absent
+  loop: "{{ rust_tools_config.tools }}"
+  loop_control:
+    index_var: idx
+    label: "{{ item.name }}"
+  when: >
+    rust_tools_version_check.results[idx].rc != 0 or
+    (
+      item.tag is defined and
+      item.tag | regex_replace('^v', '') not in rust_tools_version_check.results[idx].stdout
+    )
+
 - name: "Download and install rust tools from GitHub releases"
   ansible.builtin.get_url:
     url: "https://github.com/{{ item.repo }}/releases/download/{{ item.tag }}/{{ item.name }}-{{ platform_os }}-{{ platform_arch }}"
-    dest: "{{ ansible_env.HOME }}/.cargo/bin/{{ item.name }}"
+    dest: "{{ rust_tools_bin_dir }}/{{ item.name }}"
     mode: "0755"
     force: true
   loop: "{{ rust_tools_config.tools }}"
@@ -44,14 +118,3 @@
       item.tag is defined and
       item.tag | regex_replace('^v', '') not in rust_tools_version_check.results[idx].stdout
     )
-  register: rust_tools_download_result
-
-- name: "Report failed downloads"
-  ansible.builtin.fail:
-    msg: "Failed to download {{ item.item.name }} from {{ item.item.repo }}. Asset may not exist for this platform."
-  loop: "{{ rust_tools_download_result.results }}"
-  loop_control:
-    label: "{{ item.item.name }}"
-  when:
-    - item.failed is defined
-    - item.failed
