@@ -22,11 +22,13 @@
     rust_tools_allowed_binaries: >-
       {{
         (
-          rust_tools_config.tools
-          | map(attribute='name')
-          | list
+          (
+            rust_tools_config.tools
+            | map(attribute='name')
+            | list
+          )
+          + (rust_toolchain_binaries_config.binaries | default([]))
         )
-        + (rust_toolchain_binaries_config.binaries | default([]))
         | unique
       }}
 
@@ -65,6 +67,9 @@
         | list
         | unique
       }}
+
+- name: "Identify unmanaged binaries in rust tools directory (step 2)"
+  ansible.builtin.set_fact:
     rust_tools_unmanaged_binaries: >-
       {{
         rust_tools_installed_binaries
@@ -99,7 +104,7 @@
     rust_tools_version_check.results[idx].rc != 0 or
     (
       item.tag is defined and
-      item.tag | regex_replace('^v', '') not in rust_tools_version_check.results[idx].stdout
+      not rust_tools_version_check.results[idx].stdout | regex_search('\\b' + (item.tag | regex_replace('^v', '')) + '\\b')
     )
 
 - name: "Download and install rust tools from GitHub releases"
