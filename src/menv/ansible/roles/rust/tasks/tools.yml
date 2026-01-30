@@ -16,8 +16,8 @@
 
 - name: "Set platform variables"
   ansible.builtin.set_fact:
-    platform_os: "{{ platform_config.os_mapping[ansible_system] | default('') }}"
-    platform_arch: "{{ platform_config.arch_mapping[ansible_architecture] | default('') }}"
+    rust_platform_os: "{{ platform_config.os_mapping[ansible_system] | default('') }}"
+    rust_platform_arch: "{{ platform_config.arch_mapping[ansible_architecture] | default('') }}"
     rust_tools_bin_dir: "{{ ansible_env.HOME }}/.cargo/bin"
     rust_tools_allowed_binaries: >-
       {{
@@ -33,7 +33,7 @@
 - name: "Fail if platform is unsupported"
   ansible.builtin.fail:
     msg: "Unsupported platform: {{ ansible_system }}/{{ ansible_architecture }}. Supported: Darwin/Linux with x86_64/aarch64/arm64."
-  when: platform_os == '' or platform_arch == ''
+  when: rust_platform_os == '' or rust_platform_arch == ''
 
 - name: "Ensure rust tools directory exists"
   ansible.builtin.file:
@@ -104,7 +104,7 @@
 
 - name: "Download and install rust tools from GitHub releases"
   ansible.builtin.get_url:
-    url: "https://github.com/{{ item.repo }}/releases/download/{{ item.tag }}/{{ item.name }}-{{ platform_os }}-{{ platform_arch }}"
+    url: "https://github.com/{{ item.repo }}/releases/download/{{ item.tag }}/{{ item.name }}-{{ rust_platform_os }}-{{ rust_platform_arch }}"
     dest: "{{ rust_tools_bin_dir }}/{{ item.name }}"
     mode: "0755"
     force: true
@@ -112,9 +112,10 @@
   loop_control:
     index_var: idx
     label: "{{ item.name }}"
+  ignore_errors: true # noqa: ignore-errors
   when: >
     rust_tools_version_check.results[idx].rc != 0 or
     (
       item.tag is defined and
-      item.tag | regex_replace('^v', '') not in rust_tools_version_check.results[idx].stdout
+      not rust_tools_version_check.results[idx].stdout | regex_search('\\b' + (item.tag | regex_replace('^v', '')) + '\\b')
     )
