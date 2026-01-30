@@ -1,61 +1,57 @@
 ---
-- name: "Load cargo tools configuration"
+- name: "Load rust tools configuration"
   ansible.builtin.include_vars:
     file: "{{ local_config_root }}/rust/common/tools.yml"
-    name: cargo_tools_config
+    name: rust_tools_config
 
-# [NEW] 1. Check currently installed versions
-# check_mode: false is important to ensure this check command runs even in dry-run mode
-- name: "Check installed versions of cargo tools"
+- name: "Load platform mapping configuration"
+  ansible.builtin.include_vars:
+    file: "{{ local_config_root }}/rust/common/platforms.yml"
+    name: platform_config
+
+- name: "Set platform variables"
+  ansible.builtin.set_fact:
+    platform_os: "{{ platform_config.os_mapping[ansible_system] | default('') }}"
+    platform_arch: "{{ platform_config.arch_mapping[ansible_architecture] | default('') }}"
+
+- name: "Fail if platform is unsupported"
+  ansible.builtin.fail:
+    msg: "Unsupported platform: {{ ansible_system }}/{{ ansible_architecture }}. Supported: Darwin/Linux with x86_64/aarch64/arm64."
+  when: platform_os == '' or platform_arch == ''
+
+- name: "Check installed versions of rust tools"
   ansible.builtin.command:
     cmd: "{{ ansible_env.HOME }}/.cargo/bin/{{ item.name }} --version"
-  loop: "{{ cargo_tools_config.tools }}"
-  register: rust_cargo_tools_version_check
+  loop: "{{ rust_tools_config.tools }}"
+  register: rust_tools_version_check
   changed_when: false
   failed_when: false
   check_mode: false
 
-# [MODIFIED] 2. Only install if versions do not match
-- name: "Install or update cargo tools"
-  ansible.builtin.command:
-    # --force is needed to overwrite existing binaries, but execution is controlled by 'when'
-    cmd: >
-      {{ ansible_env.HOME }}/.cargo/bin/cargo install --force
-      {% if item.git is defined %}
-      --git {{ ('ssh://' + item.git.replace(':', '/')) if item.git.startswith('git@') else item.git }}
-      {% endif %}
-      {% if item.tag is defined %}--tag {{ item.tag }}{% endif %}
-      {{ item.name }}
-      {{ item.options | default('') }}
-  environment:
-    CARGO_NET_GIT_FETCH_WITH_CLI: "true"
-  loop: "{{ cargo_tools_config.tools }}"
+- name: "Download and install rust tools from GitHub releases"
+  ansible.builtin.get_url:
+    url: "https://github.com/{{ item.repo }}/releases/download/{{ item.tag }}/{{ item.name }}-{{ platform_os }}-{{ platform_arch }}"
+    dest: "{{ ansible_env.HOME }}/.cargo/bin/{{ item.name }}"
+    mode: "0755"
+    force: true
+  loop: "{{ rust_tools_config.tools }}"
   loop_control:
     index_var: idx
     label: "{{ item.name }}"
-  register: rust_cargo_install_result
-  changed_when: "'Installing' in rust_cargo_install_result.stderr"
-  notify: "Clean up cargo cache after installation"
-  # Add error handling: Continue even if it fails (assuming SSH keys are missing, etc.)
-  ignore_errors: true
-  # Condition explanation:
-  # 1. Command failed (rc != 0) = not installed -> needs installation
-  # 2. Tag is defined and the CLI output does not contain that version number -> needs update
-  #    (Note: Remove 'v' from git tag like 'v0.2.0' to compare with '0.2.0')
   when: >
-    rust_cargo_tools_version_check.results[idx].rc != 0 or
+    rust_tools_version_check.results[idx].rc != 0 or
     (
       item.tag is defined and
-      item.tag | regex_replace('^v', '') not in rust_cargo_tools_version_check.results[idx].stdout
+      item.tag | regex_replace('^v', '') not in rust_tools_version_check.results[idx].stdout
     )
+  register: rust_tools_download_result
 
-- name: "Warn about failed installations (likely due to missing SSH keys)"
-  ansible.builtin.debug:
-    msg: "WARNING: Failed to install {{ item.item.name }}. Ensure SSH keys are loaded if this is a private repo."
-  loop: "{{ rust_cargo_install_result.results }}"
+- name: "Report failed downloads"
+  ansible.builtin.fail:
+    msg: "Failed to download {{ item.item.name }} from {{ item.item.repo }}. Asset may not exist for this platform."
+  loop: "{{ rust_tools_download_result.results }}"
   loop_control:
     label: "{{ item.item.name }}"
   when:
     - item.failed is defined
     - item.failed
-    - not ansible_check_mode
