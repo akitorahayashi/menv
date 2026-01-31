@@ -1,0 +1,25 @@
+schema_version: 1
+id: "5ny1wp"
+issue_id: ""
+created_at: "2026-01-31"
+author_role: "taxonomy"
+confidence: "high"
+
+title: "Command Structure Inconsistency: list in make.py"
+statement: |
+  The `list` command is implemented as `list_tags` inside `src/menv/commands/make.py`
+  rather than in a dedicated file, violating the project's one-command-per-file convention.
+
+evidence:
+  - path: "src/menv/commands/make.py"
+    loc:
+      - "list_tags"
+    note: "Function defined here."
+  - path: "src/menv/main.py"
+    loc:
+      - "app.command(name=\"list\"..."
+    note: "Command registered here pointing to menv.commands.make.list_tags."
+
+tags:
+  - "consistency"
+  - "architecture"
