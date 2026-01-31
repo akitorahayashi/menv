@@ -1,0 +1,16 @@
+description: Missing coverage infrastructure
+type: risk
+severity: high
+context:
+  - pyproject.toml
+  - justfile
+details: |
+  The project lacks any code coverage configuration or tools.
+  - No `pytest-cov` or `coverage` in `pyproject.toml` dependencies.
+  - No `[tool.coverage.*]` configuration.
+  - No `cov` recipe in `justfile`.
+  This creates a risk of invisible regressions as new code is added without verification of test execution.
+recommendation: |
+  1. Add `pytest-cov` to dev dependencies.
+  2. Configure `.coveragerc` or `[tool.coverage.run]` in `pyproject.toml`.
+  3. Add a `just cov` recipe to run tests with coverage reporting.

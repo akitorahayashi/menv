@@ -1,0 +1,20 @@
+description: Untested AnsibleRunner logic
+type: gap
+severity: medium
+context:
+  - src/menv/services/ansible_runner.py
+  - tests/unit/services/
+details: |
+  `src/menv/services/ansible_runner.py` contains critical logic for executing Ansible playbooks via subprocess.
+  It handles:
+  - Command construction (paths, env vars).
+  - Error handling (FileNotFoundError, KeyboardInterrupt).
+  - Output streaming.
+
+  There is no corresponding `tests/unit/services/test_ansible_runner.py`.
+  While integration tests likely exercise this code path indirectly, the error handling and edge cases (e.g., missing ansible binary) remain unverified in isolation.
+recommendation: |
+  Create `tests/unit/services/test_ansible_runner.py` using `unittest.mock.patch` to mock `subprocess.Popen` and verify:
+  1. Correct command arguments and environment variables are passed.
+  2. `FileNotFoundError` is caught and reported gracefully.
+  3. `KeyboardInterrupt` is handled correctly.

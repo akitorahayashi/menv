@@ -1,0 +1,15 @@
+description: Undefined coverage targets
+type: risk
+severity: medium
+context:
+  - pyproject.toml
+details: |
+  The project has no defined coverage targets (e.g., minimum line coverage percentage, branch coverage).
+  Without explicit targets, there is no signal to prevent gradual degradation of test quality over time.
+recommendation: |
+  Once coverage infrastructure is in place, define minimum coverage thresholds in `pyproject.toml` or `.coveragerc`.
+  Example:
+  ```toml
+  [tool.coverage.report]
+  fail_under = 80
+  ```
