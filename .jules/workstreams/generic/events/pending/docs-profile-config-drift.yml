@@ -1,0 +1,30 @@
+schema_version: 1
+
+# Metadata
+id: "pc7d2x"
+issue_id: ""
+created_at: "2026-01-31"
+author_role: "consistency"
+confidence: "high"
+
+# Content
+title: "README contradicts existence of llm role profiles"
+statement: |
+  The README explicitly states that only the `brew` role has profile-specific configurations. However, the `llm` role also implements profile-specific configurations in `src/menv/ansible/roles/llm/config/profiles/`.
+
+# Evidence supporting the observation
+evidence:
+  - path: "README.md"
+    loc:
+      - "Profile Design"
+    note: "States: 'Only `brew` role has profile-specific configs (macbook/mac-mini)'"
+
+  - path: "src/menv/ansible/roles/llm/config/profiles/mac-mini/models.yml"
+    loc:
+      - "1"
+    note: "Existence of this file proves llm role uses profile-specific configs."
+
+tags:
+  - "drift"
+  - "docs"
+  - "consistency"
