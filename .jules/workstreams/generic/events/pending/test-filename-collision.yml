@@ -1,0 +1,41 @@
+schema_version: 1
+
+# Metadata
+id: "f4j1p7"
+issue_id: "" # ID of the issue that processed this event (empty if unprocessed)
+created_at: "2026-01-31"
+author_role: "taxonomy"
+confidence: "high"
+
+# Content
+title: "Duplicate test filenames in role integration tests"
+statement: |
+  Test modules in `tests/intg/roles/` have duplicate filenames (`test_config.py`, `test_tools.py`), violating the naming convention requiring unique filenames (e.g., `test_<role>_config.py`) to prevent potential Pytest collisions and ambiguity.
+
+# Evidence supporting the observation
+# For multi-file events, add multiple list items.
+evidence:
+  - path: "tests/intg/roles/rust/test_config.py"
+    loc:
+      - "test_config.py"
+    note: "Filename collides with editor role test."
+
+  - path: "tests/intg/roles/editor/test_config.py"
+    loc:
+      - "test_config.py"
+    note: "Filename collides with rust role test."
+
+  - path: "tests/intg/roles/rust/test_tools.py"
+    loc:
+      - "test_tools.py"
+    note: "Filename collides with go role test."
+
+  - path: "tests/intg/roles/go/test_tools.py"
+    loc:
+      - "test_tools.py"
+    note: "Filename collides with rust role test."
+
+tags:
+  - "inconsistency"
+  - "testing"
+  - "naming"

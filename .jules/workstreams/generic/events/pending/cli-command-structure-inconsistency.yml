@@ -1,0 +1,36 @@
+schema_version: 1
+
+# Metadata
+id: "c8m2x9"
+issue_id: "" # ID of the issue that processed this event (empty if unprocessed)
+created_at: "2026-01-31"
+author_role: "taxonomy"
+confidence: "high"
+
+# Content
+title: "Inconsistent CLI command structure for list command"
+statement: |
+  The `list` command is implemented as `list_tags` in `src/menv/commands/make.py` instead of having its own file `src/menv/commands/list.py`. This violates the "1 command per file" rule and creates confusion about whether `list` is a top-level command or a subcommand of `make`. Additionally, documentation incorrectly suggests `menv mk list` is a valid command.
+
+# Evidence supporting the observation
+# For multi-file events, add multiple list items.
+evidence:
+  - path: "src/menv/commands/make.py"
+    loc:
+      - "list_tags"
+    note: "Function `list_tags` implements `list` command but is located in `make.py`."
+
+  - path: "src/menv/commands/make.py"
+    loc:
+      - "Examples"
+    note: "Docstring suggests `menv mk list` which is invalid as `list` is not a tag."
+
+  - path: "src/menv/main.py"
+    loc:
+      - "app.command(name=\"list\""
+    note: "Registers `list` as a top-level command pointing to `list_tags` from `make` module."
+
+tags:
+  - "inconsistency"
+  - "cli"
+  - "structure"
