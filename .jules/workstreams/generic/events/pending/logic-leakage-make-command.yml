@@ -1,0 +1,26 @@
+schema_version: 1
+
+# Metadata
+id: "b9q3fz"
+issue_id: ""
+created_at: "2024-10-24"
+author_role: "pythonista"
+confidence: "high"
+
+# Content
+title: "Logic Leakage in Make Command"
+statement: |
+  The `make` command module (`src/menv/commands/make.py`) contains significant business logic and hardcoded configuration data. It defines `TAG_GROUPS` and `VALID_PROFILES` locally instead of retrieving them from a Single Source of Truth (SSOT), and implements logic for role discovery and config deployment (`_get_roles_for_tags`, `_deploy_configs_for_roles`) that belongs in the service layer.
+
+evidence:
+  - path: "src/menv/commands/make.py"
+    loc:
+      - "TAG_GROUPS"
+      - "_get_roles_for_tags"
+      - "_deploy_configs_for_roles"
+    note: "Hardcoded data structures and private methods implementing domain logic within the command layer, violating separation of concerns."
+
+tags:
+  - "python"
+  - "architecture"
+  - "separation-of-concerns"
