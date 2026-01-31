@@ -1,0 +1,33 @@
+# Event: Mirror Logic in Integration Tests
+# Type: pattern
+# Scope: tests/intg
+# Severity: medium
+
+description: >
+  Integration tests for Ansible roles (located in `tests/intg/roles/`) systematically reimplement logic
+  defined in Ansible tasks/templates (Jinja2) within Python test code. This "Mirror Logic" pattern
+  validates that the configuration matches the Python implementation of the logic, but does not guarantee
+  that the actual Ansible execution (which uses the Jinja2 implementation) behaves as expected.
+
+evidence:
+  - file: tests/intg/roles/python/test_pipx_tools.py
+    line: 38
+    snippet: "re.sub(r'^v', '', tool['tag'])"
+    context: >
+      Reimplements the `regex_replace('^v', '')` Jinja2 filter used in
+      `src/menv/ansible/roles/python/tasks/tools.yml` to strip version prefixes.
+  - file: src/menv/ansible/roles/python/tasks/tools.yml
+    line: 52
+    snippet: "item.tag | regex_replace('^v', '')"
+    context: >
+      The actual source of truth for the logic, which could diverge from the test implementation.
+
+implications:
+  - False confidence: Tests pass even if Ansible logic is broken or divergent.
+  - Double maintenance: Logic changes must be applied in both Ansible/Jinja2 and Python test code.
+  - Reduced failure diagnosability: Failures indicate a mismatch between two implementations of the same logic,
+    not necessarily a failure of the system under test to perform its function.
+
+recommendations:
+  - Shift towards testing behavior (e.g., did the tool get installed?) rather than internal logic implementation.
+  - Where logic is complex, consider extracting it to a shared custom filter or plugin testable in isolation.

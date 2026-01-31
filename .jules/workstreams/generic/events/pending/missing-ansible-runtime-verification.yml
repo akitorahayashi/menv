@@ -1,0 +1,31 @@
+# Event: Missing Ansible Runtime Verification
+# Type: gap
+# Scope: tests/intg
+# Severity: high
+
+description: >
+  The repository lacks tests that verify the actual execution, syntax, or runtime behavior of Ansible playbooks.
+  Current "integration" tests (`tests/intg/`) focus on structural integrity and configuration validation via
+  Python reimplementation ("Mirror Logic"), but do not invoke `ansible-playbook`.
+
+evidence:
+  - file: justfile
+    snippet: "test: unit-test intg-test"
+    context: >
+      The `test` recipe runs `pytest` for unit and integration tests, but no Ansible-specific execution commands.
+  - file: src/menv/ansible/roles/python/tasks/tools.yml
+    snippet: "community.general.homebrew"
+    context: >
+      Tasks rely on external modules (e.g., homebrew, command) whose interaction is never verified in CI/test.
+  - observation: >
+      `ansible-lint` is run in the `check` recipe, but this only performs static analysis, not runtime verification
+      (e.g., `ansible-playbook --check`).
+
+implications:
+  - Runtime errors (e.g., undefined variables, invalid Jinja2 template rendering, module failures) are not detected until manual deployment.
+  - "Works on my machine" issues are likely as the CI environment does not attempt to execute the playbooks.
+  - Refactoring Ansible roles is risky due to lack of regression testing for actual behavior.
+
+recommendations:
+  - Implement a "dry-run" test suite that executes `ansible-playbook --check` against the playbooks.
+  - Consider a lightweight execution test (e.g., against a container or local environment) for critical paths.
