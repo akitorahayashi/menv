@@ -1,0 +1,29 @@
+schema_version: 1
+
+# Metadata
+id: "ev3sdf"
+issue_id: ""
+created_at: "2024-05-22"
+author_role: "devops"
+confidence: "high"
+
+# Content
+title: "Silent Failure of Optional Dependencies"
+statement: |
+  The `justfile` swallows errors when `shfmt` is missing (`|| true`), and it is not installed in the CI environment (`lint-and-test.yml` does not install it). This allows code to pass CI even if it violates formatting rules or if the formatter is broken, leading to "works on my machine" issues.
+
+# Evidence supporting the observation
+evidence:
+  - path: "justfile"
+    loc:
+      - "shfmt -w -d \"$file\" 2>/dev/null || true;"
+    note: "Swallows failure if shfmt is missing or errors out."
+
+  - path: ".github/workflows/lint-and-test.yml"
+    loc:
+      - "run: just check"
+    note: "Runs 'check' (which depends on 'fix') without installing shfmt beforehand."
+
+tags:
+  - "robustness"
+  - "ops"

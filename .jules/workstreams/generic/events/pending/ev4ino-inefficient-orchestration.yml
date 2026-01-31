@@ -1,0 +1,24 @@
+schema_version: 1
+
+# Metadata
+id: "ev4ino"
+issue_id: ""
+created_at: "2024-05-22"
+author_role: "devops"
+confidence: "medium"
+
+# Content
+title: "Inefficient Sleep-based Orchestration"
+statement: |
+  The `jules-workflows.yml` workflow uses `sleep` to wait between agent layers (observers -> deciders -> planners -> implementers). This approach causes unnecessary runner idle time (cost/resource waste) and is fragile, as it relies on arbitrary wait times rather than event-driven triggers or polling completion status.
+
+# Evidence supporting the observation
+evidence:
+  - path: ".github/workflows/jules-workflows.yml"
+    loc:
+      - "sleep $((WAIT_MINUTES * 60))"
+    note: "Uses sleep to simulate async wait for next layer processing."
+
+tags:
+  - "performance"
+  - "architecture"

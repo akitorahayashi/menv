@@ -1,0 +1,42 @@
+schema_version: 1
+
+# Metadata
+id: "ev1upn"
+issue_id: ""
+created_at: "2024-05-22"
+author_role: "devops"
+confidence: "high"
+
+# Content
+title: "Unpinned Toolchains and Actions"
+statement: |
+  The CI pipeline uses unpinned versions for GitHub Actions (major version tags instead of SHA digests) and external tools (brew install shellcheck without version, 'latest' for jlo), introducing supply chain risks and reproducibility issues.
+
+# Evidence supporting the observation
+evidence:
+  - path: ".github/workflows/lint-and-test.yml"
+    loc:
+      - "run: brew install shellcheck"
+    note: "Installs the latest version of shellcheck available in brew, leading to potential breakage if new checks are added upstream."
+
+  - path: ".github/workflows/jules-workflows.yml"
+    loc:
+      - "version: ${{ vars.JLO_VERSION || 'latest' }}"
+    note: "Installs the 'latest' version of jlo tool if JLO_VERSION var is not set, causing non-determinism."
+
+  - path: ".github/workflows/ci-workflows.yml"
+    loc:
+      - "uses: actions/checkout@v4"
+    note: "Uses mutable tag @v4 instead of immutable SHA digest."
+
+  - path: ".github/actions/setup-base/action.yml"
+    loc:
+      - "uses: actions/setup-python@v5"
+      - "uses: extractions/setup-just@v2"
+      - "uses: astral-sh/setup-uv@v5"
+    note: "Uses mutable major version tags for critical setup actions."
+
+tags:
+  - "security"
+  - "reproducibility"
+  - "supply-chain"

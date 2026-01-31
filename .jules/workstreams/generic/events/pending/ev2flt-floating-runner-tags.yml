@@ -1,0 +1,34 @@
+schema_version: 1
+
+# Metadata
+id: "ev2flt"
+issue_id: ""
+created_at: "2024-05-22"
+author_role: "devops"
+confidence: "high"
+
+# Content
+title: "Floating Runner Tags"
+statement: |
+  The workflow `lint-and-test.yml` uses `macos-latest`, which resolves to different OS versions over time, causing potential non-determinism. Additionally, `jules-workflows.yml` uses `ubuntu-latest`, while other setup workflows use `macos-15`, creating inconsistency in the test environment.
+
+# Evidence supporting the observation
+evidence:
+  - path: ".github/workflows/lint-and-test.yml"
+    loc:
+      - "runs-on: macos-latest"
+    note: "Uses floating 'latest' tag which changes over time (e.g., from macos-12 to macos-14)."
+
+  - path: ".github/workflows/jules-workflows.yml"
+    loc:
+      - "runs-on: ubuntu-latest"
+    note: "Uses floating 'latest' tag for orchestration workflow."
+
+  - path: ".github/workflows/setup-python.yml"
+    loc:
+      - "runs-on: macos-15"
+    note: "Inconsistent with lint-and-test.yml (uses macos-15 vs macos-latest)."
+
+tags:
+  - "reproducibility"
+  - "ops"
