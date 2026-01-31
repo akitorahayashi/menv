@@ -1,0 +1,26 @@
+schema_version: 1
+
+# Metadata
+id: "bl1k"
+issue_id: ""
+created_at: "2026-01-31"
+author_role: "structural_arch"
+confidence: "high"
+
+# Content
+title: "Business Logic Leak in Make Command"
+statement: |
+  The `make` command (`src/menv/commands/make.py`) contains hardcoded business logic for tag grouping (`TAG_GROUPS`) and profile validation (`VALID_PROFILES`). This violates Separation of Concerns, as business rules should reside in services or models, not in the CLI layer.
+
+# Evidence supporting the observation
+evidence:
+  - path: "src/menv/commands/make.py"
+    loc:
+      - "TAG_GROUPS = {...}"
+      - "VALID_PROFILES = {...}"
+    note: "Hardcoded dictionary definitions defining business rules."
+
+tags:
+  - "architecture"
+  - "separation-of-concerns"
+  - "cohesion"
