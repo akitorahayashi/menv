@@ -1,0 +1,31 @@
+schema_version: 1
+
+# Metadata
+id: "e7f82a"
+issue_id: ""
+created_at: "2026-01-31"
+author_role: "structural_arch"
+confidence: "high"
+
+# Content
+title: "CLI Command Structure Violation (list command)"
+statement: |
+  The `list` command logic is embedded in `make.py` as `list_tags` instead of having its own module `list.py`. This violates the 'One Command Per File' architecture and reduces findability.
+
+# Evidence supporting the observation
+evidence:
+  - path: "src/menv/commands/make.py"
+    loc:
+      - "def list_tags"
+    note: "Command logic defined as a function inside make.py instead of a separate module."
+  - path: "src/menv/main.py"
+    loc:
+      - "menv.commands.make import list_tags"
+      - "app.command(name='list'...)(list_tags)"
+    note: "Command registration imports from make.py."
+
+tags:
+  - "architecture"
+  - "cli"
+  - "cohesion"
+  - "findability"
