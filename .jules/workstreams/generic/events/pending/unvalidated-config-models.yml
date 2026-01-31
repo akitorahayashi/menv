@@ -1,0 +1,29 @@
+schema_version: 1
+
+# Metadata
+id: "ev002b"
+issue_id: ""
+created_at: "2024-10-16"
+author_role: "data_arch"
+confidence: "high"
+
+# Content
+title: "Unvalidated Configuration Data Models"
+statement: |
+  The application lacks formal validation for `MenvConfig` and Ansible role configurations. `ConfigStorage.load` defaults to empty strings for missing fields, and Ansible tasks silently ignore malformed YAML files, allowing invalid states to propagate.
+
+evidence:
+  - path: "src/menv/services/config_storage.py"
+    loc:
+      - "line 34-45"
+    note: "ConfigStorage.load uses .get() with defaults, masking missing data."
+
+  - path: "src/menv/ansible/roles/llm/tasks/ollama.yml"
+    loc:
+      - "line 14"
+      - "ansible.builtin.include_vars"
+    note: "Ansible tasks load YAML vars without schema validation."
+
+tags:
+  - "missing-validation"
+  - "robustness"

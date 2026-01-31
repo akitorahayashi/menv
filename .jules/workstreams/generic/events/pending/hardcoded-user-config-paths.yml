@@ -1,0 +1,30 @@
+schema_version: 1
+
+# Metadata
+id: "ev001a"
+issue_id: ""
+created_at: "2024-10-16"
+author_role: "data_arch"
+confidence: "high"
+
+# Content
+title: "Hardcoded and Duplicated User Configuration Paths"
+statement: |
+  The user configuration directory path (`~/.config/menv`) is hardcoded in multiple services (`ConfigStorage` and `AnsibleRunner`), violating the Single Source of Truth principle and coupling the runner to specific filesystem layouts.
+
+evidence:
+  - path: "src/menv/services/config_storage.py"
+    loc:
+      - "line 17"
+      - "config_dir = Path.home() / \".config\" / \"menv\""
+    note: "Hardcoded default path in ConfigStorage."
+
+  - path: "src/menv/services/ansible_runner.py"
+    loc:
+      - "line 36"
+      - "local_config_root = Path.home() / \".config\" / \"menv\" / \"roles\""
+    note: "Hardcoded path re-definition in AnsibleRunner."
+
+tags:
+  - "ssot-violation"
+  - "coupling"

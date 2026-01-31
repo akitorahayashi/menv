@@ -1,0 +1,23 @@
+schema_version: 1
+
+# Metadata
+id: "ev003c"
+issue_id: ""
+created_at: "2024-10-16"
+author_role: "data_arch"
+confidence: "high"
+
+# Content
+title: "Fragile Manual TOML Serialization"
+statement: |
+  `ConfigStorage.save` uses manual string concatenation to generate TOML output instead of a proper serialization library, creating risks of syntax errors and escaping issues.
+
+evidence:
+  - path: "src/menv/services/config_storage.py"
+    loc:
+      - "line 57-71"
+    note: "Manual construction of TOML string in ConfigStorage.save."
+
+tags:
+  - "fragile-code"
+  - "security-risk"
