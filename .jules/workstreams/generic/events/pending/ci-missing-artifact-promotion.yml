@@ -1,0 +1,19 @@
+workstream: generic
+type: observation
+severity: medium
+title: Missing Artifact Promotion Pipeline
+description: >
+  The current CI/CD pipeline runs tests and checks but does not produce immutable build artifacts (e.g., Python wheels, PEX binaries, or Docker images).
+  Deployment relies on source code or implicit "latest" state, violating the "Ship artifacts, not scripts" principle.
+  This makes it impossible to cryptographically verify what code is running in an environment or to rollback to a specific known-good binary.
+evidence:
+  - file: .github/workflows/ci-workflows.yml
+    line: 1
+    content: "name: MacOS Environment Setup CI Pipeline"
+  - file: .github/workflows/ci-workflows.yml
+    line: 11
+    content: "uses: ./.github/workflows/lint-and-test.yml"
+recommendation: >
+  Implement a `build` job that produces a versioned Python Wheel (`.whl`) or PEX binary.
+  Upload this artifact to GitHub Actions Artifacts or a package registry.
+  Subsequent steps (e.g., release, deploy) should consume this exact artifact rather than checking out source code again.
