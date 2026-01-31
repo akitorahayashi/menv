@@ -1,0 +1,25 @@
+schema_version: 1
+
+# Metadata
+id: "7d9x2a"
+issue_id: ""
+created_at: "2024-10-24"
+author_role: "pythonista"
+confidence: "high"
+
+# Content
+title: "Unsafe I/O in ConfigDeployer"
+statement: |
+  The `ConfigDeployer` service performs file system operations (copying trees, reading directories) without any exception handling. This allows raw `OSError` exceptions to propagate up to the CLI, causing crashes instead of controlled failures, and violates the principle that exceptions are part of the API.
+
+evidence:
+  - path: "src/menv/services/config_deployer.py"
+    loc:
+      - "deploy_role"
+      - "roles_with_config"
+    note: "Methods use shutil.copytree, shutil.rmtree, and Path.iterdir without try/except blocks, swallowing context and leaking implementation details."
+
+tags:
+  - "python"
+  - "exception-handling"
+  - "boundary-violation"
