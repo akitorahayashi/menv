@@ -1,0 +1,28 @@
+schema_version: 1
+id: "3c8uqb"
+issue_id: ""
+created_at: "2026-01-31"
+author_role: "taxonomy"
+confidence: "high"
+
+title: "Ambiguous Create Terminology"
+statement: |
+  The verb "create" is used for both environment provisioning (`menv create`) and configuration deployment (`menv config create`), confusing the user action and violating "User-facing vocabulary aligned with code-level terminology". Code uses "deploy" for the config action.
+
+evidence:
+  - path: "src/menv/commands/create.py"
+    loc:
+      - "create"
+    note: "Command to provision environment."
+  - path: "src/menv/commands/config.py"
+    loc:
+      - "create_config"
+    note: "Command to deploy config files."
+  - path: "src/menv/services/config_deployer.py"
+    loc:
+      - "ConfigDeployer.deploy_role"
+    note: "Code terminology is 'deploy'."
+
+tags:
+  - "vocabulary"
+  - "ux"

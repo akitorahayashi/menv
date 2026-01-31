@@ -1,0 +1,24 @@
+schema_version: 1
+id: "rkfo1y"
+issue_id: ""
+created_at: "2026-01-31"
+author_role: "taxonomy"
+confidence: "high"
+
+title: "Phantom Introduce Command"
+statement: |
+  The `README.md` file references a `menv introduce` command, but no such command exists in the codebase (`main.py` or `commands/`). This is a "ghost name" that should be removed or implemented.
+
+evidence:
+  - path: "README.md"
+    loc:
+      - "menv introduce --help"
+    note: "Documentation mentions this command."
+  - path: "src/menv/main.py"
+    loc:
+      - "app"
+    note: "Command is not registered here."
+
+tags:
+  - "documentation"
+  - "consistency"
