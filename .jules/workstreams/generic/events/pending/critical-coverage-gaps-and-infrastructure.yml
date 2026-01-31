@@ -1,0 +1,49 @@
+schema_version: 1
+
+# Metadata
+id: "9f3x2a"
+issue_id: ""
+created_at: "2026-01-31"
+author_role: "cov"
+confidence: "high"
+
+# Content
+title: "Critical Coverage Gaps and Missing Infrastructure"
+statement: |
+  The project lacks test coverage infrastructure (no pytest-cov or reporting), leaving critical paths unmonitored.
+  Specifically, `AnsibleRunner` (logic for applying system changes) has zero unit tests.
+  Furthermore, `TestConfigCommand` executes against the real user filesystem (`~/.config/menv`) due to hardcoded dependency injection in `main.py`, posing a "False Safety" risk where tests pass by side-effect or endanger user data.
+
+# Evidence supporting the observation
+evidence:
+  - path: "pyproject.toml"
+    loc:
+      - "dependency-groups.dev"
+      - "tool.pytest.ini_options"
+    note: "Missing pytest-cov and coverage configuration."
+
+  - path: "src/menv/services/ansible_runner.py"
+    loc:
+      - "class AnsibleRunner"
+    note: "Critical path for system modification logic."
+
+  - path: "tests/unit/services/"
+    loc:
+      - "dir"
+    note: "Missing test_ansible_runner.py; class is completely untested."
+
+  - path: "src/menv/main.py"
+    loc:
+      - "def main"
+    note: "Dependencies (ConfigStorage) are instantiated with default args (real paths) inside the callback."
+
+  - path: "tests/unit/commands/test_config.py"
+    loc:
+      - "test_config_show_displays_config_or_error"
+    note: "Test logic explicitly acknowledges dependence on user's real environment configuration."
+
+tags:
+  - "coverage"
+  - "risk"
+  - "testing"
+  - "safety"
