@@ -1,0 +1,32 @@
+# Event: Poor Diagnosability in Checksum Tests
+# Type: quality
+# Scope: tests/intg
+# Severity: low
+
+description: >
+  The integration test `tests/intg/test_checksums.py` iterates through a list of installers in a single test method
+  (`test_installer_checksums`) using a `for` loop. If one checksum fails, the assertion raises an exception,
+  terminating the test immediately. Subsequent installers in the list are not checked, hiding potential multiple failures.
+  Additionally, these tests perform blocking network requests without explicit markers (e.g., `@pytest.mark.network`),
+  making it difficult to exclude them during offline or fast test runs.
+
+evidence:
+  - file: tests/intg/test_checksums.py
+    line: 23
+    snippet: "for installer in installer_checksums:"
+    context: >
+      Loop execution means failures are sequential and blocking.
+  - file: tests/intg/test_checksums.py
+    line: 27
+    snippet: "client.get(url)"
+    context: >
+      Hard dependency on external network availability.
+
+implications:
+  - Reduced failure visibility: You only see the first error, fix it, re-run, see the next, etc.
+  - Flakiness: Network glitches cause test failures unrelated to code changes.
+  - Slow feedback loop: Cannot easily skip slow network tests during local development.
+
+recommendations:
+  - Refactor to use `pytest.mark.parametrize` to generate independent test cases for each installer.
+  - Add a custom marker (e.g., `@pytest.mark.network`) to allow exclusion via `pytest -m "not network"`.
