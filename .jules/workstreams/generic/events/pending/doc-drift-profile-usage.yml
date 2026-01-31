@@ -1,0 +1,34 @@
+schema_version: 1
+
+# Metadata
+id: "m4n9p2"
+issue_id: ""
+created_at: "2024-05-22"
+author_role: "consistency"
+confidence: "high"
+
+# Content
+title: "Documentation Drift: Profile Usage in llm role"
+statement: |
+  The documentation (`README.md` and `AGENTS.md`) explicitly states that only the `brew` role utilizes profile-specific configurations. However, the `llm` role implementation includes a `profiles/` directory with `models.yml`, indicating undisclosed profile support.
+
+# Evidence supporting the observation
+evidence:
+  - path: "README.md"
+    loc:
+      - "Design principle"
+    note: "States: 'Only brew-formulae and brew-cask require profile specification'"
+
+  - path: "AGENTS.md"
+    loc:
+      - "Profile Design"
+    note: "States: 'Only brew role has profile-specific configs'"
+
+  - path: "src/menv/ansible/roles/llm/config/profiles/mac-mini/models.yml"
+    loc:
+      - "File existence"
+    note: "Demonstrates that llm role uses profile-based configuration"
+
+tags:
+  - "documentation"
+  - "drift"
