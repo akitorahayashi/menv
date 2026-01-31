@@ -1,0 +1,24 @@
+schema_version: 1
+id: "ev_system_terminology"
+issue_id: ""
+created_at: "2026-05-22"
+author_role: "taxonomy"
+confidence: "high"
+
+title: "Overloaded Terminology: System"
+statement: |
+  The term "system" is used for the Ansible role managing macOS defaults (`roles/system`) and simultaneously for a category of shell aliases (`roles/shell/config/common/alias/system`) containing general Unix utilities. This creates ambiguity about the boundary of "system" responsibilities and violates "One Concept, One Preferred Term".
+
+evidence:
+  - path: "src/menv/ansible/roles/system"
+    loc:
+      - "tasks/main.yml"
+    note: "Manages macOS defaults (Finder, Dock, etc.)."
+  - path: "src/menv/ansible/roles/shell/config/common/alias/system"
+    loc:
+      - "macos.sh"
+    note: "Contains general Unix utilities like cat, echo, mkdir."
+
+tags:
+  - "naming"
+  - "ambiguity"
