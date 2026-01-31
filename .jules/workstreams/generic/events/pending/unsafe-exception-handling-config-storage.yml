@@ -1,0 +1,33 @@
+schema_version: 1
+
+# Metadata
+id: "un3x9p"
+issue_id: ""
+created_at: "2026-01-31"
+author_role: "pythonista"
+confidence: "high"
+
+# Content
+title: "Unsafe exception handling in ConfigStorage"
+statement: |
+  `ConfigStorage.load` fails to handle `tomllib.TOMLDecodeError`, causing crashes on invalid config files instead of graceful failure.
+  It also returns `None` for missing files, forcing `None`-checks throughout the application logic instead of using a Null Object or raising a specific exception.
+
+evidence:
+  - path: "src/menv/services/config_storage.py"
+    loc:
+      - "44"
+    note: "`tomllib.load(f)` raises `TOMLDecodeError` on invalid YAML, which is not caught."
+  - path: "src/menv/services/config_storage.py"
+    loc:
+      - "35"
+    note: "Returns `MenvConfig | None`, forcing callers to handle `None`."
+  - path: "src/menv/commands/config.py"
+    loc:
+      - "36"
+    note: "Callers must manually check `if config is None`."
+
+tags:
+  - "anti-pattern"
+  - "exception-handling"
+  - "boundaries"

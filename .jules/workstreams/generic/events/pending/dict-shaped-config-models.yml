@@ -1,0 +1,31 @@
+schema_version: 1
+
+# Metadata
+id: "dc1c3m"
+issue_id: ""
+created_at: "2026-01-31"
+author_role: "pythonista"
+confidence: "high"
+
+# Content
+title: "Dict-shaped configuration models"
+statement: |
+  The domain models `MenvConfig` and `VcsIdentityConfig` are implemented as `TypedDict` without validation,
+  allowing invalid states and implicit defaults to propagate through the system.
+
+evidence:
+  - path: "src/menv/models/config.py"
+    loc:
+      - "8"
+      - "15"
+    note: "Models defined as TypedDict, which are essentially dicts with type hints but no runtime validation."
+  - path: "src/menv/services/config_storage.py"
+    loc:
+      - "49"
+      - "53"
+    note: "Values are extracted with `get(key, '')`, allowing empty strings for required fields like name/email."
+
+tags:
+  - "anti-pattern"
+  - "boundaries"
+  - "type-safety"
