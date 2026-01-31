@@ -1,0 +1,22 @@
+schema_version: 1
+id: "ev0005"
+issue_id: ""
+created_at: "2026-01-31"
+author_role: "pythonista"
+confidence: "medium"
+title: "Architectural violation in commands structure"
+statement: |
+  The `list` command logic (`list_tags`) is implemented within `src/menv/commands/make.py` instead of having its own dedicated module, violating the project's one-command-per-file architectural pattern.
+evidence:
+  - path: "src/menv/commands/make.py"
+    loc:
+      - "64-83"
+    note: "list_tags function implementation inside make.py"
+  - path: "src/menv/main.py"
+    loc:
+      - "74"
+    note: "list command import from make module"
+tags:
+  - "python"
+  - "architecture"
+  - "consistency"

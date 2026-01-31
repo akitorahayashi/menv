@@ -1,0 +1,22 @@
+schema_version: 1
+id: "ev0002"
+issue_id: ""
+created_at: "2026-01-31"
+author_role: "pythonista"
+confidence: "high"
+title: "Swallowed exceptions in VersionChecker"
+statement: |
+  The VersionChecker service swallows exceptions (HTTPError, KeyError, ValueError, Exception) in `get_latest_version` and `needs_update` without logging or surfacing the cause, making debugging network or parsing issues impossible.
+evidence:
+  - path: "src/menv/services/version_checker.py"
+    loc:
+      - "38-39"
+    note: "get_latest_version swallows multiple exceptions and returns None"
+  - path: "src/menv/services/version_checker.py"
+    loc:
+      - "45-46"
+    note: "needs_update swallows broad Exception and returns False"
+tags:
+  - "python"
+  - "anti-pattern"
+  - "observability"

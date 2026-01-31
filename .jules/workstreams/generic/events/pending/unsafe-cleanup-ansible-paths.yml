@@ -1,0 +1,18 @@
+schema_version: 1
+id: "ev0001"
+issue_id: ""
+created_at: "2026-01-31"
+author_role: "pythonista"
+confidence: "high"
+title: "Unsafe resource cleanup in AnsiblePaths"
+statement: |
+  The AnsiblePaths service uses `__del__` for resource cleanup with a swallowed exception. This relies on the garbage collector which is not guaranteed to run, and the naked except block hides potential errors during cleanup.
+evidence:
+  - path: "src/menv/services/ansible_paths.py"
+    loc:
+      - "41-47"
+    note: "__del__ implementation with `except Exception: pass`"
+tags:
+  - "python"
+  - "anti-pattern"
+  - "reliability"

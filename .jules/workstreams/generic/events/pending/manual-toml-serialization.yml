@@ -1,0 +1,18 @@
+schema_version: 1
+id: "ev0003"
+issue_id: ""
+created_at: "2026-01-31"
+author_role: "pythonista"
+confidence: "high"
+title: "Manual TOML serialization in ConfigStorage"
+statement: |
+  The ConfigStorage service implements manual TOML serialization by string concatenation instead of using a reliable library (e.g., tomlkit). This is fragile, error-prone, and reinvents the wheel.
+evidence:
+  - path: "src/menv/services/config_storage.py"
+    loc:
+      - "57-79"
+    note: "save method manually constructs TOML string with basic escaping"
+tags:
+  - "python"
+  - "anti-pattern"
+  - "maintainability"
