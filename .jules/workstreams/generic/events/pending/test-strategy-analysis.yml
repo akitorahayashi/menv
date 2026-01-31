@@ -1,0 +1,35 @@
+schema_version: 1
+
+# Metadata
+id: "8d7a9f"
+issue_id: ""
+created_at: "2024-10-18"
+author_role: "qa"
+confidence: "high"
+
+# Content
+title: "Testing Strategy relies on Mirror Logic and Static Analysis"
+statement: |
+  The repository uses a "Mirror Logic" testing pattern where Python tests re-implement Ansible/Jinja2 logic to validate configuration data, rather than verifying the actual Ansible execution. While this ensures data compatibility, it risks desynchronization between test logic and production logic. Additionally, there is no runtime verification (E2E) of Ansible roles, relying instead on high-quality static analysis and integrity checks.
+
+# Evidence supporting the observation
+evidence:
+  - path: "tests/intg/roles/python/test_pipx_tools.py"
+    loc:
+      - "TestPipxToolsIdempotency"
+    note: "Re-implements logic (regex stripping, version comparison) found in Ansible tasks to validate config."
+
+  - path: "src/menv/ansible/roles/python/tasks/tools.yml"
+    loc:
+      - "tasks"
+    note: "Contains the actual Jinja2 logic that is mirrored in the Python test."
+
+  - path: "tests/intg/test_role_integrity.py"
+    loc:
+      - "TestAnsibleRoleIntegrity"
+    note: "Demonstrates the reliance on static analysis for referential integrity."
+
+tags:
+  - "test-architecture"
+  - "risk-mirror-logic"
+  - "shift-left"
