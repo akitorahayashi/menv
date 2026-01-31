@@ -1,0 +1,23 @@
+schema_version: 1
+id: "v5n9q2"
+issue_id: ""
+created_at: "2026-01-31"
+author_role: "data_arch"
+confidence: "medium"
+title: "Missing configuration data validation"
+statement: |
+  Configuration data is not validated upon loading or saving, potentially allowing invalid states (e.g., malformed email addresses) to persist.
+evidence:
+  - path: "src/menv/models/config.py"
+    loc: "1-18"
+    note: "TypedDict models define structure but enforce no validation rules"
+  - path: "src/menv/services/config_storage.py"
+    loc: "47-56"
+    note: "Load method uses defaults instead of validating schema presence"
+  - path: "src/menv/commands/config.py"
+    loc: "70-87"
+    note: "Config set command captures user input without format validation"
+tags:
+  - "validation"
+  - "robustness"
+  - "data-integrity"

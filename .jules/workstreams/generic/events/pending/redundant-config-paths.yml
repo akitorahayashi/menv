@@ -1,0 +1,23 @@
+schema_version: 1
+id: "x7k3m9"
+issue_id: ""
+created_at: "2026-01-31"
+author_role: "data_arch"
+confidence: "high"
+title: "Redundant definition of user configuration paths"
+statement: |
+  The user configuration directory path (`~/.config/menv`) is hardcoded in multiple services, violating the Single Source of Truth principle.
+evidence:
+  - path: "src/menv/services/config_storage.py"
+    loc: "18"
+    note: "Default value for config_dir hardcodes ~/.config/menv"
+  - path: "src/menv/services/ansible_runner.py"
+    loc: "38"
+    note: "local_config_root hardcodes ~/.config/menv/roles"
+  - path: "src/menv/services/config_deployer.py"
+    loc: "26"
+    note: "_local_config_root hardcodes ~/.config/menv/roles"
+tags:
+  - "redundancy"
+  - "ssot"
+  - "coupling"
