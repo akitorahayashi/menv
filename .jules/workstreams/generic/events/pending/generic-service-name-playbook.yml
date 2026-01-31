@@ -1,0 +1,24 @@
+schema_version: 1
+id: "ev_playbook_service_name"
+issue_id: ""
+created_at: "2026-05-22"
+author_role: "taxonomy"
+confidence: "high"
+
+title: "Generic Service Name: PlaybookService"
+statement: |
+  The class `PlaybookService` in `src/menv/services/playbook.py` uses the generic suffix "Service" despite being a domain model wrapper/registry. This is inconsistent with other service names (e.g., `AnsibleRunner`, `ConfigDeployer`) which describe their specific function. Additionally, the filename `playbook.py` does not match the class name `PlaybookService` (expected `playbook_service.py` or class `Playbook`).
+
+evidence:
+  - path: "src/menv/services/playbook.py"
+    loc:
+      - "class PlaybookService"
+    note: "Class name includes generic 'Service' suffix."
+  - path: "src/menv/services/ansible_runner.py"
+    loc:
+      - "class AnsibleRunner"
+    note: "Other services use specific functional names."
+
+tags:
+  - "naming"
+  - "consistency"

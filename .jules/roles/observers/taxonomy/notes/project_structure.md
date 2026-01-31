@@ -9,7 +9,9 @@
 ## Services
 *   **Location:** `src/menv/services/`
 *   **Convention:** One class per file, matching the service name (e.g., `config_storage.py` -> `ConfigStorage`).
-*   **Status:** Consistent.
+*   **Violations:**
+    *   `PlaybookService` in `playbook.py` (filename mismatch).
+    *   `PlaybookService` uses generic "Service" suffix unlike other domain services.
 
 ## Protocols
 *   **Location:** `src/menv/protocols/`

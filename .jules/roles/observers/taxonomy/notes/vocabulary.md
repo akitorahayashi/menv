@@ -25,5 +25,19 @@
 *   **Internal Term:** `run` (`AnsibleRunner.run_playbook`).
 *   **Status:** **Inconsistent**.
 
+### System
+*   **Concept 1:** macOS Defaults/Preferences.
+    *   *Managed by:* `roles/system`.
+*   **Concept 2:** General Unix Utilities.
+    *   *Managed by:* `roles/shell/config/common/alias/system/macos.sh`.
+*   **Status:** **Overloaded**. "System" is used for both OS preferences and basic shell tools.
+
+### Apple vs MacOS
+*   **Concept 1:** Development Tools (Xcode, Swift).
+    *   *Term:* `Apple` (`alias/apple.sh`).
+*   **Concept 2:** System/Unix Utilities.
+    *   *Term:* `MacOS` (`alias/system/macos.sh`).
+*   **Status:** **Vague**. "Apple" and "MacOS" are overlapping terms used for distinct but adjacent categories.
+
 ## Phantom Terms
 *   `introduce`: Referenced in documentation but does not exist.
