@@ -25,6 +25,11 @@ evidence:
       - "local_config_root = Path.home() / \".config\" / \"menv\" / \"roles\""
     note: "Hardcoded path re-definition in AnsibleRunner."
 
+  - path: "src/menv/services/config_deployer.py"
+    loc:
+      - "self._local_config_root = Path.home() / \".config\" / \"menv\" / \"roles\""
+    note: "Config deployer path hardcoded, duplicating AnsibleRunner logic."
+
 tags:
   - "ssot-violation"
   - "coupling"
