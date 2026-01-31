@@ -1,0 +1,28 @@
+schema_version: 1
+id: "brk001"
+created_at: "2026-01-31"
+author_role: "consistency"
+confidence: "high"
+
+title: "Broken Backup Command Implementation"
+statement: |
+  The `menv backup` command is documented and implemented but crashes upon execution because it fails to pass required arguments (`config_dir`) to the underlying scripts `backup-system.py` and `backup-extensions.py`. The command is effectively broken.
+
+evidence:
+  - path: "src/menv/commands/backup.py"
+    loc:
+      - "process = subprocess.Popen([sys.executable, str(script_path)], ...)"
+    note: "Calls script without arguments."
+  - path: "src/menv/ansible/scripts/system/backup-system.py"
+    loc:
+      - "parser.add_argument(\"config_dir\", ...)"
+    note: "Requires config_dir argument."
+  - path: "src/menv/ansible/scripts/editor/backup-extensions.py"
+    loc:
+      - "parser.add_argument(\"config_dir\", ...)"
+    note: "Requires config_dir argument."
+
+tags:
+  - "bug"
+  - "consistency"
+  - "drift"

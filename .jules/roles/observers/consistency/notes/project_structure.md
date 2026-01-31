@@ -6,6 +6,11 @@
 - **Status**: Mostly followed (backup, config, create, make, switch, update).
 - **Exceptions**: The `list` command is implemented within `src/menv/commands/make.py`.
 
+## Command Functionality Issues
+- **Backup**: Broken implementation. `menv backup` fails to pass required arguments (`config_dir`) to backend scripts.
+- **Introduce**: Missing implementation. Documented in `README.md` but does not exist in codebase.
+- **List**: Documentation error. Docstrings in `src/menv/commands/make.py` incorrectly reference `menv make list` instead of `menv list`.
+
 ## Ansible Role Configuration
 - **Pattern**: `src/menv/ansible/roles/<role>/config/{common,profiles}/`.
 - **Constraint**: Documentation claims only `brew` role uses `profiles`.
