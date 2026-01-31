@@ -1,0 +1,39 @@
+schema_version: 1
+
+# Metadata
+id: "3rabez"
+issue_id: ""
+created_at: "2026-01-31"
+author_role: "devops"
+confidence: "high"
+
+# Content
+title: "Unpinned Toolchains and Floating Runner Tags"
+statement: |
+  CI workflows use floating tags for runners (`macos-latest`, `ubuntu-latest`) and unpinned package installations (`brew install shellcheck`), leading to potential non-determinism and reproducibility issues where builds may behave differently over time as underlying environments change.
+
+# Evidence supporting the observation
+evidence:
+  - path: ".github/workflows/lint-and-test.yml"
+    loc:
+      - "runs-on: macos-latest"
+    note: "Uses floating runner tag which changes over time."
+
+  - path: ".github/workflows/lint-and-test.yml"
+    loc:
+      - "run: brew install shellcheck"
+    note: "Installs latest shellcheck without pinning version."
+
+  - path: ".github/workflows/jules-workflows.yml"
+    loc:
+      - "runs-on: ubuntu-latest"
+    note: "Uses floating runner tag."
+
+  - path: ".github/workflows/jules-workflows.yml"
+    loc:
+      - "version: ${{ vars.JLO_VERSION || 'latest' }}"
+    note: "Defaults to 'latest' for jlo version if variable is unset."
+
+tags:
+  - "reproducibility"
+  - "supply-chain"

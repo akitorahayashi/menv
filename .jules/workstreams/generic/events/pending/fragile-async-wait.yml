@@ -1,0 +1,24 @@
+schema_version: 1
+
+# Metadata
+id: "ch9hs8"
+issue_id: ""
+created_at: "2026-01-31"
+author_role: "devops"
+confidence: "high"
+
+# Content
+title: "Fragile Async Wait in Jules Workflows"
+statement: |
+  The `jules-workflows.yml` uses fixed `sleep` durations to wait for asynchronous processing (e.g. `sleep $((WAIT_MINUTES * 60))`). This "sleep and pray" pattern is brittle: it causes failure if processing exceeds the window and wastes resources if processing finishes early.
+
+# Evidence supporting the observation
+evidence:
+  - path: ".github/workflows/jules-workflows.yml"
+    loc:
+      - "sleep $((WAIT_MINUTES * 60))"
+    note: "Uses blocking sleep to wait for async agent processing."
+
+tags:
+  - "operational-readiness"
+  - "anti-pattern"
