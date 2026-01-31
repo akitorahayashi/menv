@@ -29,3 +29,4 @@ The project uses GitHub Actions for CI/CD, heavily relying on the `menv` CLI too
 
 ### Artifacts
 - **No Build Artifacts**: The pipelines currently run scripts and verifications but do not produce immutable artifacts (e.g., binaries, containers) for promotion. The "artifact" is implicitly the source code or the PyPI package (not yet seen in release workflow).
+- **Violation of "Ship Artifacts, Not Scripts"**: Without a build step producing a versioned artifact (e.g., Wheel, PEX), deployments rely on checking out source code, which risks "prod is different" drift and makes rollback difficult.
