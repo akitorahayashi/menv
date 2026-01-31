@@ -61,7 +61,7 @@ jobs:
       - name: Check Scope and Enable Auto-Merge
         if: steps.find-pr.outputs.found == 'true'
         env:
-          GH_TOKEN: ${{ secrets.JLO_BOT_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ steps.find-pr.outputs.pr_number }}
           REPO: ${{ github.repository }}
         run: |
