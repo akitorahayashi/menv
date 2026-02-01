@@ -19,6 +19,8 @@ evidence:
       - "Profile Design"
     note: "States: 'Only brew role has profile-specific configs'"
   - path: "src/menv/ansible/roles/llm/config/profiles/mac-mini/"
+    loc:
+      - "(directory existence)"
     note: "Directory exists, indicating profile-specific config usage in llm role."
 
 tags:
