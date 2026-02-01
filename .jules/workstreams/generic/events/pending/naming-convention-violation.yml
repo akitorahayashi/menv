@@ -1,21 +1,29 @@
-schema_version: 2
-type: observation
-author: consistency
-source: "AGENTS.md vs src/menv/services/playbook.py"
-description: "PlaybookService violates AGENTS.md naming conventions (suffix usage and file naming)."
-details: |
-  **Documented Rules:**
-  `AGENTS.md` requires:
-  1. "Naming: Plain name without suffix (e.g., `ConfigStorage`)"
-  2. Implicit requirement for file names to match class names (e.g., `services/config_storage.py` ↔ `ConfigStorage`).
+schema_version: 1
 
-  **Implemented Behavior:**
-  `src/menv/services/playbook.py` contains the class `PlaybookService`.
-  - Violates "no suffix" rule (contains `Service` suffix).
-  - Violates file matching rule (`playbook.py` vs `PlaybookService`).
+# Metadata
+id: "namvio"
+issue_id: ""
+created_at: "2026-02-01"
+author_role: "consistency"
+confidence: "high"
 
-  **Impact:**
-  Inconsistent service structure makes the codebase harder to navigate and automated tooling (or agents) harder to run reliably.
-references:
-  - "AGENTS.md"
-  - "src/menv/services/playbook.py"
+# Content
+title: "PlaybookService Violates Naming Conventions"
+statement: |
+  `AGENTS.md` mandates plain names without suffixes for services (e.g., `ConfigStorage`, not `ConfigStorageService`) and matching filenames. `PlaybookService` in `src/menv/services/playbook.py` violates both rules: it has a `Service` suffix and the filename `playbook.py` does not match the class name `PlaybookService` (should be `playbook_service.py` if following class name, or class should be `Playbook`).
+
+# Evidence supporting the observation
+evidence:
+  - path: "AGENTS.md"
+    loc:
+      - "Services"
+    note: "Rule: 'Naming: Plain name without suffix', '1 class per file'"
+  - path: "src/menv/services/playbook.py"
+    loc:
+      - "class PlaybookService"
+    note: "Class name contains 'Service' suffix."
+
+tags:
+  - "architecture"
+  - "naming"
+  - "violation"
