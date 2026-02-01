@@ -22,7 +22,7 @@ It serves as the central source of truth for the **Decider** to deduplicate obse
 
 | Issue | Summary |
 | :--- | :--- |
-| _No open issues_ | - |
+| [Documentation and Implementation Drift](./bugs/documentation-and-implementation-drift.yml) | Fix inconsistencies between documentation and implementation regarding CLI commands and repair broken backup command. |
 
 ## Tests
 > Test coverage and infrastructure changes in [`tests/`](./tests/).
