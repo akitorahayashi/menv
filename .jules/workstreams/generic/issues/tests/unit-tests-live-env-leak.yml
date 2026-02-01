@@ -36,9 +36,9 @@ affected_areas:
   - "tests/conftest.py"
 
 acceptance_criteria:
-  - `src/menv/main.py` supports initializing with mock context or dependencies.
-  - Unit tests in `tests/unit/commands/` use `CliRunner` with a mocked context.
-  - Verify that running tests does not touch `~/.config/menv` (can be verified by setting `HOME` to a temp dir and asserting it's used, or mocking the storage path).
+  - "`src/menv/main.py` supports initializing with mock context or dependencies."
+  - "Unit tests in `tests/unit/commands/` use `CliRunner` with a mocked context."
+  - "Verify that running tests does not touch `~/.config/menv` (can be verified by setting `HOME` to a temp dir and asserting it's used, or mocking the storage path)."
 
 verification_commands:
   - "just test" # Should pass

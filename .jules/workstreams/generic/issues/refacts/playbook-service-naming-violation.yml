@@ -36,9 +36,9 @@ affected_areas:
   - "tests/"
 
 acceptance_criteria:
-  - `src/menv/services/playbook.py` contains a class named `Playbook` (or similar suffix-less name).
-  - No class named `PlaybookService` exists.
-  - All tests pass.
+  - "`src/menv/services/playbook.py` contains a class named `Playbook` (or similar suffix-less name)."
+  - "No class named `PlaybookService` exists."
+  - "All tests pass."
 
 verification_commands:
   - "grep -r \"PlaybookService\" src/menv/" # Should be empty
