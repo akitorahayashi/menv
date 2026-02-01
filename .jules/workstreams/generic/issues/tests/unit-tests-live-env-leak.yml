@@ -1,0 +1,49 @@
+schema_version: 2
+
+# Metadata
+id: "t3st15"
+source_events:
+  - "tstvio"
+title: "Unit Tests Leak to Live Environment"
+label: "tests"
+priority: "high"
+summary: "Isolate unit tests from live environment by preventing import of initialized app context."
+
+# Content
+problem: |
+  Unit tests in `tests/unit/commands/` (e.g., `test_config.py`) import `menv.main.app`. In `src/menv/main.py`, the `app` object is defined and has a `callback` (the `main` function) which initializes the `AppContext` with **real** service instances (`ConfigStorage`, `AnsibleRunner`, etc.) when invoked.
+
+  When `CliRunner` invokes the app in tests, this `main` callback executes, creating real services that interact with the live filesystem (e.g., `~/.config/menv`). This violates the core testing rule "Unit tests only (fast, mocks, no external processes)" and poses a risk of modifying the user's actual configuration during testing.
+
+impact: |
+  - Unit tests are not isolated.
+  - Running `just test` or `pytest` can modify the developer's/user's actual `~/.config/menv` directory.
+  - Tests are slower and flaky due to filesystem dependency.
+  - Violates `AGENTS.md` testing rules.
+
+desired_outcome: |
+  - `menv.main.py` is refactored to allow dependency injection or Context overriding for tests.
+  - Unit tests use mocks for all services (`ConfigStorage`, `AnsibleRunner`, etc.).
+  - No unit test interacts with the real filesystem (outside of temporary directories if absolutely necessary, but preferably just mocks).
+
+constraints: []
+risks: []
+
+# Specifics
+affected_areas:
+  - "src/menv/main.py"
+  - "tests/unit/commands/"
+  - "tests/conftest.py"
+
+acceptance_criteria:
+  - `src/menv/main.py` supports initializing with mock context or dependencies.
+  - Unit tests in `tests/unit/commands/` use `CliRunner` with a mocked context.
+  - Verify that running tests does not touch `~/.config/menv` (can be verified by setting `HOME` to a temp dir and asserting it's used, or mocking the storage path).
+
+verification_commands:
+  - "just test" # Should pass
+  - # Manual verification: Inspect code to ensure `ctx.obj` is mocked in tests.
+
+# Analysis Flags
+requires_deep_analysis: false
+deep_analysis_reason: ""

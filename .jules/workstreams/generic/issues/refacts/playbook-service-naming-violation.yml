@@ -1,0 +1,50 @@
+schema_version: 2
+
+# Metadata
+id: "r3n4m1"
+source_events:
+  - "namvio"
+title: "PlaybookService Naming Violation"
+label: "refacts"
+priority: "low"
+summary: "Refactor PlaybookService to adhere to project naming conventions (no suffix, matching filename)."
+
+# Content
+problem: |
+  The `PlaybookService` class in `src/menv/services/playbook.py` violates the architectural rules defined in `AGENTS.md`.
+  1. **Suffix Violation**: The class name has a `Service` suffix (`PlaybookService`), while `AGENTS.md` mandates "Plain name without suffix (e.g., `ConfigStorage`)".
+  2. **Filename Mismatch**: The filename `playbook.py` does not match the class name `PlaybookService` (should be `playbook_service.py` if following the class name, or class should be `Playbook` to match the file).
+
+impact: |
+  - Inconsistency in codebase naming conventions.
+  - Confusion for developers regarding the "1 class per file" and naming rules.
+  - Potential drift where new services start ignoring the rules.
+
+desired_outcome: |
+  - `PlaybookService` is renamed to `Playbook` (or another appropriate domain name without suffix).
+  - The filename `src/menv/services/playbook.py` remains (or is updated if the class name changes to something else) to ensure strict class-filename correspondence.
+  - References to `PlaybookService` throughout the codebase are updated.
+
+constraints: []
+risks: []
+
+# Specifics
+affected_areas:
+  - "src/menv/services/playbook.py"
+  - "src/menv/context.py"
+  - "src/menv/main.py"
+  - "tests/"
+
+acceptance_criteria:
+  - `src/menv/services/playbook.py` contains a class named `Playbook` (or similar suffix-less name).
+  - No class named `PlaybookService` exists.
+  - All tests pass.
+
+verification_commands:
+  - "grep -r \"PlaybookService\" src/menv/" # Should be empty
+  - "ls src/menv/services/playbook.py" # Should exist
+  - "just test"
+
+# Analysis Flags
+requires_deep_analysis: false
+deep_analysis_reason: ""

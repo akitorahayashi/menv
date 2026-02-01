@@ -4,24 +4,31 @@ schema_version: 2
 id: "x9z2q1" # stable identity
 source_events:
   - "dr1ft0"
+  - "prfcfg"
+  - "symlk1"
 title: "Documentation and Implementation Drift"
 label: "bugs"
 priority: "medium"
-summary: "Fix inconsistencies between documentation and implementation regarding CLI commands and repair broken backup command."
+summary: "Fix inconsistencies between documentation and implementation regarding CLI commands, architectural rules, and repair broken backup command."
 
 # Content
 problem: |
-  There are multiple discrepancies between the documentation (README.md, docstrings) and the actual implementation, as well as a functional bug in the backup command.
+  There are multiple discrepancies between the documentation (README.md, AGENTS.md, docstrings) and the actual implementation, as well as a functional bug in the backup command.
   1. `README.md` references a non-existent `menv introduce` command.
   2. `src/menv/commands/make.py` docstring shows incorrect usage `menv make list` instead of `menv list`.
   3. `menv backup` command fails at runtime because the CLI wrapper does not pass the required `config_dir` argument to the backend scripts.
+  4. `AGENTS.md` states "Only brew role has profile-specific configs", but the `llm` role also implements them in `src/menv/ansible/roles/llm/config/profiles/`.
+  5. `README.md` claims "no symlinks" are used for dotfiles, but the `shell` role (and `AGENTS.md` rules) explicitly use symlinks for configuration deployment.
 
 impact: |
   - Users are misled by incorrect documentation, leading to confusion and failed commands.
-  - The `menv backup` functionality is completely broken, preventing users from backing up their system settings.
+  - The `menv backup` functionality is completely broken.
+  - Architectural rules in `AGENTS.md` are inaccurate, potentially confusing developers.
+  - `README.md` makes false promises about system modifications (symlinks).
 
 desired_outcome: |
-  - `README.md` accurately reflects available commands (remove `introduce`).
+  - `README.md` accurately reflects available commands (remove `introduce`) and symlink usage.
+  - `AGENTS.md` accurately reflects that `llm` role also uses profile-specific configs.
   - `src/menv/commands/make.py` docstring correctly documents `menv list` usage.
   - `menv backup` command successfully passes the configuration directory to backend scripts and executes without error.
 
@@ -31,11 +38,16 @@ risks: []
 # Specifics
 affected_areas:
   - "README.md"
+  - "AGENTS.md"
   - "src/menv/commands/make.py"
   - "src/menv/commands/backup.py"
+  - "src/menv/ansible/roles/llm/"
+  - "src/menv/ansible/roles/shell/"
 
 acceptance_criteria:
   - "`menv introduce` reference is removed from README.md."
+  - "`README.md` is updated to acknowledge symlink usage for dotfiles."
+  - "`AGENTS.md` is updated to include `llm` role in profile-specific config rules."
   - "`src/menv/commands/make.py` docstring uses `menv list`."
   - "`menv backup system` invokes the backend script with the correct `config_dir` argument."
 
@@ -43,6 +55,8 @@ verification_commands:
   - "grep -r \"introduce\" README.md" # Should be empty
   - "grep \"menv make list\" src/menv/commands/make.py" # Should be empty
   - "grep \"config_dir\" src/menv/commands/backup.py" # Should find the argument passing
+  - "grep \"Only brew role\" AGENTS.md" # Should be updated or removed
+  - "grep \"no symlinks\" README.md" # Should be updated or removed
   - "just test tests/unit/commands/test_backup.py" # Ensure no regressions in existing tests
 
 # Analysis Flags
