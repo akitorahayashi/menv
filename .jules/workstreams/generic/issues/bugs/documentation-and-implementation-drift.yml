@@ -1,0 +1,50 @@
+schema_version: 2
+
+# Metadata
+id: "x9z2q1" # stable identity
+source_events:
+  - "dr1ft0"
+title: "Documentation and Implementation Drift"
+label: "bugs"
+priority: "medium"
+summary: "Fix inconsistencies between documentation and implementation regarding CLI commands and repair broken backup command."
+
+# Content
+problem: |
+  There are multiple discrepancies between the documentation (README.md, docstrings) and the actual implementation, as well as a functional bug in the backup command.
+  1. `README.md` references a non-existent `menv introduce` command.
+  2. `src/menv/commands/make.py` docstring shows incorrect usage `menv make list` instead of `menv list`.
+  3. `menv backup` command fails at runtime because the CLI wrapper does not pass the required `config_dir` argument to the backend scripts.
+
+impact: |
+  - Users are misled by incorrect documentation, leading to confusion and failed commands.
+  - The `menv backup` functionality is completely broken, preventing users from backing up their system settings.
+
+desired_outcome: |
+  - `README.md` accurately reflects available commands (remove `introduce`).
+  - `src/menv/commands/make.py` docstring correctly documents `menv list` usage.
+  - `menv backup` command successfully passes the configuration directory to backend scripts and executes without error.
+
+constraints: []
+risks: []
+
+# Specifics
+affected_areas:
+  - "README.md"
+  - "src/menv/commands/make.py"
+  - "src/menv/commands/backup.py"
+
+acceptance_criteria:
+  - "`menv introduce` reference is removed from README.md."
+  - "`src/menv/commands/make.py` docstring uses `menv list`."
+  - "`menv backup system` invokes the backend script with the correct `config_dir` argument."
+
+verification_commands:
+  - "grep -r \"introduce\" README.md" # Should be empty
+  - "grep \"menv make list\" src/menv/commands/make.py" # Should be empty
+  - "grep \"config_dir\" src/menv/commands/backup.py" # Should find the argument passing
+  - "just test tests/unit/commands/test_backup.py" # Ensure no regressions in existing tests
+
+# Analysis Flags
+requires_deep_analysis: false
+deep_analysis_reason: ""
