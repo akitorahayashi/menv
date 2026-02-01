@@ -1,0 +1,17 @@
+schema_version: 2
+type: observation
+author: consistency
+source: "AGENTS.md vs src/menv/ansible/roles/llm/config/profiles/"
+description: "AGENTS.md incorrectly claims only 'brew' role has profile-specific configs."
+details: |
+  **Documented Behavior:**
+  `AGENTS.md` states: "Profile-specific configs: Only `brew` role has profile-specific configs (macbook/mac-mini)".
+
+  **Implemented Behavior:**
+  The `llm` role also uses profile-specific configurations, evidenced by the existence of `src/menv/ansible/roles/llm/config/profiles/mac-mini/`.
+
+  **Impact:**
+  Developers relying on `AGENTS.md` might assume only `brew` needs profile handling logic or that other roles are strictly common-only.
+references:
+  - "AGENTS.md"
+  - "src/menv/ansible/roles/llm/config/profiles/"

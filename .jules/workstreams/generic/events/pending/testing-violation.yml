@@ -1,0 +1,20 @@
+schema_version: 2
+type: observation
+author: consistency
+source: "AGENTS.md vs tests/unit/commands/"
+description: "Unit tests interact with live filesystem, violating AGENTS.md isolation rules."
+details: |
+  **Documented Rules:**
+  `AGENTS.md` states: "`just unit-test`: Unit tests only (fast, mocks, no external processes)".
+
+  **Implemented Behavior:**
+  Tests in `tests/unit/commands/` (e.g., `test_config.py`) import `menv.main.app`, which initializes the full dependency graph with real implementations (e.g., `ConfigStorage`, `AnsibleRunner`).
+  - `test_config.py` reads/writes to `~/.config/menv` (external process/filesystem side effect).
+  - This prevents safe, isolated execution of unit tests.
+
+  **Impact:**
+  Running unit tests can corrupt the user's actual configuration. Tests are not isolated and depend on the environment state.
+references:
+  - "AGENTS.md"
+  - "tests/unit/commands/test_config.py"
+  - "src/menv/main.py"

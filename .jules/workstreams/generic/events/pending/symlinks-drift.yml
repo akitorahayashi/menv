@@ -1,0 +1,19 @@
+schema_version: 2
+type: observation
+author: consistency
+source: "README.md vs src/menv/ansible/roles/shell/tasks/main.yml"
+description: "README claims 'no symlinks' for dotfiles, but implementation and AGENTS.md confirm symlinks are used."
+details: |
+  **Documented Behavior:**
+  `README.md` states: "menv provisions dotfiles by copying them into your home directory (no symlinks) so pipx upgrades won’t break paths."
+
+  **Implemented Behavior:**
+  1. `src/menv/ansible/roles/shell/tasks/main.yml` explicitly uses `state: link` to create symlinks for `.zshrc` and `.zprofile` pointing to the config directory.
+  2. `AGENTS.md` confirms this strategy: "`~/.config/menv/roles/{role}/` → Local destinations: Symbolic links (changes reflected immediately)".
+
+  **Impact:**
+  Users expecting immutable copies in their home directory will find symlinks instead, which contradicts the documentation's rationale about pipx upgrades.
+references:
+  - "README.md"
+  - "src/menv/ansible/roles/shell/tasks/main.yml"
+  - "AGENTS.md"

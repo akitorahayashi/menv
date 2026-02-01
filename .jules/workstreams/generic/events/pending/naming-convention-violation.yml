@@ -1,0 +1,21 @@
+schema_version: 2
+type: observation
+author: consistency
+source: "AGENTS.md vs src/menv/services/playbook.py"
+description: "PlaybookService violates AGENTS.md naming conventions (suffix usage and file naming)."
+details: |
+  **Documented Rules:**
+  `AGENTS.md` requires:
+  1. "Naming: Plain name without suffix (e.g., `ConfigStorage`)"
+  2. Implicit requirement for file names to match class names (e.g., `services/config_storage.py` ↔ `ConfigStorage`).
+
+  **Implemented Behavior:**
+  `src/menv/services/playbook.py` contains the class `PlaybookService`.
+  - Violates "no suffix" rule (contains `Service` suffix).
+  - Violates file matching rule (`playbook.py` vs `PlaybookService`).
+
+  **Impact:**
+  Inconsistent service structure makes the codebase harder to navigate and automated tooling (or agents) harder to run reliably.
+references:
+  - "AGENTS.md"
+  - "src/menv/services/playbook.py"
