@@ -1,0 +1,45 @@
+schema_version: 1
+
+# Metadata
+id: "dr1ft0"
+issue_id: "" # ID of the issue that processed this event (empty if unprocessed)
+created_at: "2024-05-22"
+author_role: "consistency"
+confidence: "high"
+
+# Content
+title: "Documentation and Implementation Drift"
+statement: |
+  Multiple inconsistencies detected between documentation (`README.md`, docstrings) and implementation (`src/menv`).
+  1. `README.md` references a non-existent `menv introduce` command.
+  2. `src/menv/commands/make.py` docstring incorrectly documents `menv make list` which is implemented as `menv list`.
+  3. `menv backup` fails at runtime because the CLI wrapper does not pass the required `config_dir` argument to backend scripts, contradicting the implied contract of a working command.
+
+# Evidence supporting the observation
+evidence:
+  - path: "README.md"
+    loc:
+      - "Show help"
+    note: "References `menv introduce --help` which does not exist in `main.py`."
+  - path: "src/menv/main.py"
+    loc:
+      - "app definition"
+    note: "No `introduce` command registered."
+  - path: "src/menv/commands/make.py"
+    loc:
+      - "def list_tags"
+    note: "Docstring example `menv make list` conflicts with registration `menv list`."
+  - path: "src/menv/commands/backup.py"
+    loc:
+      - "subprocess.Popen"
+    note: "Calls backend script without arguments."
+  - path: "src/menv/ansible/scripts/system/backup-system.py"
+    loc:
+      - "parse_args"
+    note: "Requires `config_dir` argument."
+
+tags:
+  - "consistency"
+  - "drift"
+  - "documentation"
+  - "bug"
