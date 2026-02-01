@@ -16,3 +16,13 @@ Internal documentation (docstrings) provides usage examples that contradict the 
 CLI command wrappers invoke backend scripts without adhering to the script's interface, causing runtime failures.
 - **Example:** `menv backup` wrapper (`src/menv/commands/backup.py`) fails to pass the required `config_dir` argument to the underlying backend scripts (`scripts/system/backup-system.py`), causing them to crash.
 - **Root Cause:** Lack of integration tests verifying the end-to-end execution of CLI wrappers.
+
+### 4. Architectural Contradiction
+`AGENTS.md` defines strict architectural rules (naming, testing) that are violated by the implementation.
+- **Example:** `PlaybookService` in `playbook.py` violates naming conventions; unit tests interact with live filesystem.
+- **Risk:** Codebase becomes inconsistent and hard to maintain; tests become unreliable or dangerous.
+
+### 5. Behavioral Drift
+High-level documentation (`README.md`) makes specific claims about behavior that are directly contradicted by the implementation.
+- **Example:** `README.md` claims "no symlinks" for dotfiles, but implementation explicitly uses them.
+- **Risk:** Users are misled about how the tool affects their system.

@@ -1,0 +1,29 @@
+schema_version: 1
+
+# Metadata
+id: "prfcfg"
+issue_id: ""
+created_at: "2026-02-01"
+author_role: "consistency"
+confidence: "high"
+
+# Content
+title: "Profile-Specific Configs Used in Non-Brew Role"
+statement: |
+  `AGENTS.md` claims that only the `brew` role uses profile-specific configurations. However, the `llm` role also implements profile-specific configurations, as evidenced by the existence of `src/menv/ansible/roles/llm/config/profiles/`.
+
+# Evidence supporting the observation
+evidence:
+  - path: "AGENTS.md"
+    loc:
+      - "Profile Design"
+    note: "States: 'Only brew role has profile-specific configs'"
+  - path: "src/menv/ansible/roles/llm/config/profiles/mac-mini/"
+    loc:
+      - "(directory existence)"
+    note: "Directory exists, indicating profile-specific config usage in llm role."
+
+tags:
+  - "documentation"
+  - "drift"
+  - "architecture"
