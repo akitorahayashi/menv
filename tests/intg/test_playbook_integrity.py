@@ -52,9 +52,7 @@ class TestPlaybookIntegrity:
 
         assert not missing_roles, f"Missing role directories: {missing_roles}"
 
-    def test_tag_names_are_unique_except_shared(
-        self, playbook: Playbook
-    ) -> None:
+    def test_tag_names_are_unique_except_shared(self, playbook: Playbook) -> None:
         """Test that tag names are unique across roles (except intentionally shared ones).
 
         Currently, there are no intentionally shared tags.
@@ -93,9 +91,7 @@ class TestPlaybookIntegrity:
         assert "roles" in play
         assert play["hosts"] == "localhost"
 
-    def test_all_roles_have_at_least_one_tag(
-        self, playbook: Playbook
-    ) -> None:
+    def test_all_roles_have_at_least_one_tag(self, playbook: Playbook) -> None:
         """Test that all roles in playbook have at least one tag."""
         tags_map = playbook.get_tags_map()
 
@@ -106,9 +102,7 @@ class TestPlaybookIntegrity:
         if roles_without_tags:
             pytest.skip(f"Roles without tags (informational): {roles_without_tags}")
 
-    def test_get_all_tags_returns_non_empty_list(
-        self, playbook: Playbook
-    ) -> None:
+    def test_get_all_tags_returns_non_empty_list(self, playbook: Playbook) -> None:
         """Test that get_all_tags returns a non-empty list."""
         all_tags = playbook.get_all_tags()
 

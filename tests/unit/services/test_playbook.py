@@ -38,16 +38,16 @@ class TestPlaybook:
         return ansible_dir
 
     @pytest.fixture
-    def service(self, temp_ansible_dir: Path) -> Playbook:
+    def playbook(self, temp_ansible_dir: Path) -> Playbook:
         """Create a Playbook with mocked paths."""
         mock_paths = MockAnsiblePaths(ansible_dir=temp_ansible_dir)
         return Playbook(ansible_paths=mock_paths)
 
     def test_get_tags_map_returns_role_to_tags_mapping(
-        self, service: Playbook
+        self, playbook: Playbook
     ) -> None:
         """Test that get_tags_map returns correct role→tags mapping."""
-        tags_map = service.get_tags_map()
+        tags_map = playbook.get_tags_map()
 
         assert "brew" in tags_map
         assert tags_map["brew"] == ["brew-formulae", "brew-cask"]
@@ -58,9 +58,9 @@ class TestPlaybook:
         assert "shell" in tags_map
         assert tags_map["shell"] == ["shell"]
 
-    def test_get_all_tags_returns_sorted_list(self, service: Playbook) -> None:
+    def test_get_all_tags_returns_sorted_list(self, playbook: Playbook) -> None:
         """Test that get_all_tags returns all tags sorted."""
-        all_tags = service.get_all_tags()
+        all_tags = playbook.get_all_tags()
 
         # Should contain all tags from the playbook
         expected_tags = [
@@ -74,43 +74,41 @@ class TestPlaybook:
         ]
         assert all_tags == expected_tags
 
-    def test_get_role_for_tag_returns_correct_role(
-        self, service: Playbook
-    ) -> None:
+    def test_get_role_for_tag_returns_correct_role(self, playbook: Playbook) -> None:
         """Test that get_role_for_tag returns the correct role."""
-        assert service.get_role_for_tag("brew-formulae") == "brew"
-        assert service.get_role_for_tag("brew-cask") == "brew"
-        assert service.get_role_for_tag("python-platform") == "python"
-        assert service.get_role_for_tag("rust-tools") == "rust"
-        assert service.get_role_for_tag("shell") == "shell"
+        assert playbook.get_role_for_tag("brew-formulae") == "brew"
+        assert playbook.get_role_for_tag("brew-cask") == "brew"
+        assert playbook.get_role_for_tag("python-platform") == "python"
+        assert playbook.get_role_for_tag("rust-tools") == "rust"
+        assert playbook.get_role_for_tag("shell") == "shell"
 
     def test_get_role_for_tag_returns_none_for_unknown_tag(
-        self, service: Playbook
+        self, playbook: Playbook
     ) -> None:
         """Test that get_role_for_tag returns None for unknown tags."""
-        assert service.get_role_for_tag("unknown-tag") is None
-        assert service.get_role_for_tag("") is None
+        assert playbook.get_role_for_tag("unknown-tag") is None
+        assert playbook.get_role_for_tag("") is None
 
     def test_validate_tags_returns_true_for_valid_tags(
-        self, service: Playbook
+        self, playbook: Playbook
     ) -> None:
         """Test that validate_tags returns True for valid tags."""
-        assert service.validate_tags(["brew-formulae", "shell"]) is True
-        assert service.validate_tags(["rust-platform", "rust-tools"]) is True
-        assert service.validate_tags([]) is True  # Empty list is valid
+        assert playbook.validate_tags(["brew-formulae", "shell"]) is True
+        assert playbook.validate_tags(["rust-platform", "rust-tools"]) is True
+        assert playbook.validate_tags([]) is True  # Empty list is valid
 
     def test_validate_tags_returns_false_for_invalid_tags(
-        self, service: Playbook
+        self, playbook: Playbook
     ) -> None:
         """Test that validate_tags returns False for invalid tags."""
-        assert service.validate_tags(["unknown-tag"]) is False
-        assert service.validate_tags(["shell", "unknown-tag"]) is False
+        assert playbook.validate_tags(["unknown-tag"]) is False
+        assert playbook.validate_tags(["shell", "unknown-tag"]) is False
 
-    def test_playbook_data_is_cached(self, service: Playbook) -> None:
+    def test_playbook_data_is_cached(self, playbook: Playbook) -> None:
         """Test that playbook data is cached after first access."""
         # Access tags_map twice
-        tags_map1 = service.get_tags_map()
-        tags_map2 = service.get_tags_map()
+        tags_map1 = playbook.get_tags_map()
+        tags_map2 = playbook.get_tags_map()
 
         # Should be equal (same cached data)
         assert tags_map1 == tags_map2
