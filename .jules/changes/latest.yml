@@ -1,0 +1,76 @@
+schema_version: 1
+
+id: "d834f5"
+created_at: "2026-02-02T18:39:17Z"
+
+range:
+  from_commit: "505413fd1ac21b2723504a30705d9aec7b897507"
+  to_commit: "62c38a94c68e473d9da66b20b4b57bee0b75336f"
+  selection_mode: bootstrap
+  selection_detail: "Last 20 commits with non-.jules/ changes"
+  excluded_paths:
+    - .jules/
+
+stats:
+  commits_total: 23
+  commits_included: 23
+  files_changed: 31
+  insertions: 1331
+  deletions: 196
+
+commits:
+  - sha: "62c38a9"
+    subject: "Merge remote-tracking branch 'origin/main' into jules"
+  - sha: "1d0324b"
+    subject: "fix: update jlo tool version to v7.0.1 in tools.yml"
+  - sha: "3eee74d"
+    subject: "Merge remote-tracking branch 'origin/main' into jules"
+  - sha: "44da4fd"
+    subject: "fix: update jlo tool version to v7.0.1 in tools.yml"
+  - sha: "860ef71"
+    subject: "Merge remote-tracking branch 'origin/main' into jules"
+  - sha: "d066eba"
+    subject: "ci: exclude jules-narrator from implementer review"
+  - sha: "9eade6c"
+    subject: "Merge remote-tracking branch 'origin/main' into jules"
+  - sha: "298a19e"
+    subject: "fix: update branch pattern to include narrator in jules-automerge workflow"
+  - sha: "6c852e6"
+    subject: "Merge remote-tracking branch 'origin/main' into jules"
+  - sha: "e4e4414"
+    subject: "fix: update cron schedule to run daily at 18:00 UTC in jules-workflows.yml"
+  - sha: "0c829a0"
+    subject: "init jules"
+  - sha: "7f497ae"
+    subject: "fix: update jlo tool version to v7.0.0 in tools.yml"
+  - sha: "0ba611e"
+    subject: "feat: add jules-sync workflow to check for jules branch existence and merge main into it"
+  - sha: "22bc8ea"
+    subject: "refactor: Rename PlaybookService to Playbook (#253)"
+  - sha: "fc5c2a8"
+    subject: "fix: update code review settings and ignore markdown files in CI workflows"
+  - sha: "0893490"
+    subject: "feat: add jules-sync workflow to merge main into jules branch"
+  - sha: "a3ddda3"
+    subject: "Isolate unit tests from live environment (#252)"
+  - sha: "c5f1623"
+    subject: "fix: update cron schedule time to 17:00 UTC for daily workflows"
+  - sha: "b7811a5"
+    subject: "setup jules workflows"
+  - sha: "baf77ae"
+    subject: "feat: disable auto review in .coderabbit.yml and add code review configuration in .gemini/config.yaml"
+  - sha: "c25580e"
+    subject: "fix: update cron schedule time to 18:00 UTC for daily workflows"
+  - sha: "0f06072"
+    subject: "feat: add GitHub actions for configuring Git, installing jlo, and implementing auto-merge and review workflows"
+  - sha: "bc97977"
+    subject: "feat: update jlo tool version to v6.0.0 in tools configuration"
+
+summary:
+  overview: "The update focuses on establishing and refining the Jules automation workflows, including CI/CD pipelines for synchronization, auto-merging, and code review. It also includes refactoring of the Playbook service and test isolation improvements, alongside updates to the jlo tool version."
+  notable_changes:
+    - "Refactored PlaybookService to Playbook and isolated unit tests from the live environment."
+    - "Established jules-sync and jules-automerge workflows with daily cron schedules."
+    - "Updated jlo tool version to v7.0.1 and configured code review settings."
+    - "Adjusted CI/CD configurations, including branch patterns and review exclusions."
+  truncation_note: ""
