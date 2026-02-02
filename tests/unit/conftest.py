@@ -38,12 +38,12 @@ class MockContextCliRunner(CliRunner):
         self.mock_context = mock_context
 
     def invoke(self, app, args=None, **kwargs):
-        if "obj" not in kwargs:
+        if kwargs.get("obj") is None:
             kwargs["obj"] = self.mock_context
         return super().invoke(app, args, **kwargs)
 
 
 @pytest.fixture
-def cli_runner(mock_app_context: AppContext) -> CliRunner:
+def cli_runner(mock_app_context: AppContext) -> "MockContextCliRunner":
     """Create a CLI runner for testing Typer commands."""
     return MockContextCliRunner(mock_app_context, mix_stderr=False)
