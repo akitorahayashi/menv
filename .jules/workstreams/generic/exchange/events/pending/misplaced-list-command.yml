@@ -1,0 +1,26 @@
+schema_version: 1
+
+id: "d4list"
+issue_id: ""
+created_at: "2026-02-02"
+author_role: "data_arch"
+confidence: "medium"
+
+title: "Misplaced List Command Implementation"
+statement: |
+  The `list` command logic is implemented as `list_tags` inside `src/menv/commands/make.py` instead of a dedicated module, violating the project's file-per-command structure.
+
+evidence:
+  - path: "src/menv/commands/make.py"
+    loc:
+      - "list_tags"
+    note: "Command implementation resides in wrong module."
+  - path: "src/menv/main.py"
+    loc:
+      - "app.command(name=\"list\""
+    note: "Imports list_tags from menv.commands.make."
+
+tags:
+  - "coupling"
+  - "architectural-violation"
+  - "separation-of-concerns"
