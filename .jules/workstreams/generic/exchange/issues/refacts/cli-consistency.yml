@@ -37,19 +37,45 @@ risks:
 
 # Specifics
 affected_areas:
+  - "src/menv/main.py"
   - "src/menv/commands/make.py"
   - "src/menv/commands/config.py"
-  - "src/menv/main.py"
+  - "src/menv/commands/run.py"
+  - "src/menv/commands/identity.py"
+  - "src/menv/commands/dotfiles.py"
+  - "tests/unit/commands/test_make.py"
+  - "tests/unit/commands/test_config.py"
+  - "tests/unit/commands/test_run.py"
+  - "tests/unit/commands/test_identity.py"
+  - "tests/unit/commands/test_dotfiles.py"
 
 acceptance_criteria:
-  - "`menv list` is relocated."
-  - "`config` command is disambiguated."
-  - "Internal and external vocabulary matches."
-  - "Help text reflects changes."
+  - "Command `menv make` is renamed to `menv run`."
+  - "Command `menv list` is removed; functionality is accessible via `menv run --list`."
+  - "Command `menv config` is removed and split into two new command groups: `menv identity` and `menv dotfiles`."
+  - "Command `menv identity` handles VCS identity (`show`, `set`)."
+  - "Command `menv dotfiles` handles dotfile deployment (`deploy`)."
+  - "Command `menv config create` is renamed to `menv dotfiles deploy`."
+  - "Command `menv config set/show` is renamed to `menv identity set/show`."
+  - "Help text for all new commands is accurate and consistent."
+  - "Old commands (`make`, `config`, `list`) are removed or return a helpful deprecation error."
 
 verification_commands:
-  - "uv run pytest tests/unit/test_cli.py"
+  - "uv run pytest tests/unit/commands/test_run.py tests/unit/commands/test_identity.py tests/unit/commands/test_dotfiles.py"
+  - "menv --help"
 
 # Analysis Flags
-requires_deep_analysis: true
-deep_analysis_reason: "Renaming commands is a breaking API change that requires a migration plan or deprecation strategy."
+requires_deep_analysis: false
+deep_analysis_reason: |
+  Renaming commands is a breaking API change that requires a migration plan or deprecation strategy. Analysis confirmed that `make` should be renamed to `run`, `list` should become `run --list`, and `config` should be split into `identity` and `dotfiles`. The root `create` command (full setup) is preserved but `config create` becomes `dotfiles deploy` to resolve terminology conflicts.
+
+  Implementation Plan:
+  1. Rename `src/menv/commands/make.py` to `src/menv/commands/run.py`.
+     - Update `make` function to `run`.
+     - Add `--list` flag to `run` function to replace `list_tags`.
+  2. Create `src/menv/commands/identity.py` from `src/menv/commands/config.py` (keep `show`, `set`).
+  3. Create `src/menv/commands/dotfiles.py` from `src/menv/commands/config.py` (keep `create` -> rename to `deploy`).
+  4. Update `src/menv/main.py` to register new commands (`run`, `identity`, `dotfiles`) and remove old ones.
+  5. Rename and update tests:
+     - `tests/unit/commands/test_make.py` -> `test_run.py`
+     - Split `tests/unit/commands/test_config.py` -> `test_identity.py`, `test_dotfiles.py`
