@@ -1,0 +1,16 @@
+schema_version: 1
+id: cs2v6r
+created_at: '2026-02-03'
+status: open
+title: Config System Architecture
+statement: The configuration system suffers from hardcoded paths, duplicated logic,
+  and overloaded terminology ('config' for identity vs roles, 'create' vs 'deploy').
+  It needs architectural consolidation.
+requires_deep_analysis: true
+source_events:
+- d1path
+- a1b2c3
+- cf0v1d
+- cr8dpl
+deep_analysis_reason: Consolidating the configuration architecture impacts multiple
+  services and requires a unified data model design.

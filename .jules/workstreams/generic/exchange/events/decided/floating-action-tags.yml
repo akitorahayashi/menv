@@ -1,0 +1,33 @@
+schema_version: 1
+id: '232594'
+issue_id: cr1d5f
+created_at: '2026-02-02'
+author_role: devops
+confidence: high
+title: Supply Chain Risk from Floating Action Tags
+statement: 'GitHub Actions workflows use mutable tags (e.g., `v4`, `v5`) instead of
+  pinned SHAs, exposing the pipeline to supply-chain attacks or unexpected breaking
+  changes in action dependencies.
+
+  '
+evidence:
+- path: .github/workflows/lint-and-test.yml
+  loc:
+  - '12'
+  note: Uses `actions/checkout@v4`.
+- path: .github/actions/setup-base/action.yml
+  loc:
+  - '7'
+  note: Uses `actions/setup-python@v5`.
+- path: .github/actions/setup-base/action.yml
+  loc:
+  - '11'
+  note: Uses `extractions/setup-just@v2`.
+- path: .github/actions/setup-base/action.yml
+  loc:
+  - '14'
+  note: Uses `astral-sh/setup-uv@v5`.
+tags:
+- supply-chain
+- security
+- pinning

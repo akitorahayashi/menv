@@ -1,0 +1,25 @@
+schema_version: 1
+id: g7h8i9
+issue_id: ar7y2k
+created_at: '2026-02-02'
+author_role: pythonista
+confidence: high
+title: AnsibleRunner mixes I/O with logic and lacks unit tests
+statement: 'AnsibleRunner directly uses subprocess and os modules, mixing I/O with
+  core logic. This tight coupling forces heavy mocking for tests, likely contributing
+  to the complete absence of unit tests for this service.
+
+  '
+evidence:
+- path: src/menv/services/ansible_runner.py
+  loc:
+  - '71'
+  note: Direct usage of subprocess.Popen prevents easy mocking.
+- path: tests/unit/services/
+  loc:
+  - .
+  note: Missing test_ansible_runner.py indicates zero coverage for this service.
+tags:
+- testing
+- boundaries
+- coverage

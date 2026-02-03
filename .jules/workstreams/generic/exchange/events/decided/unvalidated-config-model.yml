@@ -1,0 +1,24 @@
+schema_version: 1
+id: d3conf
+issue_id: uc7h3v
+created_at: '2026-02-02'
+author_role: data_arch
+confidence: high
+title: Missing Validation for Configuration Model
+statement: '`MenvConfig` is a `TypedDict` used to type-hint data loaded directly from
+  disk without runtime validation, allowing invalid states to propagate.
+
+  '
+evidence:
+- path: src/menv/models/config.py
+  loc:
+  - MenvConfig
+  note: Type definition is a TypedDict with no runtime checks.
+- path: src/menv/services/config_storage.py
+  loc:
+  - load
+  note: Method casts loaded TOML dictionary to MenvConfig without validation.
+tags:
+- missing-validation
+- type-safety
+- data-integrity

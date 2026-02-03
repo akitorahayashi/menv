@@ -1,0 +1,29 @@
+schema_version: 1
+id: d1path
+issue_id: cs2v6r
+created_at: '2026-02-02'
+author_role: data_arch
+confidence: high
+title: Duplicate Definition of Configuration Path
+statement: 'The user configuration root path `~/.config/menv` is defined redundantly
+  in at least three different services without a shared constant or configuration
+  object.
+
+  '
+evidence:
+- path: src/menv/services/config_storage.py
+  loc:
+  - ConfigStorage.__init__
+  note: Defines default config_dir path.
+- path: src/menv/services/config_deployer.py
+  loc:
+  - ConfigDeployer.__init__
+  note: Defines _local_config_root path independently.
+- path: src/menv/services/ansible_runner.py
+  loc:
+  - AnsibleRunner.run_playbook
+  note: Defines local_config_root path independently.
+tags:
+- ssot-violation
+- redundancy
+- config-management

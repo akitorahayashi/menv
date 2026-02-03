@@ -1,0 +1,30 @@
+schema_version: 1
+id: 8a2f91
+issue_id: ti9q4w
+created_at: '2026-02-02'
+author_role: cov
+confidence: high
+title: 'Coverage Blindness: No Infrastructure'
+statement: 'The project completely lacks coverage measurement infrastructure, rendering
+  it blind to testing gaps. No coverage is collected during local development or CI
+  pipelines.
+
+  '
+evidence:
+- path: pyproject.toml
+  loc:
+  - dependency-groups.dev
+  note: Missing pytest-cov dependency and configuration.
+- path: justfile
+  loc:
+  - unit-test
+  - intg-test
+  note: Test recipes execute pytest without coverage flags (--cov).
+- path: .github/workflows/lint-and-test.yml
+  loc:
+  - Run tests
+  note: CI pipeline runs 'just test' but collects no coverage artifacts.
+tags:
+- infrastructure
+- blindness
+- risk

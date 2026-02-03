@@ -1,0 +1,9 @@
+schema_version: 1
+id: pi2n5c
+created_at: '2026-02-03'
+status: open
+title: Phantom Introduce Command
+statement: README references a non-existent `menv introduce` command.
+requires_deep_analysis: false
+source_events:
+- c8d4e1

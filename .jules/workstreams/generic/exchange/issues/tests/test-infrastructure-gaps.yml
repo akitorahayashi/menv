@@ -1,0 +1,13 @@
+schema_version: 1
+id: ti9q4w
+created_at: '2026-02-03'
+status: open
+title: Test Infrastructure Gaps
+statement: The project lacks coverage reporting infrastructure and the `justfile`
+  silently suppresses errors in verification steps, leading to blind spots in quality
+  assurance.
+requires_deep_analysis: false
+source_events:
+- 8a2f91
+- n7vahq
+- a26469

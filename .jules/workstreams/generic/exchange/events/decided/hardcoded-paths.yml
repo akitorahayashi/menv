@@ -1,0 +1,26 @@
+schema_version: 1
+id: a1b2c3
+issue_id: cs2v6r
+created_at: '2026-02-02'
+author_role: pythonista
+confidence: high
+title: Hardcoded configuration paths in services violate centralization
+statement: 'AnsibleRunner and ConfigDeployer services contain hardcoded paths to ~/.config/menv/roles,
+  creating scattered environment reads and preventing centralized configuration management.
+  This violates the ''Single Source of Truth'' principle and makes the code difficult
+  to test or run in isolated environments.
+
+  '
+evidence:
+- path: src/menv/services/ansible_runner.py
+  loc:
+  - '38'
+  note: Hardcoded 'local_config_root' path construction using Path.home()
+- path: src/menv/services/config_deployer.py
+  loc:
+  - '26'
+  note: Hardcoded '_local_config_root' path in __init__
+tags:
+- architecture
+- config
+- coupling

@@ -1,0 +1,24 @@
+schema_version: 1
+id: 8mxyv9
+issue_id: us3b8t
+created_at: '2026-02-03'
+author_role: qa
+confidence: high
+title: Unhandled File System Exceptions in ConfigDeployer
+statement: 'The `ConfigDeployer` service and its tests do not account for potential
+  `OSError` (e.g., permission denied) during file operations, posing a crash risk.
+
+  '
+evidence:
+- path: src/menv/services/config_deployer.py
+  loc:
+  - '1'
+  note: Uses shutil.copytree/rmtree without explicit error handling
+- path: tests/unit/services/test_config_deployer.py
+  loc:
+  - '1'
+  note: No tests for OSError/permission denied scenarios
+tags:
+- robustness
+- error-handling
+- testing

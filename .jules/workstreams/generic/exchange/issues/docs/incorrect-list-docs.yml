@@ -1,0 +1,10 @@
+schema_version: 1
+id: il6g7h
+created_at: '2026-02-03'
+status: open
+title: Incorrect List Command Documentation
+statement: The documentation for `list_tags` incorrectly references `menv make list`
+  instead of the actual `menv list` command.
+requires_deep_analysis: false
+source_events:
+- b9a3c2

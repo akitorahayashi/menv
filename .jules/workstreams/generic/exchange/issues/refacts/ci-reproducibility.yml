@@ -1,0 +1,11 @@
+schema_version: 1
+id: cr1d5f
+created_at: '2026-02-03'
+status: open
+title: CI Reproducibility
+statement: The CI pipeline uses floating tags and unpinned dependencies, creating
+  risks for reproducibility and supply chain security.
+requires_deep_analysis: false
+source_events:
+- '232594'
+- 67041d

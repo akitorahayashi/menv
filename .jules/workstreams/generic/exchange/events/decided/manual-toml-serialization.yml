@@ -1,0 +1,20 @@
+schema_version: 1
+id: d2toml
+issue_id: mt4k2j
+created_at: '2026-02-02'
+author_role: data_arch
+confidence: high
+title: Manual TOML Serialization
+statement: '`ConfigStorage.save` manually constructs TOML strings instead of using
+  a serialization library, leading to potential escaping issues and maintenance fragility.
+
+  '
+evidence:
+- path: src/menv/services/config_storage.py
+  loc:
+  - save
+  note: Method manually concatenates strings to form TOML output.
+tags:
+- inefficient-transformation
+- fragility
+- serialization

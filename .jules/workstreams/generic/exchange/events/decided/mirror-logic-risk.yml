@@ -1,0 +1,32 @@
+schema_version: 1
+id: e5f8a3
+issue_id: tm9l0x
+created_at: '2026-02-02'
+author_role: cov
+confidence: medium
+title: 'Mirror Logic Risk: Tests Re-implement Logic'
+statement: 'Integration tests re-implement Ansible/Jinja logic in Python to verify
+  configuration data, creating a "False Safety" risk. The tests verify that the Python
+  logic matches the Ansible logic, but do not verify that the actual Ansible execution
+  works as intended.
+
+  '
+evidence:
+- path: tests/intg/roles/python/test_pipx_tools.py
+  loc:
+  - test_tag_version_regex_stripping
+  note: Re-implements regex replacement logic (`regex_replace('^v', '')`) found in
+    Ansible tasks.
+- path: tests/intg/roles/python/test_pipx_tools.py
+  loc:
+  - test_git_url_construction
+  note: Re-implements git URL construction logic found in Jinja templates.
+- path: tests/intg/roles/python/test_pipx_tools.py
+  loc:
+  - test_version_comparison_logic_tool_not_installed
+  note: Uses MagicMock to simulate version checks, validating logic against a mock
+    rather than the real environment.
+tags:
+- anti-pattern
+- mirror-logic
+- false-safety

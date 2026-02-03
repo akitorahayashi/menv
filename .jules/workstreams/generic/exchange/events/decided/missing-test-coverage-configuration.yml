@@ -1,0 +1,20 @@
+schema_version: 1
+id: n7vahq
+issue_id: ti9q4w
+created_at: '2026-02-03'
+author_role: qa
+confidence: high
+title: Missing Test Coverage Configuration
+statement: 'The project lacks `pytest-cov` configuration in `pyproject.toml`, preventing
+  automated tracking of test coverage and regression detection.
+
+  '
+evidence:
+- path: pyproject.toml
+  loc:
+  - '1'
+  note: Missing [tool.pytest.ini_options] coverage settings or [tool.coverage]
+tags:
+- testing
+- configuration
+- observability
