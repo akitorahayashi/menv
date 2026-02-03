@@ -13,24 +13,28 @@ summary: "Replace brittle 'Mirror Logic' in role integrity tests with authentic 
 problem: |
   `tests/intg/test_role_integrity.py` re-implements Ansible's variable resolution and Jinja2 templating logic in Python (using regex and `eval`) to validate configuration files.
   This "Mirror Logic" pattern verifies a simulation of the behavior rather than the behavior itself.
+  Specifically, it manually maps package paths to runtime paths using regex, which is fragile and error-prone.
 
 impact: |
   - **False Confidence**: Tests may pass while Ansible fails (or vice versa) if the simulation diverges from reality.
   - **Maintenance**: Updates to Ansible logic must be duplicated in the test suite.
   - **Security**: Use of `eval` on template strings is risky.
+  - **Fragility**: Regex parsing fails on multiline strings or complex YAML structures.
 
 desired_outcome: |
-  - Remove manual re-implementation of Ansible logic.
-  - Use a robust method to verify file references, such as:
-    - Running Ansible in `--check` mode (dry run).
-    - Using `ansible-runner` Python library to inspect inventory/vars.
-    - Or at least using proper Jinja2 rendering instead of regex/eval.
+  - Remove manual re-implementation of Ansible logic (regex and `eval`).
+  - Implement a `pytest` fixture that stages the `local_config_root` structure in a temporary directory, mirroring the actual runtime environment.
+  - Use `yaml.safe_load` (or Ansible's `DataLoader`) to parse task files robustly.
+  - Use `jinja2.Environment` to render template strings safely.
+  - Verify file existence against the staged environment, eliminating the need for complex path translation logic.
 
 constraints:
   - Tests must remain non-destructive (do not modify the host).
+  - Do not introduce heavy dependencies like `ansible-runner` unless necessary (standard `ansible` libs or `jinja2` + `yaml` should suffice).
 
 risks:
-  - Running Ansible (even in check mode) might be slower than the current regex approach.
+  - `ansible` internal Python API is not stable; prefer standard `yaml` and `jinja2` libraries where possible.
+  - Staging the environment might slightly increase test execution time (file I/O), but this is acceptable for integration tests.
 
 # Specifics
 affected_areas:
@@ -39,11 +43,19 @@ affected_areas:
 acceptance_criteria:
   - "Regex parsing of YAML/Jinja is removed."
   - "`eval` usage is removed."
-  - "Tests correctly identify missing files referenced in roles."
+  - "Tests use a staged environment (fixture) that mimics runtime directory structure."
+  - "Tests correctly identify missing files referenced in roles using `jinja2` rendering."
 
 verification_commands:
   - "uv run pytest tests/intg/test_role_integrity.py"
 
 # Analysis Flags
-requires_deep_analysis: true
-deep_analysis_reason: "Finding a performant and non-destructive way to verify Ansible references without mirroring logic requires investigating Ansible's Python API or CLI capabilities."
+requires_deep_analysis: false
+deep_analysis_reason: |
+  Finding a performant and non-destructive way to verify Ansible references without mirroring logic requires investigating Ansible's Python API or CLI capabilities.
+
+  **Deep Analysis Findings:**
+  - `ansible-playbook --check` is insufficient because the `file` module (symlinks) does not validate source existence by default, and `ansible.builtin.find` requires paths to exist.
+  - The core issue is the discrepancy between source repo structure and installed runtime structure.
+  - **Solution:** Create a `pytest` fixture to "stage" the environment (symlink/copy files to a temp dir matching runtime layout). This aligns the test environment with Ansible's expectations.
+  - **Implementation:** Replace Regex with `yaml` parsing. Replace `eval` with `jinja2` rendering. Validate against the staged environment. This removes the need for "Mirror Logic" path mapping.
