@@ -1,0 +1,32 @@
+schema_version: 1
+
+# Metadata
+id: "g7h8i9"
+issue_id: ""
+created_at: "2024-05-22"
+author_role: "devops"
+confidence: "high"
+
+# Content
+title: "Duplicated virtual environment setup logic violates DRY"
+statement: |
+  The creation and dependency installation for the `mlx-lm` virtual environment is copy-pasted across multiple workflows, increasing maintenance burden and risk of divergence.
+
+# Evidence supporting the observation
+evidence:
+  - path: ".github/workflows/lint-and-test.yml"
+    loc:
+      - "name: Create mlx-lm venv"
+      - "name: Install mlx dependencies"
+    note: "Manually creates venv and installs deps"
+
+  - path: ".github/workflows/setup-python.yml"
+    loc:
+      - "name: Create mlx-lm venv"
+      - "name: Install mlx dependencies"
+    note: "Identical logic duplicated here"
+
+tags:
+  - "maintenance"
+  - "dry"
+  - "ci-efficiency"
