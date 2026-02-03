@@ -1,0 +1,49 @@
+schema_version: 2
+
+# Metadata
+id: "t7e8st"
+source_events:
+  - "qa7x2b"
+title: "Eliminate Mirror Logic in Integration Tests"
+label: "tests"
+priority: "medium"
+summary: "Replace brittle 'Mirror Logic' in role integrity tests with authentic verification methods."
+
+# Content
+problem: |
+  `tests/intg/test_role_integrity.py` re-implements Ansible's variable resolution and Jinja2 templating logic in Python (using regex and `eval`) to validate configuration files.
+  This "Mirror Logic" pattern verifies a simulation of the behavior rather than the behavior itself.
+
+impact: |
+  - **False Confidence**: Tests may pass while Ansible fails (or vice versa) if the simulation diverges from reality.
+  - **Maintenance**: Updates to Ansible logic must be duplicated in the test suite.
+  - **Security**: Use of `eval` on template strings is risky.
+
+desired_outcome: |
+  - Remove manual re-implementation of Ansible logic.
+  - Use a robust method to verify file references, such as:
+    - Running Ansible in `--check` mode (dry run).
+    - Using `ansible-runner` Python library to inspect inventory/vars.
+    - Or at least using proper Jinja2 rendering instead of regex/eval.
+
+constraints:
+  - Tests must remain non-destructive (do not modify the host).
+
+risks:
+  - Running Ansible (even in check mode) might be slower than the current regex approach.
+
+# Specifics
+affected_areas:
+  - "tests/intg/test_role_integrity.py"
+
+acceptance_criteria:
+  - "Regex parsing of YAML/Jinja is removed."
+  - "`eval` usage is removed."
+  - "Tests correctly identify missing files referenced in roles."
+
+verification_commands:
+  - "uv run pytest tests/intg/test_role_integrity.py"
+
+# Analysis Flags
+requires_deep_analysis: true
+deep_analysis_reason: "Finding a performant and non-destructive way to verify Ansible references without mirroring logic requires investigating Ansible's Python API or CLI capabilities."

@@ -1,0 +1,48 @@
+schema_version: 2
+
+# Metadata
+id: "d6o7dr"
+source_events:
+  - "2903b6"
+  - "96b4f2"
+title: "Fix Documentation Drift and Broken Links"
+label: "docs"
+priority: "low"
+summary: "Remove invalid root AGENTS.md and correct README.md statements about symlinks."
+
+# Content
+problem: |
+  Documentation is out of sync with reality:
+  1. The root `AGENTS.md` contains invalid relative links (e.g., `../../../../AGENTS.md`) and references non-existent files. It appears to be a misplaced copy of a template.
+  2. `README.md` explicitly claims "no symlinks" are used for dotfiles, but the `shell` Ansible role uses `state: link` to symlink `.zprofile`, `.zshrc`, and alias files.
+
+impact: |
+  - **Credibility**: False claims in README erode trust.
+  - **Confusion**: Broken links in developer docs waste time.
+
+desired_outcome: |
+  - Remove or fix the misplaced `AGENTS.md`.
+  - Update `README.md` to accurately describe the symlinking behavior OR update the implementation to copy files (if the "no symlinks" claim is a hard requirement).
+
+constraints:
+  - None.
+
+risks:
+  - None.
+
+# Specifics
+affected_areas:
+  - "AGENTS.md"
+  - "README.md"
+  - "src/menv/ansible/roles/shell/tasks/main.yml"
+
+acceptance_criteria:
+  - "Root `AGENTS.md` is removed or fixed."
+  - "`README.md` accurately describes dotfile provisioning."
+
+verification_commands:
+  - "cat README.md"
+
+# Analysis Flags
+requires_deep_analysis: false
+deep_analysis_reason: ""

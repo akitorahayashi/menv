@@ -1,0 +1,60 @@
+schema_version: 2
+
+# Metadata
+id: "a2n3ru"
+source_events:
+  - "arun01"
+  - "ev3c4d"
+  - "ev5e6f"
+  - "ev1a2b"
+title: "AnsibleRunner Quality and Safety Overhaul"
+label: "refacts"
+priority: "high"
+summary: "Refactor AnsibleRunner to separate I/O from logic, handle exceptions properly, and ensure safe resource cleanup."
+
+# Content
+problem: |
+  The `AnsibleRunner` service and its dependency `AnsiblePaths` have critical quality and safety issues:
+  1. `AnsibleRunner.run_playbook` mixes execution logic with direct `sys.stdout` writes, making it impossible to test without mocking the entire class.
+  2. It catches `FileNotFoundError` and returns an exit code, swallowing the exception and preventing callers from handling it.
+  3. `AnsiblePaths` uses `__del__` for resource cleanup, which is unreliable and can swallow exceptions during interpreter shutdown.
+  4. The critical path `run_playbook` is skipped in tests due to the use of `MockAnsibleRunner` in the CLI test suite.
+
+impact: |
+  - **Blind Spots**: The core functionality of the tool (running playbooks) is effectively untested.
+  - **Reliability**: Resource leaks or unhandled exceptions may occur silently.
+  - **Flexibility**: Callers cannot react to specific errors because they are converted to generic exit codes.
+
+desired_outcome: |
+  - `AnsibleRunner` accepts an output stream (or uses a callback/generator) instead of writing to `sys.stdout` directly.
+  - Exceptions are propagated to the caller, allowing the CLI layer to decide how to handle them.
+  - `AnsiblePaths` implements the Context Manager protocol (`__enter__`/`__exit__`) for safe cleanup.
+  - `MockAnsibleRunner` is removed or restricted, and real `AnsibleRunner` is tested with unit tests covering command construction and error handling.
+
+constraints:
+  - Must maintain real-time output streaming for the user experience.
+
+risks:
+  - Refactoring I/O might break the progress display if not careful.
+
+# Specifics
+affected_areas:
+  - "src/menv/services/ansible_runner.py"
+  - "src/menv/services/ansible_paths.py"
+  - "tests/unit/test_ansible_runner.py"
+  - "tests/unit/conftest.py"
+
+acceptance_criteria:
+  - "`AnsibleRunner.run_playbook` does not write to global `sys.stdout`."
+  - "`AnsibleRunner` raises explicit exceptions for failures."
+  - "`AnsiblePaths` uses context managers, not `__del__`."
+  - "Unit tests exist for `AnsibleRunner` covering success and failure paths."
+  - "Coverage for `ansible_runner.py` is > 90%."
+
+verification_commands:
+  - "uv run pytest tests/unit/test_ansible_runner.py"
+  - "uv run pytest tests/unit/test_ansible_paths.py"
+
+# Analysis Flags
+requires_deep_analysis: true
+deep_analysis_reason: "Refactoring the I/O strategy and resource management requires careful design to ensure thread safety (if applicable) and proper integration with Typer/Rich."

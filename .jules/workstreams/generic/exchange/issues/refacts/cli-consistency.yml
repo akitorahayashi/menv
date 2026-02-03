@@ -1,0 +1,55 @@
+schema_version: 2
+
+# Metadata
+id: "c4l5ic"
+source_events:
+  - "j0k1l2"
+  - "g7h8i9"
+  - "d4e5f6"
+  - "a1b2c3"
+title: "CLI and Terminology Consistency"
+label: "refacts"
+priority: "medium"
+summary: "Resolve terminology mismatches and restructure CLI commands for consistency and clarity."
+
+# Content
+problem: |
+  The CLI and internal codebase suffer from vocabulary mismatches and structural issues:
+  1. **Misplaced Command**: `menv list` is a root command but lists tags for `menv make`, violating hierarchy.
+  2. **Overloaded Term**: "Config" refers to both User Identity (Git name/email) and Ansible Role Configuration (dotfiles).
+  3. **Vocabulary Mismatch**: CLI uses `create` for dotfiles, internals use `deploy`. CLI uses `make` for execution, internals use `run`.
+
+impact: |
+  - **Confusion**: Users and developers must mentally map inconsistent terms.
+  - **Ambiguity**: "Config" operations are unclear without context.
+  - **Usability**: Command structure does not reflect logical relationships.
+
+desired_outcome: |
+  - `list` is moved to be a subcommand of the execution command (e.g., `menv run list`).
+  - "Config" is split or renamed (e.g., `menv identity` vs `menv dotfiles`).
+  - Terminology is unified (prefer `run` over `make`, `deploy` over `create`).
+
+constraints:
+  - This is a breaking change for the CLI interface.
+
+risks:
+  - Users will need to relearn commands. Documentation must be updated.
+
+# Specifics
+affected_areas:
+  - "src/menv/commands/make.py"
+  - "src/menv/commands/config.py"
+  - "src/menv/main.py"
+
+acceptance_criteria:
+  - "`menv list` is relocated."
+  - "`config` command is disambiguated."
+  - "Internal and external vocabulary matches."
+  - "Help text reflects changes."
+
+verification_commands:
+  - "uv run pytest tests/unit/test_cli.py"
+
+# Analysis Flags
+requires_deep_analysis: true
+deep_analysis_reason: "Renaming commands is a breaking API change that requires a migration plan or deprecation strategy."

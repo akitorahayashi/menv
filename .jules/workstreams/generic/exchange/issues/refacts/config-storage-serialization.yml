@@ -1,0 +1,44 @@
+schema_version: 2
+
+# Metadata
+id: "c5o6st"
+source_events:
+  - "manser"
+title: "Safe Config Serialization"
+label: "refacts"
+priority: "medium"
+summary: "Replace manual TOML string construction with a proper serialization library."
+
+# Content
+problem: |
+  `ConfigStorage.save` manually constructs TOML strings using string concatenation and custom escaping logic. This is fragile, error-prone, and duplicates schema structure definitions.
+
+impact: |
+  - **Robustness**: High risk of generating invalid TOML or handling edge cases (like quotes) incorrectly.
+  - **Maintainability**: Adding new fields requires manual updates to the serialization string template.
+
+desired_outcome: |
+  - Use a dedicated library (e.g., `tomli-w` or similar) to serialize the configuration object to TOML.
+  - Remove manual escaping logic.
+
+constraints:
+  - May require adding a new dependency since `tomllib` (standard library) is read-only.
+
+risks:
+  - None significant.
+
+# Specifics
+affected_areas:
+  - "src/menv/services/config_storage.py"
+
+acceptance_criteria:
+  - "No manual string concatenation in `save()`."
+  - "Valid TOML is produced."
+  - "Special characters are handled correctly."
+
+verification_commands:
+  - "uv run pytest tests/unit/test_config_storage.py"
+
+# Analysis Flags
+requires_deep_analysis: false
+deep_analysis_reason: ""
