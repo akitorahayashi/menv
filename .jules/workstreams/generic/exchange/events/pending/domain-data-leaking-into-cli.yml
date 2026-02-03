@@ -1,0 +1,30 @@
+schema_version: 1
+
+# Metadata
+id: "domcli"
+issue_id: ""
+created_at: "2026-02-03"
+author_role: "data_arch"
+confidence: "high"
+
+# Content
+title: "Domain Data Leaking into CLI"
+statement: |
+  Domain concepts `TAG_GROUPS` (role aggregation) and `VALID_PROFILES` (execution targets) are defined in the CLI layer `commands/make.py` instead of the service layer. This violates Boundary Sovereignty, making the domain model dependent on the CLI implementation and preventing reusability in other interfaces.
+
+# Evidence supporting the observation
+evidence:
+  - path: "src/menv/commands/make.py"
+    loc:
+      - "lines 17-23"
+    note: "Defines `TAG_GROUPS`."
+
+  - path: "src/menv/commands/make.py"
+    loc:
+      - "lines 27"
+    note: "Defines `VALID_PROFILES`."
+
+tags:
+  - "boundary-sovereignty"
+  - "coupling"
+  - "cli-leakage"

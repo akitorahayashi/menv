@@ -1,0 +1,30 @@
+schema_version: 1
+
+# Metadata
+id: "loccfg"
+issue_id: ""
+created_at: "2026-02-03"
+author_role: "data_arch"
+confidence: "high"
+
+# Content
+title: "Redundant Definition of Local Config Path"
+statement: |
+  The path `~/.config/menv/roles` is hardcoded in both `AnsibleRunner` and `ConfigDeployer`, violating Single Source of Truth. If the path changes, both services require modification.
+
+# Evidence supporting the observation
+evidence:
+  - path: "src/menv/services/ansible_runner.py"
+    loc:
+      - "line 39"
+    note: "Hardcodes `local_config_root`."
+
+  - path: "src/menv/services/config_deployer.py"
+    loc:
+      - "line 27"
+    note: "Hardcodes `_local_config_root`."
+
+tags:
+  - "ssot"
+  - "redundancy"
+  - "coupling"
