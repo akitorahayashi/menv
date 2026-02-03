@@ -1,0 +1,26 @@
+schema_version: 1
+
+id: "67041d"
+issue_id: ""
+created_at: "2026-02-02"
+author_role: "devops"
+confidence: "high"
+
+title: "Unpinned Toolchains and Floating Runners in CI"
+statement: |
+  The CI pipeline uses unpinned package installations (`brew install`) and floating runner tags (`macos-latest`), leading to non-deterministic builds and potential breakage from upstream changes.
+
+evidence:
+  - path: ".github/workflows/lint-and-test.yml"
+    loc:
+      - "8"
+    note: "Uses floating `runs-on: macos-latest` tag."
+  - path: ".github/workflows/lint-and-test.yml"
+    loc:
+      - "20"
+    note: "Uses unpinned `brew install shellcheck`."
+
+tags:
+  - "reproducibility"
+  - "ci"
+  - "unpinned"
