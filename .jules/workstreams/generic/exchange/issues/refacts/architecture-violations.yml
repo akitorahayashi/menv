@@ -16,50 +16,55 @@ summary: "Consolidate misplaced application logic and enforce clear boundaries b
 
 # Content
 problem: |
-  The application suffers from significant architectural violations where logic is misplaced:
-  1. Core Python application logic (e.g., system backup) is located in `src/menv/ansible/scripts/`, hidden from the main package structure.
-  2. The `make` CLI command contains domain definitions (`TAG_GROUPS`, `VALID_PROFILES`) and business logic (`_get_roles_for_tags`), violating separation of concerns.
-  3. `AnsibleRunner` and `ConfigDeployer` both hardcode the local config path `~/.config/menv/roles`, violating SSOT.
-  4. `AnsibleRunner` enforces an implicit directory structure contract on Ansible roles.
+  The application suffers from significant architectural violations where logic is misplaced and coupled inefficiently:
+  1. **Hidden Application Logic**: `src/menv/ansible/scripts/system/backup-system.py` is a core logic component but is implemented as a standalone script. It is invoked via `subprocess` from `src/menv/commands/backup.py`, completely bypassing the Python module system, type checking, and shared service context.
+  2. **Leaky Domain Logic**: The `make` CLI command (`src/menv/commands/make.py`) contains authoritative domain definitions (`TAG_GROUPS`, `VALID_PROFILES`, `PROFILE_ALIASES`) and business logic (`_get_roles_for_tags`), violating the separation of concerns between the presentation layer (CLI) and the domain layer.
+  3. **SSOT Violation**: The local configuration root path (`~/.config/menv/roles`) is hardcoded in multiple places (`AnsibleRunner`, `ConfigDeployer`), creating a maintenance risk.
+  4. **Implicit Contracts**: `AnsibleRunner` constructs paths based on implicit assumptions about the Ansible directory structure (e.g., location of `playbook.yml`, `roles/`), which are not formally encapsulated.
 
 impact: |
   These violations lead to:
-  - **Poor Testability**: Logic in scripts or CLI commands is harder to test in isolation.
-  - **Maintenance Burden**: Updates to paths or domain data require changes in multiple places.
-  - **Fragility**: Implicit contracts break easily when directory structures change.
-  - **Low Discoverability**: Developers cannot find core logic in expected locations.
+  - **Fragility & Runtime Errors**: Invoking internal Python scripts via `subprocess` is brittle, hides errors, and prevents static analysis (mypy) from verifying the integration.
+  - **Testing Gaps**: Logic embedded in scripts or CLI commands is difficult to unit test in isolation.
+  - **Maintenance Burden**: Updates to domain constants or paths require synchronized changes across multiple files.
+  - **Poor Discoverability**: Developers expect core logic in `services/` or `models/`, not hidden in `ansible/scripts/` or CLI modules.
 
 desired_outcome: |
-  - System backup logic is moved from Ansible scripts to a proper Python service in `src/menv/services/`.
-  - Domain definitions (`TAG_GROUPS`, `VALID_PROFILES`) are moved to a domain model or service.
-  - CLI commands delegate all business logic to services.
-  - Local config path is defined in a single source of truth (e.g., `AnsiblePaths` or `ConfigStorage`).
+  - **SystemBackupService**: Port the logic from `backup-system.py` into a new proper Python service `src/menv/services/system_backup.py` that implements `SystemBackupProtocol`.
+  - **Refactored Backup Command**: Update `src/menv/commands/backup.py` to inject and use `SystemBackupService` instead of shelling out to a script.
+  - **Domain Model**: specific domain constants (`TAG_GROUPS`, `VALID_PROFILES`, etc.) are moved to a new module `src/menv/models/domain.py`.
+  - **Unified Path Resolution**: `AnsiblePaths` is updated to include a `local_config_root` property, serving as the Single Source of Truth.
+  - **Updated Consumers**: `AnsibleRunner` and `ConfigDeployer` are updated to use `AnsiblePaths` for all path resolution.
 
 constraints:
-  - Must ensure existing Ansible playbooks continue to function or are updated to use the new paths.
+  - **Ansible Compatibility**: The `system` role in Ansible uses `community.general.osx_defaults` for applying settings. The refactoring must ensure that the backup logic (which generates the YAML used by Ansible) remains compatible with the expected input format of the Ansible role.
+  - **CLI Compatibility**: The CLI interface (`menv backup`, `menv make`) must remain unchanged from the user's perspective.
 
 risks:
-  - Moving the backup script might break existing `menv backup` command if not updated correctly.
-  - Changing config paths requires migration or backward compatibility for existing users.
+  - **Backup Regression**: If the new `SystemBackupService` fails to replicate the `defaults` command logic exactly (especially special key handling), the backup might be corrupted.
+  - **Path Migration**: Changing how `local_config_root` is resolved must ensure it still points to the correct location to avoid orphaned configurations.
 
 # Specifics
 affected_areas:
   - "src/menv/ansible/scripts/system/backup-system.py"
   - "src/menv/commands/make.py"
+  - "src/menv/commands/backup.py"
   - "src/menv/services/ansible_runner.py"
   - "src/menv/services/config_deployer.py"
+  - "src/menv/services/ansible_paths.py"
 
 acceptance_criteria:
-  - "backup-system.py logic resides in `src/menv/services/`."
-  - "`make.py` contains no domain constants or business logic methods."
-  - "`~/.config/menv/roles` is defined in exactly one place."
-  - "All unit and integration tests pass."
+  - "`backup-system.py` logic is fully ported to `src/menv/services/system_backup.py` and covered by unit tests."
+  - "`menv backup system` executes successfully using the new service."
+  - "`make.py` imports domain constants from `src/menv/models/domain.py`."
+  - "`~/.config/menv/roles` is defined *only* in `AnsiblePaths` (or equivalent SSOT)."
+  - "Existing integration tests for roles pass."
 
 verification_commands:
-  - "uv run pytest"
+  - "uv run pytest src/menv/services/test_system_backup.py"
   - "uv run mypy src/"
-  - "uv run ruff check src/"
+  - "menv backup system --help"
 
 # Analysis Flags
-requires_deep_analysis: true
-deep_analysis_reason: "This refactoring involves moving files, changing class responsibilities, and modifying the contract between Python and Ansible, which requires a careful design to avoid regressions."
+requires_deep_analysis: false
+deep_analysis_reason: "This refactoring involves moving files, changing class responsibilities, and modifying the contract between Python and Ansible, which requires a careful design to avoid regressions. Deep analysis confirmed that `backup-system.py` is a standalone script invoked via `subprocess` by `menv backup`, and is not used by Ansible playbooks (which use `community.general.osx_defaults`). This allows safe refactoring into a proper Python service (`SystemBackupService`) without breaking Ansible execution. Domain constants in `make.py` were identified as candidates for extraction to `src/menv/models/domain.py`. The `local_config_root` duplication was confirmed in `AnsibleRunner` and `ConfigDeployer` and can be unified in `AnsiblePaths`."
