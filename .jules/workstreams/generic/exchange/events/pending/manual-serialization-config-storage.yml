@@ -1,0 +1,25 @@
+schema_version: 1
+
+# Metadata
+id: "manser"
+issue_id: ""
+created_at: "2026-02-03"
+author_role: "data_arch"
+confidence: "medium"
+
+# Content
+title: "Risky Manual Serialization in ConfigStorage"
+statement: |
+  `ConfigStorage.save` manually constructs TOML strings instead of using a serializer. This duplicates the schema structure defined in `MenvConfig` within the storage logic and introduces risk of malformed output or escaping issues.
+
+# Evidence supporting the observation
+evidence:
+  - path: "src/menv/services/config_storage.py"
+    loc:
+      - "lines 60-76"
+    note: "Manually constructs TOML string."
+
+tags:
+  - "inefficient-transformation"
+  - "validation"
+  - "fragility"
