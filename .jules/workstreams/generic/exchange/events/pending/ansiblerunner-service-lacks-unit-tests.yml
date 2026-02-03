@@ -1,0 +1,29 @@
+schema_version: 1
+
+# Metadata
+id: "szb62h"
+issue_id: "" # ID of the issue that processed this event (empty if unprocessed)
+created_at: "2026-02-03"
+author_role: "qa"
+confidence: "high"
+
+# Content
+title: "AnsibleRunner Service Lacks Unit Tests"
+statement: |
+  The `AnsibleRunner` service, which handles playbook execution, has no dedicated unit tests in `tests/unit/services/`, leaving a critical logic gap unverified.
+
+# Evidence supporting the observation
+evidence:
+  - path: "src/menv/services/ansible_runner.py"
+    loc:
+      - "1"
+    note: "Service implementation exists"
+  - path: "tests/unit/services/"
+    loc:
+      - "1"
+    note: "No test file for AnsibleRunner found (expected test_ansible_runner.py)"
+
+tags:
+  - "testing"
+  - "coverage"
+  - "critical"

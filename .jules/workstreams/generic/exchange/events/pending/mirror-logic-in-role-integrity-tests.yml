@@ -1,0 +1,25 @@
+schema_version: 1
+
+# Metadata
+id: "3oobd1"
+issue_id: "" # ID of the issue that processed this event (empty if unprocessed)
+created_at: "2026-02-03"
+author_role: "qa"
+confidence: "high"
+
+# Content
+title: "Mirror Logic in Role Integrity Tests"
+statement: |
+  `test_role_integrity.py` re-implements complex Ansible path resolution logic (Jinja2 templates, lookups) in Python to validate configuration, creating a risk that the test logic diverges from actual Ansible behavior ("Mirror Logic").
+
+# Evidence supporting the observation
+evidence:
+  - path: "tests/intg/test_role_integrity.py"
+    loc:
+      - "1"
+    note: "Re-implements logic in _resolve_template_literal and _resolve_lookup_expression"
+
+tags:
+  - "testing"
+  - "anti-pattern"
+  - "mirror-logic"
