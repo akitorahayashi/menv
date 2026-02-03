@@ -1,0 +1,34 @@
+schema_version: 1
+
+# Metadata
+id: "qa7x2b"
+issue_id: ""
+created_at: "2024-10-26"
+author_role: "qa"
+confidence: "high"
+
+# Content
+title: "Mirror Logic in Ansible Integrity Tests"
+statement: |
+  tests/intg/test_role_integrity.py re-implements Ansible's variable resolution and Jinja2 templating logic in Python to validate configuration files. This "Mirror Logic" pattern creates a high maintenance burden and risk of drift, as the test verifies a simulation of the behavior rather than the behavior itself. The test relies on brittle regex parsing of YAML which is prone to false negatives/positives compared to actual Ansible execution.
+
+# Evidence supporting the observation
+evidence:
+  - path: "tests/intg/test_role_integrity.py"
+    loc:
+      - "_resolve_template_literal"
+    note: "Manually replaces Jinja variables, duplicating Ansible logic."
+  - path: "tests/intg/test_role_integrity.py"
+    loc:
+      - "SRC_PATTERN"
+    note: "Uses regex to parse YAML src keys, ignoring full YAML spec."
+  - path: "tests/intg/test_role_integrity.py"
+    loc:
+      - "_resolve_lookup_expression"
+    note: "Implements eval to simulate lookup(), a security risk and logic duplication."
+
+tags:
+  - "test-quality"
+  - "anti-pattern"
+  - "mirror-logic"
+  - "fragility"
