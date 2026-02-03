@@ -15,45 +15,68 @@ summary: "Harden CI pipeline by pinning dependencies, unifying runner versions, 
 # Content
 problem: |
   The CI pipeline has several deficiencies:
-  1. **Supply Chain Risk**: GitHub Actions uses mutable tags (e.g., `@v4`) instead of commit SHAs.
-  2. **Inconsistency**: Different workflows use different runner versions (`macos-latest` vs `macos-15`).
-  3. **Duplication**: Logic for setting up virtual environments is copy-pasted across workflows.
-  4. **Missing Artifacts**: The pipeline tests the source but does not build or publish a versioned artifact, meaning the deployed code might differ from the tested code.
+  1. **Supply Chain Risk**: GitHub Actions uses mutable tags (e.g., `actions/checkout@v4`, `actions/setup-python@v5`, `extractions/setup-just@v2`, `astral-sh/setup-uv@v5`) instead of commit SHAs. This exposes the pipeline to supply chain attacks if a tag is updated to point to a malicious commit.
+  2. **Inconsistency**: Different workflows use different runner versions (`macos-latest` in `lint-and-test.yml` vs `macos-15` in `setup-python.yml`). `macos-latest` is ambiguous and changes over time.
+  3. **Duplication**: Logic for setting up virtual environments (specifically the `mlx` environment setup) is copy-pasted across `lint-and-test.yml` and `setup-python.yml`.
+  4. **Missing Artifacts**: The pipeline tests the source but does not build or publish a versioned artifact (Wheel/Sdist). Deployment integrity is not guaranteed as the deployed artifact is not the exact binary that was tested.
 
 impact: |
-  - **Security**: Upstream compromises could inject malicious code.
-  - **Stability**: "Latest" tags can break builds unexpectedly.
-  - **Maintenance**: Changes to setup logic must be applied in multiple places.
-  - **Reliability**: Deployment integrity is not guaranteed.
+  - **Security**: Upstream compromises could inject malicious code via mutable Action tags.
+  - **Stability**: "Latest" tags can break builds unexpectedly if the upstream Action changes behavior.
+  - **Maintenance**: Changes to setup logic (like `mlx` venv config) must be applied in multiple places.
+  - **Reliability**: Without building an artifact, we cannot verify packaging correctness or ensure the distributed code matches the tested source.
 
 desired_outcome: |
-  - All GitHub Actions are pinned to commit SHAs.
-  - A single runner version is used consistently (e.g., `macos-14` or `macos-15`).
-  - Common setup logic is extracted to composite actions.
-  - A build step produces a verified artifact (e.g., Python Wheel).
+  - All GitHub Actions `uses` directives are pinned to full commit SHAs with comments indicating the version tag.
+  - A single runner version `macos-15` is used consistently across all workflows.
+  - Common setup logic for `mlx` environment is extracted to a new composite action `.github/actions/setup-mlx`.
+  - A new `build` job is added to the pipeline to produce a verified Python Wheel and Sdist using `uv build`.
+  - Artifacts are uploaded using `actions/upload-artifact` for retention.
 
 constraints:
   - Must remain compatible with GitHub Actions runners.
+  - Must use `uv` for build and environment management where applicable.
 
 risks:
-  - Pinning versions requires automated tools (e.g., Dependabot) to stay up to date.
+  - Pinning versions increases maintenance burden; versions must be manually updated or automated (e.g., Renovate/Dependabot).
+  - `macos-15` availability might be lower than `macos-latest` on GitHub's free tier (though usually it's fine for public repos).
 
 # Specifics
 affected_areas:
   - ".github/workflows/lint-and-test.yml"
   - ".github/workflows/setup-python.yml"
   - ".github/actions/setup-base/action.yml"
+  - ".github/actions/setup-mlx/action.yml"
+  - "pyproject.toml"
 
 acceptance_criteria:
-  - "All `uses` directives use commit SHAs."
-  - "All jobs use the same macOS version."
-  - "Setup logic is centralized."
-  - "A `build` job produces a distribution artifact."
+  - "All `uses` directives in workflows and actions use 40-character commit SHAs."
+  - "All jobs explicitly specify `runs-on: macos-15`."
+  - "New composite action `.github/actions/setup-mlx` exists and is used in both `lint-and-test.yml` and `setup-python.yml`."
+  - "A `build` job successfully runs `uv build` and produces `.whl` and `.tar.gz` files."
+  - "Artifacts are uploaded and available for download from the workflow run."
 
 verification_commands:
-  - "grep -r 'uses:' .github/workflows/"
-  - "grep -r 'runs-on:' .github/workflows/"
+  - "grep -r 'uses:' .github/workflows/ .github/actions/ | grep -v '@[0-9a-f]\\{40\\}'"
+  - "grep -r 'runs-on:' .github/workflows/ | grep -v 'macos-15'"
+  - "ls -F .github/actions/setup-mlx/action.yml"
 
 # Analysis Flags
-requires_deep_analysis: true
-deep_analysis_reason: "Defining the artifact strategy (Wheel vs PEX vs Source) and release process requires architectural decisions."
+requires_deep_analysis: false
+deep_analysis_reason: |
+  Defining the artifact strategy (Wheel vs PEX vs Source) and release process requires architectural decisions.
+
+  **Analysis Findings (Planner):**
+  1.  **Pinning Strategy:**
+      - Identified unpinned actions: `actions/checkout`, `actions/setup-python`, `extractions/setup-just`, `astral-sh/setup-uv`.
+      - Strategy: Replace tags with full commit SHAs. Add comments `# vX.Y.Z` for readability.
+  2.  **Runner Standardization:**
+      - `macos-15` is selected as the standard runner version to align with the project's bleeding-edge target and `setup-python.yml`.
+  3.  **De-duplication:**
+      - The `mlx` environment setup (mkdir, uv venv, uv sync --only-group mlx) is repeated.
+      - Solution: Create `.github/actions/setup-mlx/action.yml`.
+  4.  **Artifact Strategy:**
+      - The project uses `hatchling` build backend.
+      - `uv build` is the preferred command as `uv` is already the primary tool.
+      - Build both Sdist and Wheel.
+      - Upload using `actions/upload-artifact@v4` (pinned to SHA).
