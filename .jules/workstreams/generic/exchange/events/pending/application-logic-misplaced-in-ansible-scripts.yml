@@ -1,0 +1,25 @@
+schema_version: 1
+
+# Metadata
+id: "ev001a"
+issue_id: ""
+created_at: "2024-10-18"
+author_role: "structural_arch"
+confidence: "high"
+
+# Content
+title: "Application Logic Misplaced in Ansible Scripts"
+statement: |
+  Python application logic (e.g., backup functionality) is located in `src/menv/ansible/scripts/`, disconnecting it from the core application structure and hiding it from standard discovery and testing workflows.
+
+# Evidence supporting the observation
+evidence:
+  - path: "src/menv/ansible/scripts/system/backup-system.py"
+    loc:
+      - "1-140"
+    note: "Entire file is Python application logic for backing up system settings, placed in Ansible scripts directory."
+
+tags:
+  - "architecture-violation"
+  - "cohesion"
+  - "findability"

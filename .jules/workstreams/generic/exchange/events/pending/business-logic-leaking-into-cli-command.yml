@@ -1,0 +1,24 @@
+schema_version: 1
+
+# Metadata
+id: "ev001b"
+issue_id: ""
+created_at: "2024-10-18"
+author_role: "structural_arch"
+confidence: "high"
+
+# Content
+title: "Business Logic Leaking into CLI Command"
+statement: |
+  The `make` command contains private methods implementing core business logic (role resolution and configuration deployment), violating separation of concerns and making this logic unavailable to other parts of the application.
+
+# Evidence supporting the observation
+evidence:
+  - path: "src/menv/commands/make.py"
+    loc:
+      - "33-66"
+    note: "Methods `_get_roles_for_tags` and `_deploy_configs_for_roles` implement business logic inside the command layer."
+
+tags:
+  - "architecture-violation"
+  - "separation-of-concerns"
