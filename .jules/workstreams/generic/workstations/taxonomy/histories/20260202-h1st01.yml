@@ -1,0 +1,40 @@
+schema_version: 1
+
+id: "h1st01"
+created_at: "2026-02-02T19:00:00Z"
+
+observer: "taxonomy"
+workstream: "generic"
+
+inputs:
+  change_summary_path: ".jules/changes/latest.yml"
+
+plan: |
+  1. Initialize Taxonomy Workstation directories and perspective.
+  2. Analyze codebase for naming inconsistencies and vocabulary mismatches.
+  3. Record observations as pending events.
+  4. Update workstation history and perspective.
+
+actions:
+  - "Initialized .jules/workstreams/generic/workstations/taxonomy/"
+  - "Created perspective.yml"
+  - "Created event: overloaded-term-config.yml (cf0v1d)"
+  - "Created event: overloaded-term-system.yml (sy5t3m)"
+  - "Created event: vocabulary-mismatch-make-run.yml (mk7run)"
+  - "Created event: vocabulary-mismatch-create-deploy.yml (cr8dpl)"
+
+outcomes:
+  summary: "Identified 4 key taxonomy issues involving concept overloading and vocabulary mismatches."
+  emitted_events:
+    - ".jules/workstreams/generic/exchange/events/pending/overloaded-term-config.yml"
+    - ".jules/workstreams/generic/exchange/events/pending/overloaded-term-system.yml"
+    - ".jules/workstreams/generic/exchange/events/pending/vocabulary-mismatch-make-run.yml"
+    - ".jules/workstreams/generic/exchange/events/pending/vocabulary-mismatch-create-deploy.yml"
+  notes: |
+    Found significant overloading of 'config' (Identity vs Role Config) and 'system' (Role vs Alias).
+    Also noted mismatch between CLI terms ('make', 'create') and service implementation ('run', 'deploy').
+
+perspective_updates:
+  goals_delta: []
+  learned_exclusions_delta: []
+  bias_adjustments: []

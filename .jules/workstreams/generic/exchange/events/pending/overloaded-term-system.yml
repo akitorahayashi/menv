@@ -1,0 +1,23 @@
+schema_version: 1
+
+id: "sy5t3m"
+issue_id: ""
+created_at: "2026-02-02"
+author_role: "taxonomy"
+confidence: "high"
+
+title: "Term 'system' Overloaded for macOS Defaults and Unix Utilities"
+statement: |
+  The term 'system' is architecturally overloaded, referring to both the 'system' Ansible role (which sets macOS defaults) and the 'system' shell alias category (which contains generic Unix utilities).
+
+evidence:
+  - path: "src/menv/ansible/roles/system/"
+    loc: "directory"
+    note: "Ansible role for macOS system defaults"
+  - path: "src/menv/ansible/roles/shell/config/common/alias/system/"
+    loc: "directory"
+    note: "Shell alias category for generic Unix utilities"
+
+tags:
+  - "concept-overloading"
+  - "naming-collision"

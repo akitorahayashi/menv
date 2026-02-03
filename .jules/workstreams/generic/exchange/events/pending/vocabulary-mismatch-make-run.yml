@@ -1,0 +1,23 @@
+schema_version: 1
+
+id: "mk7run"
+issue_id: ""
+created_at: "2026-02-02"
+author_role: "taxonomy"
+confidence: "high"
+
+title: "Vocabulary Mismatch between CLI 'make' and Service 'run'"
+statement: |
+  There is a vocabulary mismatch between the CLI command `menv make` and the internal service terminology `AnsibleRunner.run_playbook`. The CLI uses 'make' while the domain logic uses 'run'.
+
+evidence:
+  - path: "src/menv/commands/make.py"
+    loc: "def make"
+    note: "CLI command defined as 'make'"
+  - path: "src/menv/services/ansible_runner.py"
+    loc: "def run_playbook"
+    note: "Internal service method defined as 'run_playbook'"
+
+tags:
+  - "vocabulary-mismatch"
+  - "cli-service-divergence"
