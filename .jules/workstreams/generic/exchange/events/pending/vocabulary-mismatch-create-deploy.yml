@@ -12,13 +12,16 @@ statement: |
 
 evidence:
   - path: "src/menv/commands/config.py"
-    loc: "def create_config"
+    loc:
+      - "def create_config"
     note: "CLI command named 'create' (menv config create)"
   - path: "src/menv/services/config_deployer.py"
-    loc: "def deploy_role"
+    loc:
+      - "def deploy_role"
     note: "Internal service method named 'deploy_role'"
   - path: "src/menv/main.py"
-    loc: "app.command(name=\"create\""
+    loc:
+      - "app.command(name=\"create\""
     note: "Top-level command 'menv create' also uses 'create'"
 
 tags:

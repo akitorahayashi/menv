@@ -12,10 +12,12 @@ statement: |
 
 evidence:
   - path: "src/menv/ansible/roles/system/"
-    loc: "directory"
+    loc:
+      - "directory"
     note: "Ansible role for macOS system defaults"
   - path: "src/menv/ansible/roles/shell/config/common/alias/system/"
-    loc: "directory"
+    loc:
+      - "directory"
     note: "Shell alias category for generic Unix utilities"
 
 tags:

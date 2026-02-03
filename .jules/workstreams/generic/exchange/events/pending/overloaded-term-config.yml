@@ -12,10 +12,12 @@ statement: |
 
 evidence:
   - path: "src/menv/services/config_storage.py"
-    loc: "class ConfigStorage"
+    loc:
+      - "class ConfigStorage"
     note: "Manages identity configuration (name/email) in ~/.config/menv/config.toml"
   - path: "src/menv/services/config_deployer.py"
-    loc: "class ConfigDeployer"
+    loc:
+      - "class ConfigDeployer"
     note: "Manages role configuration files in ~/.config/menv/roles/"
 
 tags:

@@ -12,10 +12,12 @@ statement: |
 
 evidence:
   - path: "src/menv/commands/make.py"
-    loc: "def make"
+    loc:
+      - "def make"
     note: "CLI command defined as 'make'"
   - path: "src/menv/services/ansible_runner.py"
-    loc: "def run_playbook"
+    loc:
+      - "def run_playbook"
     note: "Internal service method defined as 'run_playbook'"
 
 tags:
