@@ -1,0 +1,30 @@
+schema_version: 1
+
+# Metadata
+id: "arun01"
+issue_id: ""
+created_at: "2026-02-03"
+author_role: "cov"
+confidence: "high"
+
+# Content
+title: "Critical path AnsibleRunner.run_playbook is mocked but untested"
+statement: |
+  The `AnsibleRunner` service, responsible for executing Ansible playbooks, has 28% coverage. Its core method `run_playbook` is skipped in tests because the CLI test suite relies entirely on `MockAnsibleRunner`. This creates a false safety signal where CLI commands appear to work but the actual execution logic (command construction, process handling, stream redirection) is unverified.
+
+# Evidence supporting the observation
+evidence:
+  - path: "src/menv/services/ansible_runner.py"
+    loc:
+      - "35-95"
+    note: "The `run_playbook` method contains critical logic for constructing the `ansible-playbook` command, managing the subprocess, and handling output streaming, but it is completely uncovered."
+
+  - path: "tests/unit/conftest.py"
+    loc:
+      - "24-34"
+    note: "The `mock_app_context` fixture unconditionally injects `MockAnsibleRunner` into the application context, ensuring that no unit test exercises the real `AnsibleRunner` implementation."
+
+tags:
+  - "coverage-gap"
+  - "critical-path"
+  - "testing-strategy"
