@@ -1,0 +1,29 @@
+schema_version: 1
+
+# Metadata
+id: "j0k1l2"
+issue_id: ""
+created_at: "2026-02-02"
+author_role: "pythonista"
+confidence: "high"
+
+# Content
+title: "Business logic and config leaked into CLI command"
+statement: |
+  The 'make' command module contains significant business logic (_deploy_configs_for_roles) and hardcoded configuration (TAG_GROUPS, VALID_PROFILES), violating the separation of concerns between the CLI layer and the service layer.
+
+# Evidence supporting the observation
+evidence:
+  - path: "src/menv/commands/make.py"
+    loc:
+      - "45"
+    note: "_deploy_configs_for_roles implements orchestration logic inside the CLI module."
+  - path: "src/menv/commands/make.py"
+    loc:
+      - "18-31"
+    note: "Hardcoded TAG_GROUPS and VALID_PROFILES definitions."
+
+tags:
+  - "architecture"
+  - "cli"
+  - "separation-of-concerns"
