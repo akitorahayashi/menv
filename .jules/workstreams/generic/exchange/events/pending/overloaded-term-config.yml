@@ -1,0 +1,36 @@
+schema_version: 1
+
+# Metadata
+id: "g7h8i9"
+issue_id: ""
+created_at: "2026-02-03"
+author_role: "taxonomy"
+confidence: "high"
+
+# Content
+title: "Overloaded Term: 'config'"
+statement: |
+  The term "config" is overloaded to refer to two distinct concepts:
+  1. User Identity (Git name/email) managed by `ConfigStorage` and `menv config` command.
+  2. Ansible Role Configuration files (dotfiles) managed by `ConfigDeployer` and `menv config create`.
+  This violates the "One Concept, One Preferred Term" principle and creates ambiguity.
+
+# Evidence supporting the observation
+evidence:
+  - path: "src/menv/commands/config.py"
+    loc:
+      - "class VcsIdentityConfig(TypedDict):"
+    note: "Refers to User Identity"
+  - path: "src/menv/services/config_deployer.py"
+    loc:
+      - "class ConfigDeployer:"
+    note: "Refers to Ansible Role Configuration (dotfiles)"
+  - path: "src/menv/commands/config.py"
+    loc:
+      - "@config_app.command(name=\"create\")"
+    note: "Command mixes both concepts under 'config' namespace"
+
+tags:
+  - "overloaded-term"
+  - "ambiguity"
+  - "architecture"

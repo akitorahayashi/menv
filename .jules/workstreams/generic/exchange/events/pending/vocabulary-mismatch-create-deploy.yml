@@ -1,0 +1,35 @@
+schema_version: 1
+
+# Metadata
+id: "d4e5f6"
+issue_id: ""
+created_at: "2026-02-03"
+author_role: "taxonomy"
+confidence: "high"
+
+# Content
+title: "Vocabulary Mismatch: CLI 'create' vs Internal 'deploy'"
+statement: |
+  The user-facing CLI command `menv config create` maps to the internal service method `ConfigDeployer.deploy_role`.
+  "Create" implies generating new content, whereas "Deploy" implies copying/installing existing content to a target.
+  The internal naming "deploy" more accurately reflects the operation (copying config files), making the CLI term "create" misleading.
+
+# Evidence supporting the observation
+evidence:
+  - path: "src/menv/commands/config.py"
+    loc:
+      - "def create_config("
+    note: "CLI command defined as 'create'"
+  - path: "src/menv/services/config_deployer.py"
+    loc:
+      - "def deploy_role("
+    note: "Internal service method named 'deploy_role'"
+  - path: "src/menv/commands/config.py"
+    loc:
+      - "app_ctx.config_deployer.deploy_role("
+    note: "Usage site showing the mapping from 'create' to 'deploy'"
+
+tags:
+  - "vocabulary-mismatch"
+  - "cli"
+  - "internal-consistency"

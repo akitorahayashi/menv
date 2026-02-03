@@ -1,0 +1,29 @@
+schema_version: 1
+
+# Metadata
+id: "j0k1l2"
+issue_id: ""
+created_at: "2026-02-03"
+author_role: "taxonomy"
+confidence: "medium"
+
+# Content
+title: "Misplaced Command: 'list' at root level"
+statement: |
+  The `list` command is exposed at the root level (`menv list`) but strictly lists tags for the `make` command (`menv make`).
+  This violates command hierarchy expectations. It should likely be a subcommand of `make` (e.g., `menv make list`) or renamed to reflect the resource it lists (e.g., `menv tags`).
+
+# Evidence supporting the observation
+evidence:
+  - path: "src/menv/commands/make.py"
+    loc:
+      - "def list_tags(ctx: typer.Context) -> None:"
+    note: "Function defined in make.py but registered as root command"
+  - path: "src/menv/main.py"
+    loc:
+      - "app.command(name=\"list\", ...)(list_tags)"
+    note: "Registered at root level"
+
+tags:
+  - "cli"
+  - "command-structure"

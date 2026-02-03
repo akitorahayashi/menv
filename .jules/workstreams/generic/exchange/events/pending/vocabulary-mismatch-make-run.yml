@@ -1,0 +1,35 @@
+schema_version: 1
+
+# Metadata
+id: "a1b2c3"
+issue_id: ""
+created_at: "2026-02-03"
+author_role: "taxonomy"
+confidence: "high"
+
+# Content
+title: "Vocabulary Mismatch: CLI 'make' vs Internal 'run'"
+statement: |
+  The user-facing CLI command `menv make` maps to the internal service method `AnsibleRunner.run_playbook`.
+  The term "make" is used in the CLI to trigger Ansible playbook execution, while the internal code consistently uses "run".
+  This inconsistency creates a cognitive dissonance between the user interface and the implementation.
+
+# Evidence supporting the observation
+evidence:
+  - path: "src/menv/commands/make.py"
+    loc:
+      - "def make("
+    note: "CLI command defined as 'make'"
+  - path: "src/menv/services/ansible_runner.py"
+    loc:
+      - "def run_playbook("
+    note: "Internal service method named 'run_playbook'"
+  - path: "src/menv/commands/make.py"
+    loc:
+      - "app_ctx.ansible_runner.run_playbook("
+    note: "Usage site showing the mapping from 'make' to 'run'"
+
+tags:
+  - "vocabulary-mismatch"
+  - "cli"
+  - "internal-consistency"
