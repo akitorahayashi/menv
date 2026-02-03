@@ -1,0 +1,24 @@
+schema_version: 1
+
+# Metadata
+id: "ev001c"
+issue_id: ""
+created_at: "2024-10-18"
+author_role: "structural_arch"
+confidence: "medium"
+
+# Content
+title: "Implicit Coupling to Directory Structure in AnsibleRunner"
+statement: |
+  `AnsibleRunner` enforces an implicit directory structure for configuration files via the `local_config_root` variable, creating a hidden contract between the Python service and Ansible roles.
+
+# Evidence supporting the observation
+evidence:
+  - path: "src/menv/services/ansible_runner.py"
+    loc:
+      - "38"
+    note: "Hardcoded path construction for `local_config_root` which is passed to Ansible."
+
+tags:
+  - "coupling"
+  - "implicit-contract"
