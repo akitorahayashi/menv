@@ -1,0 +1,22 @@
+schema_version: 1
+id: "c8d4e1"
+issue_id: ""
+created_at: "2026-02-02"
+author_role: "consistency"
+confidence: "high"
+title: "Documentation references non-existent `menv introduce` command"
+statement: |
+  The `README.md` file instructs users to run `menv introduce --help`, but no such command exists in the codebase or is registered in the CLI application.
+evidence:
+  - path: "README.md"
+    loc:
+      - "125"
+    note: "References `menv introduce --help`."
+  - path: "src/menv/main.py"
+    loc:
+      - "1-125"
+    note: "No `introduce` command is registered in the Typer app."
+tags:
+  - "phantom-command"
+  - "documentation"
+  - "drift"
