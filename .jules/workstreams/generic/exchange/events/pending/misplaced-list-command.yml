@@ -1,0 +1,21 @@
+schema_version: 1
+id: "lst001"
+issue_id: ""
+created_at: "2026-02-02"
+author_role: "structural_arch"
+confidence: "high"
+title: "List command violates structure"
+statement: |
+  The `list` command, exposed as `menv list`, is implemented as `list_tags` within `src/menv/commands/make.py`. This violates the project's implicit 'one command per file' architecture and hinders findability.
+evidence:
+  - path: "src/menv/commands/make.py"
+    loc:
+      - "line 77"
+    note: "list_tags function defined here"
+  - path: "src/menv/main.py"
+    loc:
+      - "line 96"
+    note: "imports list_tags from menv.commands.make"
+tags:
+  - "structure"
+  - "findability"

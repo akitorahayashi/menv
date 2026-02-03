@@ -1,0 +1,22 @@
+schema_version: 1
+id: "bkp001"
+issue_id: ""
+created_at: "2026-02-02"
+author_role: "structural_arch"
+confidence: "high"
+title: "Backup logic split causes runtime failure"
+statement: |
+  The backup functionality is distributed across the CLI wrapper (`menv/commands/backup.py`) and external scripts (`menv/ansible/scripts/`), creating a fragile process boundary. The CLI fails to pass the mandatory `config_dir` argument required by the backend scripts, causing the command to fail. This violates boundary enforcement (hiding internals) and cohesion (logic split).
+evidence:
+  - path: "src/menv/commands/backup.py"
+    loc:
+      - "line 87"
+    note: "subprocess call to script fails to pass arguments"
+  - path: "src/menv/ansible/scripts/system/backup-system.py"
+    loc:
+      - "line 190"
+    note: "script requires 'config_dir' positional argument"
+tags:
+  - "boundary-violation"
+  - "cohesion"
+  - "broken-feature"
