@@ -1,12 +1,26 @@
-schema_version: 1
+schema_version: 2
 id: cl5n3p
-created_at: '2026-02-03'
-status: open
-title: CLI Logic Leaks
-statement: Business logic (`_deploy_configs_for_roles`) and command implementations
-  (`list_tags`) are leaking into the CLI layer (`make.py`), violating separation of
-  concerns.
-requires_deep_analysis: false
 source_events:
 - j0k1l2
 - d4list
+title: CLI Logic Leaks
+label: refacts
+priority: medium
+summary: Business logic (`_deploy_configs_for_roles`) and command implementations
+  (`list_tags`) are leaking i...
+problem: Business logic (`_deploy_configs_for_roles`) and command implementations
+  (`list_tags`) are leaking into the CLI layer (`make.py`), violating separation of
+  concerns.
+impact: Technical debt accumulation and reduced maintainability.
+desired_outcome: Resolve the described issue.
+constraints: []
+risks: []
+affected_areas:
+- src/menv
+acceptance_criteria:
+- The issue is resolved.
+- Relevant tests pass.
+verification_commands:
+- just check
+- just test
+requires_deep_analysis: false

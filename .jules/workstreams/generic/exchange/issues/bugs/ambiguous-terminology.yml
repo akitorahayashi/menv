@@ -1,12 +1,26 @@
-schema_version: 1
+schema_version: 2
 id: at4x9z
-created_at: '2026-02-03'
-status: open
-title: Ambiguous Terminology
-statement: Inconsistent terminology usage causes confusion and naming collisions.
-  Specifically, 'apple' vs 'macos' in shell aliases, and 'system' being overloaded
-  for both Ansible roles and alias categories.
-requires_deep_analysis: false
 source_events:
 - d7e5f3
 - sy5t3m
+title: Ambiguous Terminology
+label: bugs
+priority: medium
+summary: Inconsistent terminology usage causes confusion and naming collisions. Specifically,
+  'apple' vs 'mac...
+problem: Inconsistent terminology usage causes confusion and naming collisions. Specifically,
+  'apple' vs 'macos' in shell aliases, and 'system' being overloaded for both Ansible
+  roles and alias categories.
+impact: Operational instability or incorrect behavior.
+desired_outcome: Resolve the described issue.
+constraints: []
+risks: []
+affected_areas:
+- src/menv
+acceptance_criteria:
+- The issue is resolved.
+- Relevant tests pass.
+verification_commands:
+- just check
+- just test
+requires_deep_analysis: false

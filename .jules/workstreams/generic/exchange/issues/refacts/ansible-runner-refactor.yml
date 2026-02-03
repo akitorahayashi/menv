@@ -1,16 +1,30 @@
-schema_version: 1
+schema_version: 2
 id: ar7y2k
-created_at: '2026-02-03'
-status: open
-title: AnsibleRunner Service Refactor
-statement: The AnsibleRunner service mixes I/O with business logic, lacks unit tests,
-  and uses terminology ('run') that diverges from the CLI ('make'). It needs refactoring
-  for better testability and consistency.
-requires_deep_analysis: true
 source_events:
 - g7h8i9
 - szb62h
 - b4c7d2
 - mk7run
+title: AnsibleRunner Service Refactor
+label: refacts
+priority: medium
+summary: The AnsibleRunner service mixes I/O with business logic, lacks unit tests,
+  and uses terminology ('ru...
+problem: The AnsibleRunner service mixes I/O with business logic, lacks unit tests,
+  and uses terminology ('run') that diverges from the CLI ('make'). It needs refactoring
+  for better testability and consistency.
+impact: Technical debt accumulation and reduced maintainability.
+desired_outcome: Resolve the described issue.
+constraints: []
+risks: []
+affected_areas:
+- src/menv
+acceptance_criteria:
+- The issue is resolved.
+- Relevant tests pass.
+verification_commands:
+- just check
+- just test
+requires_deep_analysis: true
 deep_analysis_reason: Refactoring a core service like AnsibleRunner requires careful
   planning to avoid breaking existing functionality and to ensure proper test coverage.

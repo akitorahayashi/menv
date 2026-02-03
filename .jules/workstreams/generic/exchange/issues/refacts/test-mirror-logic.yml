@@ -1,15 +1,29 @@
-schema_version: 1
+schema_version: 2
 id: tm9l0x
-created_at: '2026-02-03'
-status: open
-title: Test Mirror Logic
-statement: Integration tests re-implement Ansible logic (Jinja2, path resolution)
-  to verify configuration, creating a 'Mirror Logic' risk where tests verify the re-implementation
-  rather than the actual behavior.
-requires_deep_analysis: true
 source_events:
 - 3oobd1
 - e5f8a3
+title: Test Mirror Logic
+label: refacts
+priority: medium
+summary: Integration tests re-implement Ansible logic (Jinja2, path resolution) to
+  verify configuration, crea...
+problem: Integration tests re-implement Ansible logic (Jinja2, path resolution) to
+  verify configuration, creating a 'Mirror Logic' risk where tests verify the re-implementation
+  rather than the actual behavior.
+impact: Technical debt accumulation and reduced maintainability.
+desired_outcome: Resolve the described issue.
+constraints: []
+risks: []
+affected_areas:
+- src/menv
+acceptance_criteria:
+- The issue is resolved.
+- Relevant tests pass.
+verification_commands:
+- just check
+- just test
+requires_deep_analysis: true
 deep_analysis_reason: Replacing mirror logic in tests requires designing a new testing
   strategy that validates against actual Ansible execution or uses Ansible's own testing
   tools.

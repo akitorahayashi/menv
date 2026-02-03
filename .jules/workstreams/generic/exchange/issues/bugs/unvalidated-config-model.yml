@@ -1,10 +1,24 @@
-schema_version: 1
+schema_version: 2
 id: uc7h3v
-created_at: '2026-02-03'
-status: open
-title: Unvalidated Config Model
-statement: '`MenvConfig` is a `TypedDict` without runtime validation, allowing invalid
-  configuration states to propagate.'
-requires_deep_analysis: false
 source_events:
 - d3conf
+title: Unvalidated Config Model
+label: bugs
+priority: medium
+summary: '`MenvConfig` is a `TypedDict` without runtime validation, allowing invalid
+  configuration states to p...'
+problem: '`MenvConfig` is a `TypedDict` without runtime validation, allowing invalid
+  configuration states to propagate.'
+impact: Operational instability or incorrect behavior.
+desired_outcome: Resolve the described issue.
+constraints: []
+risks: []
+affected_areas:
+- src/menv
+acceptance_criteria:
+- The issue is resolved.
+- Relevant tests pass.
+verification_commands:
+- just check
+- just test
+requires_deep_analysis: false

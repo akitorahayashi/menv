@@ -1,10 +1,23 @@
-schema_version: 1
+schema_version: 2
 id: il6g7h
-created_at: '2026-02-03'
-status: open
-title: Incorrect List Command Documentation
-statement: The documentation for `list_tags` incorrectly references `menv make list`
-  instead of the actual `menv list` command.
-requires_deep_analysis: false
 source_events:
 - b9a3c2
+title: Incorrect List Command Documentation
+label: docs
+priority: medium
+summary: The documentation for `list_tags` incorrectly references `menv make list`
+  instead of the actual `men...
+problem: The documentation for `list_tags` incorrectly references `menv make list`
+  instead of the actual `menv list` command.
+impact: User confusion and potential misuse of the tool.
+desired_outcome: Resolve the described issue.
+constraints: []
+risks: []
+affected_areas:
+- src/menv
+acceptance_criteria:
+- The issue is resolved.
+- Relevant tests pass.
+verification_commands:
+- just check
+requires_deep_analysis: false

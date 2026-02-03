@@ -1,10 +1,24 @@
-schema_version: 1
+schema_version: 2
 id: bb8j1m
-created_at: '2026-02-03'
-status: open
-title: Broken Backup Command
-statement: The `menv backup` command fails because the wrapper script does not pass
-  the required `config_dir` argument to the underlying backend scripts.
-requires_deep_analysis: false
 source_events:
 - a7f9b2
+title: Broken Backup Command
+label: bugs
+priority: medium
+summary: The `menv backup` command fails because the wrapper script does not pass
+  the required `config_dir` a...
+problem: The `menv backup` command fails because the wrapper script does not pass
+  the required `config_dir` argument to the underlying backend scripts.
+impact: Operational instability or incorrect behavior.
+desired_outcome: Resolve the described issue.
+constraints: []
+risks: []
+affected_areas:
+- src/menv
+acceptance_criteria:
+- The issue is resolved.
+- Relevant tests pass.
+verification_commands:
+- just check
+- just test
+requires_deep_analysis: false

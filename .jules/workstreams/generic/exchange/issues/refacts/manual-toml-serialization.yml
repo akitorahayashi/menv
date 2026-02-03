@@ -1,10 +1,24 @@
-schema_version: 1
+schema_version: 2
 id: mt4k2j
-created_at: '2026-02-03'
-status: open
-title: Manual TOML Serialization
-statement: '`ConfigStorage` manually serializes TOML, which is fragile. It should
-  use a proper library.'
-requires_deep_analysis: false
 source_events:
 - d2toml
+title: Manual TOML Serialization
+label: refacts
+priority: medium
+summary: '`ConfigStorage` manually serializes TOML, which is fragile. It should use
+  a proper library.'
+problem: '`ConfigStorage` manually serializes TOML, which is fragile. It should use
+  a proper library.'
+impact: Technical debt accumulation and reduced maintainability.
+desired_outcome: Resolve the described issue.
+constraints: []
+risks: []
+affected_areas:
+- src/menv
+acceptance_criteria:
+- The issue is resolved.
+- Relevant tests pass.
+verification_commands:
+- just check
+- just test
+requires_deep_analysis: false

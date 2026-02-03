@@ -1,11 +1,25 @@
-schema_version: 1
+schema_version: 2
 id: cr1d5f
-created_at: '2026-02-03'
-status: open
-title: CI Reproducibility
-statement: The CI pipeline uses floating tags and unpinned dependencies, creating
-  risks for reproducibility and supply chain security.
-requires_deep_analysis: false
 source_events:
 - '232594'
 - 67041d
+title: CI Reproducibility
+label: refacts
+priority: medium
+summary: The CI pipeline uses floating tags and unpinned dependencies, creating risks
+  for reproducibility and...
+problem: The CI pipeline uses floating tags and unpinned dependencies, creating risks
+  for reproducibility and supply chain security.
+impact: Technical debt accumulation and reduced maintainability.
+desired_outcome: Resolve the described issue.
+constraints: []
+risks: []
+affected_areas:
+- src/menv
+acceptance_criteria:
+- The issue is resolved.
+- Relevant tests pass.
+verification_commands:
+- just check
+- just test
+requires_deep_analysis: false
