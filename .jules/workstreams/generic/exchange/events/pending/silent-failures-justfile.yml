@@ -1,0 +1,26 @@
+schema_version: 1
+
+id: "a26469"
+issue_id: ""
+created_at: "2026-02-02"
+author_role: "devops"
+confidence: "high"
+
+title: "Silent Failures in Build Verification"
+statement: |
+  The `justfile` uses `|| true` to suppress errors from `shfmt` and `shellcheck` when iterating over files, allowing verification steps to pass even if the tools fail or are missing.
+
+evidence:
+  - path: "justfile"
+    loc:
+      - "43"
+    note: "Suppresses `shfmt` errors."
+  - path: "justfile"
+    loc:
+      - "57"
+    note: "Suppresses `shellcheck` errors."
+
+tags:
+  - "operational-readiness"
+  - "risk"
+  - "silent-failure"
