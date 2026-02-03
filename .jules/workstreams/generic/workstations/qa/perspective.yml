@@ -1,0 +1,21 @@
+schema_version: 1
+
+observer: "qa"
+workstream: "generic"
+
+updated_at: "2024-10-26T12:00:00Z"
+
+goals:
+  short_term: []
+
+biases:
+  assumptions: []
+  blind_spots: []
+  heuristics: []
+
+recent_runs:
+  - created_at: "2024-10-26T12:00:00Z"
+    summary: "Identified Mirror Logic anti-pattern in integration tests."
+    history_path: ".jules/workstreams/generic/workstations/qa/histories/20241026-run001.yml"
+
+learned_exclusions: []
