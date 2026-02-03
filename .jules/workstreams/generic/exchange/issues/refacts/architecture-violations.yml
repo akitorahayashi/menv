@@ -1,0 +1,65 @@
+schema_version: 2
+
+# Metadata
+id: "a1r2ch"
+source_events:
+  - "ev001a"
+  - "ev001c"
+  - "loccfg"
+  - "domcli"
+  - "ev001b"
+  - "ev7g8h"
+title: "Architecture Violations in Ansible/Python Integration"
+label: "refacts"
+priority: "high"
+summary: "Consolidate misplaced application logic and enforce clear boundaries between CLI, Services, and Ansible."
+
+# Content
+problem: |
+  The application suffers from significant architectural violations where logic is misplaced:
+  1. Core Python application logic (e.g., system backup) is located in `src/menv/ansible/scripts/`, hidden from the main package structure.
+  2. The `make` CLI command contains domain definitions (`TAG_GROUPS`, `VALID_PROFILES`) and business logic (`_get_roles_for_tags`), violating separation of concerns.
+  3. `AnsibleRunner` and `ConfigDeployer` both hardcode the local config path `~/.config/menv/roles`, violating SSOT.
+  4. `AnsibleRunner` enforces an implicit directory structure contract on Ansible roles.
+
+impact: |
+  These violations lead to:
+  - **Poor Testability**: Logic in scripts or CLI commands is harder to test in isolation.
+  - **Maintenance Burden**: Updates to paths or domain data require changes in multiple places.
+  - **Fragility**: Implicit contracts break easily when directory structures change.
+  - **Low Discoverability**: Developers cannot find core logic in expected locations.
+
+desired_outcome: |
+  - System backup logic is moved from Ansible scripts to a proper Python service in `src/menv/services/`.
+  - Domain definitions (`TAG_GROUPS`, `VALID_PROFILES`) are moved to a domain model or service.
+  - CLI commands delegate all business logic to services.
+  - Local config path is defined in a single source of truth (e.g., `AnsiblePaths` or `ConfigStorage`).
+
+constraints:
+  - Must ensure existing Ansible playbooks continue to function or are updated to use the new paths.
+
+risks:
+  - Moving the backup script might break existing `menv backup` command if not updated correctly.
+  - Changing config paths requires migration or backward compatibility for existing users.
+
+# Specifics
+affected_areas:
+  - "src/menv/ansible/scripts/system/backup-system.py"
+  - "src/menv/commands/make.py"
+  - "src/menv/services/ansible_runner.py"
+  - "src/menv/services/config_deployer.py"
+
+acceptance_criteria:
+  - "backup-system.py logic resides in `src/menv/services/`."
+  - "`make.py` contains no domain constants or business logic methods."
+  - "`~/.config/menv/roles` is defined in exactly one place."
+  - "All unit and integration tests pass."
+
+verification_commands:
+  - "uv run pytest"
+  - "uv run mypy src/"
+  - "uv run ruff check src/"
+
+# Analysis Flags
+requires_deep_analysis: true
+deep_analysis_reason: "This refactoring involves moving files, changing class responsibilities, and modifying the contract between Python and Ansible, which requires a careful design to avoid regressions."

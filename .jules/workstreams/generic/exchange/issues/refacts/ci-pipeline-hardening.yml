@@ -1,0 +1,59 @@
+schema_version: 2
+
+# Metadata
+id: "c3i4pi"
+source_events:
+  - "g7h8i9"
+  - "d4e5f6"
+  - "a1b2c3"
+  - "j0k1l2"
+title: "CI Pipeline Hardening and Standardization"
+label: "refacts"
+priority: "medium"
+summary: "Harden CI pipeline by pinning dependencies, unifying runner versions, deduplicating logic, and introducing artifact builds."
+
+# Content
+problem: |
+  The CI pipeline has several deficiencies:
+  1. **Supply Chain Risk**: GitHub Actions uses mutable tags (e.g., `@v4`) instead of commit SHAs.
+  2. **Inconsistency**: Different workflows use different runner versions (`macos-latest` vs `macos-15`).
+  3. **Duplication**: Logic for setting up virtual environments is copy-pasted across workflows.
+  4. **Missing Artifacts**: The pipeline tests the source but does not build or publish a versioned artifact, meaning the deployed code might differ from the tested code.
+
+impact: |
+  - **Security**: Upstream compromises could inject malicious code.
+  - **Stability**: "Latest" tags can break builds unexpectedly.
+  - **Maintenance**: Changes to setup logic must be applied in multiple places.
+  - **Reliability**: Deployment integrity is not guaranteed.
+
+desired_outcome: |
+  - All GitHub Actions are pinned to commit SHAs.
+  - A single runner version is used consistently (e.g., `macos-14` or `macos-15`).
+  - Common setup logic is extracted to composite actions.
+  - A build step produces a verified artifact (e.g., Python Wheel).
+
+constraints:
+  - Must remain compatible with GitHub Actions runners.
+
+risks:
+  - Pinning versions requires automated tools (e.g., Dependabot) to stay up to date.
+
+# Specifics
+affected_areas:
+  - ".github/workflows/lint-and-test.yml"
+  - ".github/workflows/setup-python.yml"
+  - ".github/actions/setup-base/action.yml"
+
+acceptance_criteria:
+  - "All `uses` directives use commit SHAs."
+  - "All jobs use the same macOS version."
+  - "Setup logic is centralized."
+  - "A `build` job produces a distribution artifact."
+
+verification_commands:
+  - "grep -r 'uses:' .github/workflows/"
+  - "grep -r 'runs-on:' .github/workflows/"
+
+# Analysis Flags
+requires_deep_analysis: true
+deep_analysis_reason: "Defining the artifact strategy (Wheel vs PEX vs Source) and release process requires architectural decisions."
