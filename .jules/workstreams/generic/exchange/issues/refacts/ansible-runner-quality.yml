@@ -22,39 +22,55 @@ problem: |
 
 impact: |
   - **Blind Spots**: The core functionality of the tool (running playbooks) is effectively untested.
-  - **Reliability**: Resource leaks or unhandled exceptions may occur silently.
+  - **Reliability**: Resource leaks or unhandled exceptions may occur silently. `AnsiblePaths` relies on `__del__` which is unpredictable.
   - **Flexibility**: Callers cannot react to specific errors because they are converted to generic exit codes.
+  - **Coupling**: `AnsibleRunner` is coupled to `rich.console.Console` and `sys.stdout`, preventing reuse in other contexts (e.g., buffering output).
 
 desired_outcome: |
-  - `AnsibleRunner` accepts an output stream (or uses a callback/generator) instead of writing to `sys.stdout` directly.
-  - Exceptions are propagated to the caller, allowing the CLI layer to decide how to handle them.
-  - `AnsiblePaths` implements the Context Manager protocol (`__enter__`/`__exit__`) for safe cleanup.
+  - `AnsibleRunner.run_playbook` returns an iterator of output lines (`Iterator[str]`) instead of writing to `sys.stdout` directly.
+  - `AnsibleRunner` raises typed exceptions (`AnsibleExecutionError`, `AnsibleNotFoundError`) instead of returning integer exit codes.
+  - `AnsiblePaths` implements the Context Manager protocol (`__enter__`/`__exit__`) for deterministic resource cleanup.
+  - `menv` application lifecycle ensures `AnsiblePaths` is properly cleaned up (via `ctx.call_on_close` or similar).
+  - Consumers (`make`, `create` commands) are updated to consume the generator and handle exceptions.
   - `MockAnsibleRunner` is removed or restricted, and real `AnsibleRunner` is tested with unit tests covering command construction and error handling.
 
 constraints:
   - Must maintain real-time output streaming for the user experience.
+  - `AnsiblePaths` must be cleaned up reliably at application exit.
 
 risks:
-  - Refactoring I/O might break the progress display if not careful.
+  - Changing `AnsiblePaths` to a context manager requires ensuring `__exit__` is always called, which can be tricky with global/singleton usage in `Typer`.
+  - Refactoring I/O might break the progress display (colors/formatting) if raw bytes vs decoded strings are mishandled.
 
 # Specifics
 affected_areas:
   - "src/menv/services/ansible_runner.py"
   - "src/menv/services/ansible_paths.py"
+  - "src/menv/commands/make.py"
+  - "src/menv/commands/create.py"
+  - "src/menv/main.py"
   - "tests/unit/test_ansible_runner.py"
+  - "tests/unit/test_ansible_paths.py"
   - "tests/unit/conftest.py"
+  - "tests/unit/commands/test_make.py"
+  - "tests/unit/commands/test_create.py"
 
 acceptance_criteria:
-  - "`AnsibleRunner.run_playbook` does not write to global `sys.stdout`."
-  - "`AnsibleRunner` raises explicit exceptions for failures."
-  - "`AnsiblePaths` uses context managers, not `__del__`."
-  - "Unit tests exist for `AnsibleRunner` covering success and failure paths."
+  - "`AnsibleRunner.run_playbook` yields strings and does not write to global `sys.stdout`."
+  - "`AnsibleRunner` raises `AnsibleExecutionError` (containing exit code) on failure."
+  - "`AnsiblePaths` implements `__enter__` and `__exit__`."
+  - "`menv.main` ensures `AnsiblePaths` cleanup via `ctx.call_on_close`."
+  - "`make` and `create` commands print output in real-time and handle exceptions correctly."
+  - "Unit tests exist for `AnsibleRunner` mocking `subprocess.Popen`."
+  - "Unit tests exist for `AnsiblePaths` verifying context manager behavior."
   - "Coverage for `ansible_runner.py` is > 90%."
 
 verification_commands:
   - "uv run pytest tests/unit/test_ansible_runner.py"
   - "uv run pytest tests/unit/test_ansible_paths.py"
+  - "uv run pytest tests/unit/commands/test_make.py"
+  - "menv make --help"
 
 # Analysis Flags
-requires_deep_analysis: true
-deep_analysis_reason: "Refactoring the I/O strategy and resource management requires careful design to ensure thread safety (if applicable) and proper integration with Typer/Rich."
+requires_deep_analysis: false
+deep_analysis_reason: "Refactoring the I/O strategy and resource management requires careful design to ensure thread safety (if applicable) and proper integration with Typer/Rich. Analysis confirms `AnsibleRunner` should yield output as a generator to decouple I/O. `AnsiblePaths` must adopt the context manager protocol, with its lifecycle managed by the `Typer` context in `main.py`. Consumers like `make` and `create` must be updated to iterate over the runner's output and handle new typed exceptions."
