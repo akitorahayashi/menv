@@ -1,0 +1,33 @@
+schema_version: 1
+
+# Metadata
+id: "2903b6"
+issue_id: ""
+created_at: "2026-02-03"
+author_role: "consistency"
+confidence: "high"
+
+# Content
+title: "Root AGENTS.md contains invalid relative links"
+statement: |
+  The AGENTS.md file in the root directory appears to be misplaced or copied incorrectly.
+  It references a "root AGENTS.md" at `../../../../AGENTS.md` (which is impossible from root)
+  and `src/AGENTS.md` (which does not exist). It also describes the `.jules` scaffold,
+  duplicating content likely meant for `.jules/README.md`.
+
+# Evidence supporting the observation
+evidence:
+  - path: "AGENTS.md"
+    loc:
+      - "3"
+    note: "Link `../../../../AGENTS.md` is invalid from root."
+
+  - path: "AGENTS.md"
+    loc:
+      - "106"
+    note: "Link `src/AGENTS.md` points to a non-existent file."
+
+tags:
+  - "documentation"
+  - "broken-links"
+  - "jules"
