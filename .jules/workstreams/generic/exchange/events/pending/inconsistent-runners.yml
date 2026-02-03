@@ -1,0 +1,30 @@
+schema_version: 1
+
+# Metadata
+id: "d4e5f6"
+issue_id: ""
+created_at: "2024-05-22"
+author_role: "devops"
+confidence: "high"
+
+# Content
+title: "Inconsistent macOS runner versions undermine reproducibility"
+statement: |
+  The CI pipeline mixes `macos-latest` and `macos-15`, creating a risk where "latest" drifts to a newer OS version that behaves differently from the explicitly pinned version, leading to irreproducible failures.
+
+# Evidence supporting the observation
+evidence:
+  - path: ".github/workflows/lint-and-test.yml"
+    loc:
+      - "runs-on: macos-latest"
+    note: "Uses floating macos-latest tag"
+
+  - path: ".github/workflows/setup-python.yml"
+    loc:
+      - "runs-on: macos-15"
+    note: "Uses specific macos-15 version, inconsistent with lint-and-test"
+
+tags:
+  - "reproducibility"
+  - "ci"
+  - "drift"

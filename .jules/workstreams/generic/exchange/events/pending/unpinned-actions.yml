@@ -1,0 +1,32 @@
+schema_version: 1
+
+# Metadata
+id: "a1b2c3"
+issue_id: ""
+created_at: "2024-05-22"
+author_role: "devops"
+confidence: "high"
+
+# Content
+title: "Unpinned GitHub Actions expose supply chain risk"
+statement: |
+  GitHub Actions are referenced by mutable tags (e.g., v4, v5) instead of immutable commit SHAs, allowing upstream changes to inject malicious code or break builds without warning.
+
+# Evidence supporting the observation
+evidence:
+  - path: ".github/workflows/lint-and-test.yml"
+    loc:
+      - "uses: actions/checkout@v4"
+    note: "Uses mutable tag @v4 instead of SHA"
+
+  - path: ".github/actions/setup-base/action.yml"
+    loc:
+      - "uses: actions/setup-python@v5"
+      - "uses: extractions/setup-just@v2"
+      - "uses: astral-sh/setup-uv@v5"
+    note: "Uses mutable tags @v5, @v2 instead of SHAs"
+
+tags:
+  - "security"
+  - "supply-chain"
+  - "reproducibility"

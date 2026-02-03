@@ -1,0 +1,25 @@
+schema_version: 1
+
+# Metadata
+id: "j0k1l2"
+issue_id: ""
+created_at: "2024-05-22"
+author_role: "devops"
+confidence: "medium"
+
+# Content
+title: "CI validates source but fails to promote immutable artifacts"
+statement: |
+  The current pipeline runs tests and setup scripts against the source code but does not build or publish a versioned artifact (e.g., Wheel, PEX), meaning deployment relies on a potentially different checkout than what was tested.
+
+# Evidence supporting the observation
+evidence:
+  - path: ".github/workflows/ci-workflows.yml"
+    loc:
+      - "jobs: [lint-and-test, setup-python, ...]"
+    note: "Orchestrates testing/setup but lacks build/publish steps"
+
+tags:
+  - "architecture"
+  - "delivery"
+  - "reproducibility"
