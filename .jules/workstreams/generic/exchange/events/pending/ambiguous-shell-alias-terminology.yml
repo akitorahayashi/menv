@@ -9,10 +9,12 @@ statement: |
   The shell alias configuration uses inconsistent terminology for macOS-related aliases, with `apple.sh` existing at the top level and `macos.sh` nested under `system/`, creating ambiguity about where platform-specific aliases should reside.
 evidence:
   - path: "src/menv/ansible/roles/shell/config/common/alias/apple.sh"
-    loc: "File existence"
+    loc:
+      - "File existence"
     note: "\"Apple\" terminology used at root level."
   - path: "src/menv/ansible/roles/shell/config/common/alias/system/macos.sh"
-    loc: "File existence"
+    loc:
+      - "File existence"
     note: "\"MacOS\" terminology used in `system/` subdirectory."
 tags:
   - "ambiguous-terminology"

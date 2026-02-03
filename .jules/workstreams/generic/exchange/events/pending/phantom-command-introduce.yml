@@ -9,10 +9,12 @@ statement: |
   The `README.md` file instructs users to run `menv introduce --help`, but no such command exists in the codebase or is registered in the CLI application.
 evidence:
   - path: "README.md"
-    loc: "125"
+    loc:
+      - "125"
     note: "References `menv introduce --help`."
   - path: "src/menv/main.py"
-    loc: "1-125"
+    loc:
+      - "1-125"
     note: "No `introduce` command is registered in the Typer app."
 tags:
   - "phantom-command"

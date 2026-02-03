@@ -9,10 +9,12 @@ statement: |
   The `menv backup` command is non-functional because the CLI wrapper in `src/menv/commands/backup.py` invokes the backend scripts (e.g., `backup-system.py`) without passing the mandatory `config_dir` argument required by the scripts.
 evidence:
   - path: "src/menv/commands/backup.py"
-    loc: "76-82"
+    loc:
+      - "76-82"
     note: "`subprocess.Popen` call only passes the script path, missing arguments."
   - path: "src/menv/ansible/scripts/system/backup-system.py"
-    loc: "170-174"
+    loc:
+      - "170-174"
     note: "Script defines `config_dir` as a mandatory positional argument."
 tags:
   - "broken-command"

@@ -9,10 +9,12 @@ statement: |
   The `list_tags` function in `src/menv/commands/make.py` documents its usage as `menv make list`, but it is registered as a top-level command `menv list` in `src/menv/main.py`. The `menv make` command does not appear to support `list` as a subcommand or tag.
 evidence:
   - path: "src/menv/commands/make.py"
-    loc: "64-68"
+    loc:
+      - "64-68"
     note: "Docstring shows `menv make list`."
   - path: "src/menv/main.py"
-    loc: "92-94"
+    loc:
+      - "92-94"
     note: "Registered as `app.command(name='list')` (top-level)."
 tags:
   - "incorrect-docs"
