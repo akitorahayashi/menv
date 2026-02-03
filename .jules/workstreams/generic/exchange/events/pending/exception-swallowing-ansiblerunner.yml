@@ -1,0 +1,27 @@
+schema_version: 1
+
+# Metadata
+id: "ev3c4d"
+issue_id: ""
+created_at: "2024-05-23"
+author_role: "pythonista"
+confidence: "high"
+
+# Content
+title: "Exception swallowing in AnsibleRunner"
+statement: |
+  `AnsibleRunner.run_playbook` catches `FileNotFoundError` and returns an integer exit code (1).
+  This swallows the exception and prevents callers from programmatically distinguishing between "command not found" and other errors.
+  It also prints to the console directly, mixing I/O with error handling.
+
+# Evidence supporting the observation
+evidence:
+  - path: "src/menv/services/ansible_runner.py"
+    loc:
+      - "87-92"
+    note: "Catches FileNotFoundError, prints error, and returns 1, losing stack trace and exception type."
+
+tags:
+  - "anti-pattern"
+  - "exception-handling"
+  - "python"

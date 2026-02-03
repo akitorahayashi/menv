@@ -1,0 +1,26 @@
+schema_version: 1
+
+# Metadata
+id: "ev5e6f"
+issue_id: ""
+created_at: "2024-05-23"
+author_role: "pythonista"
+confidence: "medium"
+
+# Content
+title: "Mixed I/O and Logic in AnsibleRunner"
+statement: |
+  `AnsibleRunner` mixes core execution logic with direct `sys.stdout` writes.
+  This makes the class difficult to test without capturing global stdout and couples the logic to the CLI environment.
+
+# Evidence supporting the observation
+evidence:
+  - path: "src/menv/services/ansible_runner.py"
+    loc:
+      - "81-83"
+    note: "Direct writes to sys.stdout inside the execution loop."
+
+tags:
+  - "anti-pattern"
+  - "io-mixing"
+  - "testability"
