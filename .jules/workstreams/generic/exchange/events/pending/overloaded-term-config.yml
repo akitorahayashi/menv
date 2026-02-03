@@ -1,0 +1,25 @@
+schema_version: 1
+
+id: "cf0v1d"
+issue_id: ""
+created_at: "2026-02-02"
+author_role: "taxonomy"
+confidence: "high"
+
+title: "Term 'config' Overloaded for Identity and Ansible Roles"
+statement: |
+  The term 'config' is architecturally overloaded, referring to both user identity configuration (managed by ConfigStorage) and Ansible role configuration files (managed by ConfigDeployer).
+
+evidence:
+  - path: "src/menv/services/config_storage.py"
+    loc:
+      - "class ConfigStorage"
+    note: "Manages identity configuration (name/email) in ~/.config/menv/config.toml"
+  - path: "src/menv/services/config_deployer.py"
+    loc:
+      - "class ConfigDeployer"
+    note: "Manages role configuration files in ~/.config/menv/roles/"
+
+tags:
+  - "concept-overloading"
+  - "naming-collision"
