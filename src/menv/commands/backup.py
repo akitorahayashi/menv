@@ -107,6 +107,9 @@ def backup(
     if target == "system":
         definitions_path = local_config_dir / "definitions"
         if not definitions_path.exists():
+            console.print(
+                f"[dim]ℹ Local definitions not found at {definitions_path}. Using package defaults.[/]"
+            )
             # Fallback to package definitions
             package_definitions_path = (
                 app_ctx.config_deployer.get_package_config_path(role)
