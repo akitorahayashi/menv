@@ -1,0 +1,37 @@
+schema_version: 1
+
+id: "h7b9a2"
+created_at: "2026-02-02T19:00:00Z"
+
+observer: "consistency"
+workstream: "generic"
+
+inputs:
+  change_summary_path: ".jules/changes/latest.yml"
+
+plan: |
+  Analyze the codebase for discrepancies between documentation and implementation, specifically focusing on phantom commands, broken implementations, and documentation drift.
+
+actions:
+  - "Read README.md, AGENTS.md, and source code."
+  - "Verified menv backup command implementation."
+  - "Verified phantom menv introduce command."
+  - "Verified list_tags docstring."
+  - "Verified shell alias structure."
+  - "Checked for missing ansible.just file."
+
+outcomes:
+  summary: "Identified 4 consistency issues: broken backup command, phantom introduce command, incorrect list docs, and ambiguous alias terms."
+  emitted_events:
+    - ".jules/workstreams/generic/exchange/events/pending/broken-backup-command.yml"
+    - ".jules/workstreams/generic/exchange/events/pending/phantom-command-introduce.yml"
+    - ".jules/workstreams/generic/exchange/events/pending/incorrect-list-command-docs.yml"
+    - ".jules/workstreams/generic/exchange/events/pending/ambiguous-shell-alias-terminology.yml"
+  notes: |
+    Found references to 'PlaybookService' in change summary but code is clean.
+    'ansible.just' is missing but no current code references it, so suppressed event.
+
+perspective_updates:
+  goals_delta: []
+  learned_exclusions_delta: []
+  bias_adjustments: []

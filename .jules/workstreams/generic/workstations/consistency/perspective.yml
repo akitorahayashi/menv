@@ -1,0 +1,21 @@
+schema_version: 1
+
+observer: "consistency"
+workstream: "generic"
+
+updated_at: "2026-02-02T19:00:00Z"
+
+goals:
+  short_term: []
+
+biases:
+  assumptions: []
+  blind_spots: []
+  heuristics: []
+
+recent_runs:
+  - created_at: "2026-02-02T19:00:00Z"
+    summary: "Identified 4 consistency issues: broken backup command, phantom introduce command, incorrect list docs, and ambiguous alias terms."
+    history_path: ".jules/workstreams/generic/workstations/consistency/histories/20260202-d834f5.yml"
+
+learned_exclusions: []
