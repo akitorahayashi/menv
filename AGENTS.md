@@ -1,127 +1,125 @@
-# menv - macOS Environment Setup Project
+# .jules/ Scaffold Design
 
-## Overview
+See [root AGENTS.md](../../../../AGENTS.md) for design principles.
 
-pipx-installable CLI for macOS dev environment setup using bundled Ansible playbooks.
+## Directory Structure
 
-## CLI Commands
-
-| Command | Alias | Description |
-|---------|-------|-------------|
-| `menv create <profile>` | `cr` | Create core environment (macbook/mbk, mac-mini/mmn); use `-v` for verbose, `-o` for overwrite |
-| `menv make <tag> [profile]` | `mk` | Run individual task (default: common); profile only needed for brew-formulae/brew-cask; use `-o` for overwrite |
-| `menv list` | `ls` | List available tags |
-| `menv backup <target>` | `bk` | Backup system/VS Code |
-| `menv config set` | `cf set` | Set VCS identities interactively |
-| `menv config show` | `cf show` | Show current VCS identity configuration |
-| `menv config create [role]` | `cf cr [role]` | Deploy role configs to ~/.config/menv/; use `-o` for overwrite |
-| `menv switch <profile>` | `sw` | Switch VCS identity (personal/p, work/w) |
-| `menv update` | `u` | Self-update via pipx |
-
-## Package Structure
-
-```text
-src/menv/
-├── main.py           # Typer CLI entry point
-├── context.py        # AppContext (DI container)
-├── commands/         # CLI commands (1 command per file)
-├── models/           # Data models (1 file per domain)
-├── services/         # Service classes (1 class per file)
-├── protocols/        # Protocol definitions (1 per service)
-└── ansible/          # Bundled Ansible playbooks and roles
-
-tests/
-├── unit/             # Unit tests (mocks, no external processes)
-│   ├── commands/     # CLI command tests
-│   └── services/     # Service tests
-├── intg/             # Integration tests (subprocess, real scripts)
-│   └── roles/        # Ansible role script tests
-├── mocks/            # Mock implementations (1 class per file, Protocol-compliant)
-└── conftest.py       # Shared fixtures
+```
+.jules/
+├── JULES.md              # Agent contract (formal rules)
+├── README.md             # Human guide (informal)
+├── changes/
+│   └── latest.yml        # Narrator output (bounded changes summary)
+├── roles/
+│   ├── narrator/
+│   │   ├── prompt.yml    # Entry point
+│   │   ├── contracts.yml # Layer contract
+│   │   └── schemas/
+│   │       └── change.yml
+│   ├── observers/
+│   │   ├── contracts.yml
+│   │   ├── schemas/
+│   │   │   └── event.yml
+│   │   └── <role>/
+│   │       └── role.yml
+│   ├── deciders/
+│   │   ├── contracts.yml
+│   │   ├── schemas/
+│   │   │   ├── issue.yml
+│   │   │   └── feedback.yml
+│   │   └── <role>/
+│   │       └── role.yml
+│   ├── planners/
+│   │   ├── prompt.yml
+│   │   └── contracts.yml
+│   └── implementers/
+│       ├── prompt.yml
+│       └── contracts.yml
+├── workstreams/
+│   └── <workstream>/
+│       ├── events/
+│       │   └── <state>/
+│       │       └── *.yml
+│       └── issues/
+│           ├── index.md
+│           └── <label>/
+│               └── *.yml
+└── setup/
+    ├── tools.yml         # Tool selection
+    ├── env.toml          # Environment variables (generated/merged)
+    ├── install.sh        # Installation script (generated)
+    └── .gitignore        # Ignores env.toml
 ```
 
-## Architecture Principles
+## Document Hierarchy
 
-### Directory Naming
-- **No ambiguous names**: `core/`, `utils/`, `helpers/` are forbidden
-- Every file must belong to a clear, specific category
+| Document | Audience | Contains |
+|----------|----------|----------|
+| `JULES.md` | Jules agents | Formal contracts and schemas |
+| `README.md` | Humans | Informal guide |
 
-### Models (`models/`)
-- **1 file per domain** (group related models)
-- Pure data structures (dataclass, TypedDict)
-- No business logic
+**Rule**: Jules-internal details stay in `.jules/`. Execution/orchestration belongs in `.github/`.
 
-### Protocols (`protocols/`)
-- Define interface for each service
-- **Naming**: `XxxProtocol` suffix (e.g., `ConfigStorageProtocol`)
-- Both real implementations and mocks must satisfy the Protocol
+## Prompt Hierarchy
 
-### Services (`services/`)
-- **1 class per file**
-- Each service must have a corresponding Protocol in `protocols/`
-- **Naming**: Plain name without suffix (e.g., `ConfigStorage`)
-- Example: `services/config_storage.py` (ConfigStorage) ↔ `protocols/config_storage.py` (ConfigStorageProtocol)
+See [root AGENTS.md](../../../../AGENTS.md#2-prompt-hierarchy-no-duplication) for the contract structure.
 
-### Mocks (`tests/mocks/`)
-- **1 class per file** (mirror service structure)
-- Must implement corresponding Protocol
-- Never put implementations in `__init__.py`
+| File | Scope | Content |
+|------|-------|---------|
+| `prompt.yml` | Role | Entry point. Lists all contracts to follow. |
+| `role.yml` | Role | Specialized focus (observers/deciders only). |
+| `contracts.yml` | Layer | Workflow, inputs, outputs, constraints shared within layer. |
+| `JULES.md` | Global | Rules applying to ALL layers (branch naming, system boundaries). |
 
-## Design Rules
+## Schema Files
 
-### Path Resolution
-- CLI passes `profile`, `config_dir_abs_path`, `repo_root_path`, `local_config_root` as Ansible extra vars
-- `local_config_root` points to `~/.config/menv/roles` for externalized configs
-- Roles handle fallback logic (profile-specific → common)
-- Use `importlib.resources` for package path resolution
+Schemas define the structure for artifacts produced by agents.
 
-### Profile Design
-- **Common profile by default**: Most roles use `common` profile (no explicit profile argument needed)
-- **Profile-specific configs**: Only `brew` role has profile-specific configs (macbook/mac-mini)
-  - `brew-formulae` and `brew-cask` require profile specification (use aliases: mbk, mmn)
-  - All other tasks default to `common` profile
-- Roles store configs in `config/common/` (all roles) and `config/profiles/` (brew only)
+| Schema | Location | Purpose |
+|--------|----------|---------|
+| `change.yml` | `.jules/roles/narrator/schemas/` | Changes summary structure |
+| `event.yml` | `.jules/roles/observers/schemas/` | Observer event structure |
+| `issue.yml` | `.jules/roles/deciders/schemas/` | Issue structure |
+| `feedback.yml` | `.jules/roles/deciders/schemas/` | Feedback structure |
 
-### Config Deployment Strategy
+**Rule**: Agents copy the schema and fill its fields. Never invent structure.
 
-**Two-stage config deployment:**
-1. **Package → `~/.config/menv/roles/{role}/`**: Copy via `menv config create` or auto-deploy on `menv make`
-2. **`~/.config/menv/roles/{role}/` → Local destinations**: Symbolic links (changes reflected immediately)
+## Workstream Model
 
-**Config externalization benefits:**
-- Users can edit configs in `~/.config/menv/roles/` without reinstalling menv
-- Changes to `.rust-version`, `tools.yml`, etc. take effect immediately
-- No `pipx reinstall` required for config updates
+Workstreams isolate events and issues so that decider rules do not mix across unrelated operational areas.
 
-**Usage in Ansible tasks:**
-- Read configs from `{{ local_config_root }}/{role}/common/` or `{{ local_config_root }}/{role}/profiles/`
-- Deployment to local destinations (`~/.zshrc`, `~/.gitconfig`, etc.): `ansible.builtin.file` with `state: link`
-- Set `mode: "0644"` for config/text files, `mode: "0755"` for executable scripts
+- Observers and deciders declare their destination workstream in `prompt.yml` via `workstream: <name>`.
+- If the workstream directory is missing, execution fails fast.
+- Planners and implementers do not declare a workstream; the issue file path is authoritative.
 
-### Rust Tools Installation
+### Workstream Directories
 
-The rust role downloads pre-built binaries from GitHub releases rather than compiling via cargo.
+| Directory | Purpose |
+|-----------|---------|
+| `.jules/workstreams/<workstream>/events/<state>/` | Observer outputs, Decider inputs |
+| `.jules/workstreams/<workstream>/issues/<label>/` | Decider/Planner outputs, Implementer inputs |
 
-**Configuration files:**
-- `config/common/tools.yml`: List of tools with name, repo (owner/name), and tag
-- `config/common/platforms.yml`: OS and architecture mapping for asset names
+## Data Flow
 
-**Installation process:**
-1. Check installed version via `<tool> --version`
-2. Download binary from `https://github.com/<repo>/releases/download/<tag>/<name>-<os>-<arch>`
-3. Install to `~/.cargo/bin/` with executable permissions
+The pipeline is file-based and uses local issues as the handoff point:
 
-**Tools included:** gho, jlo, kpv, mx, pure, ssv
+```
+narrator -> observers -> deciders -> [planners] -> implementers
+(changes)   (events)    (issues)    (expand)      (code changes)
+```
 
-**Asset naming convention:** `<binary>-<os>-<arch>` (e.g., `mx-darwin-aarch64`)
+1. **Narrator** runs first, producing `.jules/changes/latest.yml` for observer context.
+2. **Observers** emit events to workstream event directories.
+3. **Deciders** read events, emit issues, and link related events via `source_events`.
+4. **Planners** expand issues with `requires_deep_analysis: true`.
+5. **Implementers** execute approved tasks and create PRs with code changes.
 
-### Testing
-- Run via `just test` (runs both unit-test and intg-test)
-- `just unit-test`: Unit tests only (fast, mocks, no external processes)
-- `just intg-test`: Integration tests only (subprocess, real scripts)
-- Mocks must be Protocol-compliant for type safety
-- Prefer DI over monkeypatch where possible
+## Setup Compiler
 
-### Development
-- `just run <args>`: Run menv in dev mode
-- `just check`: Format and lint
+See [src/AGENTS.md](../../../src/AGENTS.md#setup-compiler) for implementation details.
+
+The setup directory contains:
+- `tools.yml`: User-selected components
+- `env.toml`: Generated environment variables (gitignored)
+- `install.sh`: Generated installation script (dependency-sorted)
+- `.gitignore`: Excludes `env.toml`
