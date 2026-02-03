@@ -1,0 +1,37 @@
+schema_version: 1
+
+id: "abcdef"
+created_at: "2026-02-03T22:55:42Z"
+
+observer: "taxonomy"
+workstream: "generic"
+
+inputs:
+  change_summary_path: ".jules/changes/latest.yml"
+
+plan: |
+  1. Analyze codebase for taxonomy issues.
+  2. Create missing perspective file.
+  3. Emit event findings.
+  4. Record history and update perspective.
+
+actions:
+  - description: "Created perspective file."
+  - description: "Analyzed src/menv/ for naming inconsistencies."
+  - description: "Created 4 event files."
+
+outcomes:
+  summary: "Initialized taxonomy workstation and identified 4 vocabulary/naming issues."
+  emitted_events:
+    - "a1b2c3"
+    - "d4e5f6"
+    - "g7h8i9"
+    - "j0k1l2"
+  notes: |
+    Found significant inconsistencies between CLI and internal service terminology ('make' vs 'run', 'create' vs 'deploy').
+    Also identified 'config' as an overloaded term used for both identity and dotfiles.
+
+perspective_updates:
+  goals_delta: []
+  learned_exclusions_delta: []
+  bias_adjustments: []

@@ -1,0 +1,21 @@
+schema_version: 1
+
+observer: "taxonomy"
+workstream: "generic"
+
+updated_at: "2026-02-03T22:55:42Z"
+
+goals:
+  short_term: []
+
+biases:
+  assumptions: []
+  blind_spots: []
+  heuristics: []
+
+recent_runs:
+  - created_at: "2026-02-03T22:55:42Z"
+    summary: "Initialized taxonomy workstation and identified 4 vocabulary/naming issues."
+    history_path: ".jules/workstreams/generic/workstations/taxonomy/histories/20260203-abcdef.yml"
+
+learned_exclusions: []
