@@ -533,7 +533,7 @@ dev = [
     { name = "ansible-lint", specifier = ">=25.0.0" },
     { name = "mypy", specifier = ">=1.8.0" },
     { name = "pytest", specifier = ">=8.4.1,<9.0.0" },
-    { name = "pytest-cov", specifier = ">=6.0.0" },
+    { name = "pytest-cov", specifier = ">=6.2.0" },
     { name = "pytest-xdist", specifier = ">=3.8.0,<4.0.0" },
     { name = "ruff", specifier = ">=0.12.10,<1.0.0" },
     { name = "types-pyyaml", specifier = ">=6.0.0" },
