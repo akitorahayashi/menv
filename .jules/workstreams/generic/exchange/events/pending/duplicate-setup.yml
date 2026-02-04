@@ -1,0 +1,29 @@
+schema_version: 1
+
+id: "m3n4o5"
+issue_id: ""
+created_at: "2024-05-22"
+author_role: "devops"
+confidence: "high"
+
+title: "Duplicate setup logic for mlx-lm virtual environment"
+statement: |
+  The logic to provision the `mlx-lm` virtual environment is duplicated across multiple workflows, increasing maintenance burden and risk of drift.
+  `lint-and-test.yml` and `setup-python.yml` both manually construct the environment using identical shell commands.
+
+evidence:
+  - path: ".github/workflows/lint-and-test.yml"
+    loc:
+      - "Create mlx-lm venv"
+      - "Install mlx dependencies"
+    note: "Manual venv creation and syncing duplicate logic found elsewhere."
+
+  - path: ".github/workflows/setup-python.yml"
+    loc:
+      - "Create mlx-lm venv"
+      - "Install mlx dependencies"
+    note: "Identical setup block to lint-and-test.yml."
+
+tags:
+  - "maintenance"
+  - "dry"
