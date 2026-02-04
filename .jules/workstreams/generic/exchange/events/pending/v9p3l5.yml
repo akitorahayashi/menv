@@ -1,0 +1,22 @@
+schema_version: 1
+id: "v9p3l5"
+issue_id: ""
+created_at: "2026-02-04"
+author_role: "taxonomy"
+confidence: "high"
+title: "Terminology Mismatch: 'Create' vs 'Deploy'"
+statement: |
+  The CLI command `menv config create` uses the verb "create", while the underlying service method is named `deploy_role`, causing a disconnect between user-facing and internal terminology.
+evidence:
+  - path: "src/menv/commands/config.py"
+    loc:
+      - "@config_app.command(name='create')"
+    note: "CLI exposes the action as 'create'."
+  - path: "src/menv/services/config_deployer.py"
+    loc:
+      - "def deploy_role(self, role: str, overwrite: bool = False) -> DeployResult:"
+    note: "Service implements the action as 'deploy'."
+tags:
+  - "taxonomy"
+  - "vocabulary-mismatch"
+  - "cli"
