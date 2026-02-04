@@ -1,0 +1,31 @@
+schema_version: 1
+
+id: "x9y8z7"
+issue_id: ""
+created_at: "2024-05-22"
+author_role: "devops"
+confidence: "high"
+
+title: "Unpinned toolchains and dependencies in CI"
+statement: |
+  Critical CI components use floating tags or 'latest' versions, creating supply chain risks and non-deterministic builds.
+  GitHub Actions references are pinned to mutable tags (v4, v5) instead of SHAs.
+  Homebrew installations use implicit 'latest'.
+
+evidence:
+  - path: ".github/actions/setup-base/action.yml"
+    loc:
+      - "uses: actions/setup-python@v5"
+      - "uses: extractions/setup-just@v2"
+      - "uses: astral-sh/setup-uv@v5"
+    note: "Actions pinned to mutable tags allow upstream supply chain attacks."
+
+  - path: ".github/workflows/lint-and-test.yml"
+    loc:
+      - "run: brew install shellcheck shfmt"
+    note: "Implicit 'latest' from Homebrew means linting rules can change unexpectedly."
+
+tags:
+  - "security"
+  - "reproducibility"
+  - "supply-chain"
