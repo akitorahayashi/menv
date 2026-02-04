@@ -1,0 +1,24 @@
+schema_version: 1
+id: "sym001"
+issue_id: ""
+created_at: "2026-02-04"
+author_role: "consistency"
+confidence: "high"
+title: "README.md Incorrectly Claims Dotfiles Are Copied (No Symlinks)"
+statement: |
+  The README.md explicitly states that dotfiles are provisioned by copying them into the home directory (no symlinks). However, the implementation in the shell Ansible role uses `state: link`, creating symbolic links. This contradicts the documentation and misinforms users about how their environment is modified.
+evidence:
+  - path: "README.md"
+    loc:
+      - "54"
+    note: "States: 'menv provisions dotfiles by copying them into your home directory (no symlinks)'"
+  - path: "src/menv/ansible/roles/shell/tasks/main.yml"
+    loc:
+      - "6"
+      - "13"
+      - "54"
+    note: "Uses `ansible.builtin.file` with `state: link` for dotfiles."
+tags:
+  - "documentation"
+  - "drift"
+  - "shell"

@@ -1,0 +1,26 @@
+schema_version: 1
+id: "brw001"
+issue_id: ""
+created_at: "2026-02-04"
+author_role: "consistency"
+confidence: "high"
+title: "Brew Formulae Documentation Claims Profile Requirement But Implementation Uses Common Fallback"
+statement: |
+  Documentation in `README.md` and `AGENTS.md` states that `brew-formulae` requires profile specification because it has machine-specific configurations. However, the implementation shows that `brew-formulae` configuration is stored in `config/common/formulae` and the profile-specific directories (e.g., `macbook`) do not contain formulae configurations. The Ansible task logic falls back to the common configuration, making the profile specification unnecessary for obtaining correct configuration.
+evidence:
+  - path: "README.md"
+    loc:
+      - "52"
+    note: "States: 'Only brew-formulae and brew-cask require profile specification since they have machine-specific configurations.'"
+  - path: "src/menv/ansible/roles/brew/tasks/formulae.yml"
+    loc:
+      - "9-11"
+    note: "Uses `first_found` to fallback to `common/formulae/Brewfile` if profile-specific file is missing."
+  - path: "src/menv/ansible/roles/brew/config/profiles/macbook/"
+    loc:
+      - "dir"
+    note: "Does not contain `formulae` directory, only `cask`."
+tags:
+  - "documentation"
+  - "drift"
+  - "brew"
