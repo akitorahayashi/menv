@@ -106,4 +106,7 @@ _find_shell_files:
     @find . -type f \( -name "*.sh" -o -name "*.bash" \) | \
     grep -v "\.git" | \
     grep -v "\.uv-cache" | \
-    grep -v "\.venv"
+    grep -v "\.venv" | \
+    grep -v "\.menv" | \
+    grep -v "site-packages" | \
+    grep -v "node_modules"
