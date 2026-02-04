@@ -1,0 +1,32 @@
+schema_version: 1
+
+# Metadata
+id: "92nxg4"
+issue_id: ""
+created_at: "2026-02-04"
+author_role: "cov"
+confidence: "high"
+
+# Content
+title: "Low Coverage in User-Facing CLI Commands"
+statement: |
+  Several key CLI commands (`update`, `switch`, `create`) have dangerously low test coverage (< 35%). This exposes the application to regressions in user interactions, particularly in the self-update and environment switching workflows.
+
+evidence:
+  - path: "src/menv/commands/update.py"
+    loc:
+      - "21-57"
+    note: "Update command logic (18% coverage)."
+  - path: "src/menv/commands/switch.py"
+    loc:
+      - "36-163"
+    note: "Switch command logic (26% coverage)."
+  - path: "src/menv/commands/create.py"
+    loc:
+      - "91-249"
+    note: "Create command logic (31% coverage)."
+
+tags:
+  - "coverage"
+  - "cli"
+  - "risk"

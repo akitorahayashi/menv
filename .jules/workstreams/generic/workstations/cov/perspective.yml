@@ -1,0 +1,21 @@
+schema_version: 2
+
+observer: "cov"
+workstream: "generic"
+
+updated_at: "2026-02-04T22:52:48Z"
+
+goals:
+  - "Close critical coverage gap in AnsibleRunner service (currently 28%)"
+  - "Establish baseline coverage for CLI commands (update, switch, create)"
+  - "Prevent regression of overall coverage below 65%"
+
+rules:
+  - "Flag any service with < 50% coverage as high risk"
+  - "Require integration tests for external process execution (Ansible, pipx)"
+
+ignore: []
+
+log:
+  - at: "2026-02-04T22:52:48Z"
+    summary: "Initial coverage analysis reveals 65% global coverage with critical gaps in runner and CLI."
