@@ -39,7 +39,7 @@ constraints:
 
 risks:
   - Pinning versions increases maintenance burden; versions must be manually updated or automated (e.g., Renovate/Dependabot).
-  - `macos-15` availability might be lower than `macos-latest` on GitHub's free tier (though usually it's fine for public repos).
+  - '`macos-15` availability might be lower than `macos-latest` on GitHub''s free tier (though usually it''s fine for public repos).'
 
 # Specifics
 affected_areas:
