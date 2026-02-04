@@ -1,0 +1,8 @@
+{
+  "issue_labels": {
+    "refacts": {
+      "color": "1d76db",
+      "description": "Refactoring and technical debt reduction"
+    }
+  }
+}
