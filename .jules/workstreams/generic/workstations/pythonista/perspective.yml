@@ -1,0 +1,22 @@
+schema_version: 2
+
+observer: "pythonista"
+workstream: "generic"
+
+updated_at: "2024-05-22T12:00:00Z"
+
+goals:
+  - "Centralize configuration and domain constants (SSOT) to remove duplication and CLI coupling."
+  - "Standardize exception handling in services: raise typed exceptions instead of swallowing and printing."
+  - "Replace manual TOML generation in ConfigStorage with a proper library (tomli-w)."
+
+rules:
+  - "Services must not print to stdout/stderr; return data or raise exceptions."
+  - "Exceptions must preserve context; avoid bare returns on failure."
+  - "Configuration paths must be defined in one place (AppContext or Config service)."
+
+ignore: []
+
+log:
+  - at: "2024-05-22T12:00:00Z"
+    summary: "Initial analysis: identified manual TOML generation, exception swallowing in services, and domain logic leaks in CLI."
