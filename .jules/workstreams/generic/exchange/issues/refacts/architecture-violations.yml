@@ -37,12 +37,12 @@ desired_outcome: |
   - **Updated Consumers**: `AnsibleRunner` and `ConfigDeployer` are updated to use `AnsiblePaths` for all path resolution.
 
 constraints:
-  - **Ansible Compatibility**: The `system` role in Ansible uses `community.general.osx_defaults` for applying settings. The refactoring must ensure that the backup logic (which generates the YAML used by Ansible) remains compatible with the expected input format of the Ansible role.
-  - **CLI Compatibility**: The CLI interface (`menv backup`, `menv make`) must remain unchanged from the user's perspective.
+  - "**Ansible Compatibility**: The `system` role in Ansible uses `community.general.osx_defaults` for applying settings. The refactoring must ensure that the backup logic (which generates the YAML used by Ansible) remains compatible with the expected input format of the Ansible role."
+  - "**CLI Compatibility**: The CLI interface (`menv backup`, `menv make`) must remain unchanged from the user's perspective."
 
 risks:
-  - **Backup Regression**: If the new `SystemBackupService` fails to replicate the `defaults` command logic exactly (especially special key handling), the backup might be corrupted.
-  - **Path Migration**: Changing how `local_config_root` is resolved must ensure it still points to the correct location to avoid orphaned configurations.
+  - "**Backup Regression**: If the new `SystemBackupService` fails to replicate the `defaults` command logic exactly (especially special key handling), the backup might be corrupted."
+  - "**Path Migration**: Changing how `local_config_root` is resolved must ensure it still points to the correct location to avoid orphaned configurations."
 
 # Specifics
 affected_areas:
