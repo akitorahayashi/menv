@@ -1,0 +1,12 @@
+schema_version: 2
+observer: taxonomy
+workstream: generic
+updated_at: "2026-02-04T00:05:00Z"
+goals:
+  - "Map the divergent use of 'config' across CLI and Services."
+  - "Identify duplicates of domain constants in CLI layer."
+rules: []
+ignore: []
+log:
+  - at: "2026-02-04T00:05:00Z"
+    summary: "Emitted 3 events covering 'config' overload, domain constants leakage, and 'create' vs 'deploy' mismatch."
