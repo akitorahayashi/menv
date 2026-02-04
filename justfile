@@ -103,10 +103,12 @@ clean:
 
 # @hidden
 _find_shell_files:
-    @find . -type f \( -name "*.sh" -o -name "*.bash" \) | \
-    grep -v "\.git" | \
-    grep -v "\.uv-cache" | \
-    grep -v "\.venv" | \
-    grep -v "\.menv" | \
-    grep -v "site-packages" | \
-    grep -v "node_modules"
+    @find . \( \
+        -name ".git" -o \
+        -name ".uv-cache" -o \
+        -name ".venv" -o \
+        -name ".menv" -o \
+        -name "site-packages" -o \
+        -name "node_modules" \
+    \) -prune -o \
+    -type f \( -name "*.sh" -o -name "*.bash" \) -print
