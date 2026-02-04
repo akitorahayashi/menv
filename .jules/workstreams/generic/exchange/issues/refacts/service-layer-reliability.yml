@@ -1,0 +1,52 @@
+schema_version: 2
+
+# Metadata
+id: "svc3m8"
+source_events:
+  - "d4e5f6"
+  - "a1b2c3"
+  - "j2r5t3"
+title: "Service Layer Reliability and Hygiene"
+label: "refacts"
+priority: "medium"
+summary: "Services swallow exceptions, use manual TOML generation, and unsafe cleanup."
+
+# Content
+problem: |
+  The service layer exhibits several anti-patterns that affect reliability and maintainability:
+  1. **Exception Swallowing:** `AnsibleRunner` and `VersionChecker` catch broad exceptions (`FileNotFoundError`, `OSError`) and return exit codes or `None` instead of propagating them or raising domain-specific exceptions. This couples the service to the CLI/UI.
+  2. **Manual TOML Handling:** `ConfigStorage` generates TOML using string concatenation and escaping, which is fragile and error-prone.
+  3. **Unsafe Resource Cleanup:** `AnsiblePaths` relies on `__del__` for cleanup, which is not guaranteed to run and can cause issues during interpreter shutdown.
+
+impact: |
+  - **Fragility:** Manual TOML generation can produce invalid files if edge cases (escaping) aren't handled perfectly.
+  - **Coupling:** Services returning exit codes/printing to console makes them hard to reuse or test programmatically.
+  - **Reliability:** Unsafe cleanup can lead to resource leaks.
+
+desired_outcome: |
+  - Services raise proper exceptions instead of handling them (let the CLI layer handle UI/exit codes).
+  - Use `tomli-w` (or similar) for robust TOML serialization.
+  - Use explicit context managers (`__enter__`/`__exit__`) instead of `__del__` for resource cleanup.
+
+constraints: []
+risks: []
+
+# Specifics
+affected_areas:
+  - "src/menv/services/ansible_runner.py"
+  - "src/menv/services/version_checker.py"
+  - "src/menv/services/config_storage.py"
+  - "src/menv/services/ansible_paths.py"
+
+acceptance_criteria:
+  - "AnsibleRunner raises exceptions on failure instead of returning exit codes (where appropriate for API)."
+  - "ConfigStorage uses a library for TOML writing."
+  - "AnsiblePaths implements context manager protocol."
+
+verification_commands:
+  - "grep 'tomli' pyproject.toml"
+  - "grep '__del__' src/menv/services/ansible_paths.py"
+
+# Analysis Flags
+requires_deep_analysis: false
+deep_analysis_reason: ""
