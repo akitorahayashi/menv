@@ -35,8 +35,8 @@ desired_outcome: |
   - `MockAnsibleRunner` is removed or restricted, and real `AnsibleRunner` is tested with unit tests covering command construction and error handling.
 
 constraints:
-  - Must maintain real-time output streaming for the user experience.
-  - `AnsiblePaths` must be cleaned up reliably at application exit.
+  - "Must maintain real-time output streaming for the user experience."
+  - "`AnsiblePaths` must be cleaned up reliably at application exit."
 
 risks:
   - Changing `AnsiblePaths` to a context manager requires ensuring `__exit__` is always called, which can be tricky with global/singleton usage in `Typer`.
