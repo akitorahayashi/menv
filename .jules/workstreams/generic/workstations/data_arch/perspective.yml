@@ -1,0 +1,19 @@
+schema_version: 2
+
+observer: "data_arch"
+workstream: "generic"
+
+updated_at: "2026-02-04T22:53:12Z"
+
+goals:
+  - "Eliminate manual TOML serialization in ConfigStorage."
+  - "Consolidate redundant configuration paths to establish SSOT."
+  - "Migrate domain constants (TAG_GROUPS, VALID_PROFILES) from CLI to Service layer."
+
+rules: []
+
+ignore: []
+
+log:
+  - at: "2026-02-04T22:53:12Z"
+    summary: "Initial inspection identified manual TOML serialization, SSOT violations in config paths, and domain logic leakage in CLI."
