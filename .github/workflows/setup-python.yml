@@ -10,7 +10,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
 
       - name: Setup base environment
         uses: ./.github/actions/setup-base
@@ -20,17 +20,9 @@ jobs:
 
       - name: Run uv setup
         run: just run make uv 
-        
-      - name: Prepare menv venv directory
-        run: mkdir -p "$HOME/.menv/venvs"
 
-      - name: Create mlx-lm venv
-        run: uv venv "$HOME/.menv/venvs/mlx-lm"
-
-      - name: Install mlx dependencies
-        env:
-          UV_PROJECT_ENVIRONMENT: $HOME/.menv/venvs/mlx-lm
-        run: uv sync --only-group mlx
+      - name: Setup MLX Environment
+        uses: ./.github/actions/setup-mlx
 
       - name: Run python-tools setup
         run: just run make python-tools 

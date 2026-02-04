@@ -1,0 +1,19 @@
+name: Setup MLX Environment
+description: Create and sync mlx-lm virtual environment
+
+runs:
+  using: "composite"
+  steps:
+    - name: Prepare menv venv directory
+      shell: bash
+      run: mkdir -p "$HOME/.menv/venvs"
+
+    - name: Create mlx-lm venv
+      shell: bash
+      run: uv venv "$HOME/.menv/venvs/mlx-lm"
+
+    - name: Install mlx dependencies
+      shell: bash
+      env:
+        UV_PROJECT_ENVIRONMENT: $HOME/.menv/venvs/mlx-lm
+      run: uv sync --only-group mlx
