@@ -1,0 +1,32 @@
+{
+  "issue_labels": {
+    "docs": {
+      "color": "0075ca",
+      "description": "Documentation changes"
+    },
+    "bug": {
+      "color": "d73a4a",
+      "description": "Something isn't working"
+    },
+    "feature": {
+      "color": "a2eeef",
+      "description": "New feature or request"
+    },
+    "refactor": {
+      "color": "0e8a16",
+      "description": "Code change that neither fixes a bug nor adds a feature"
+    },
+    "test": {
+      "color": "fbca04",
+      "description": "Adding or modifying tests"
+    },
+    "chore": {
+      "color": "1d76db",
+      "description": "Routine tasks, maintenance"
+    },
+    "ci": {
+      "color": "c5def5",
+      "description": "CI related changes"
+    }
+  }
+}
