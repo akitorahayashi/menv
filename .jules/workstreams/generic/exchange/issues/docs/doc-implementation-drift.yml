@@ -1,0 +1,45 @@
+schema_version: 2
+
+# Metadata
+id: "doc9p4"
+source_events:
+  - "brw001"
+  - "sym001"
+title: "Documentation vs Implementation Drift"
+label: "docs"
+priority: "medium"
+summary: "README contradicts implementation regarding dotfile symlinking and Brew formulae."
+
+# Content
+problem: |
+  The `README.md` explicitly states that "menv provisions dotfiles by copying them into your home directory (no symlinks)". However, the actual implementation in `src/menv/ansible/roles/shell/tasks/main.yml` uses `state: link`, creating symbolic links.
+
+  Additionally, documentation claims `brew-formulae` requires profile specification due to machine-specific configurations, but the code implements a fallback to `common`, making the profile specification optional in practice.
+
+impact: |
+  - **User Confusion:** Users expect copies but get symlinks, which affects how they manage their dotfiles (e.g. git tracking).
+  - **Misleading Instructions:** Users may waste time creating profile-specific Brewfiles when they aren't strictly necessary.
+
+desired_outcome: |
+  - Documentation is updated to accurately reflect the current implementation (which seems to be the intended behavior).
+  - Specifically, update `README.md` to state that dotfiles are symlinked.
+  - Update `README.md` and `AGENTS.md` to clarify that `brew-formulae` has a common fallback.
+
+constraints: []
+risks: []
+
+# Specifics
+affected_areas:
+  - "README.md"
+  - "AGENTS.md"
+
+acceptance_criteria:
+  - "README.md accurately describes dotfile provisioning (symlinks)."
+  - "README.md accurately describes Brew formulae configuration (common fallback)."
+
+verification_commands:
+  - "grep -i 'symlink' README.md"
+
+# Analysis Flags
+requires_deep_analysis: false
+deep_analysis_reason: ""
