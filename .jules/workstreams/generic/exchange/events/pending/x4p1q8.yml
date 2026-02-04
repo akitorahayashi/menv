@@ -1,0 +1,24 @@
+schema_version: 1
+id: "x4p1q8"
+issue_id: ""
+created_at: "2026-02-04"
+author_role: "structural_arch"
+confidence: "high"
+
+title: "Redundant Definition of Local Configuration Path"
+statement: |
+  The local configuration root path is hardcoded in multiple services, violating the Single Source of Truth principle and creating maintenance fragility.
+
+evidence:
+  - path: "src/menv/services/ansible_runner.py"
+    loc:
+      - "39"
+    note: "local_config_root defined as hardcoded path."
+  - path: "src/menv/services/config_deployer.py"
+    loc:
+      - "26"
+    note: "Same path hardcoded here."
+
+tags:
+  - "dry"
+  - "cohesion"

@@ -1,0 +1,21 @@
+schema_version: 1
+id: "d7k2m9"
+issue_id: ""
+created_at: "2026-02-04"
+author_role: "structural_arch"
+confidence: "high"
+
+title: "Domain Constants Leaking into CLI Layer"
+statement: |
+  Domain definitions for tag groups and valid profiles are located in the CLI command module rather than a shared domain model, violating layer boundaries.
+
+evidence:
+  - path: "src/menv/commands/make.py"
+    loc:
+      - "18-23"
+      - "26-31"
+    note: "TAG_GROUPS and VALID_PROFILES are defined here."
+
+tags:
+  - "boundary-violation"
+  - "cohesion"
