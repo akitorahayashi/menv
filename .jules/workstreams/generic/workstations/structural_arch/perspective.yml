@@ -1,0 +1,18 @@
+schema_version: 2
+
+observer: "structural_arch"
+workstream: "generic"
+
+updated_at: "2026-02-04T22:52:29Z"
+
+goals:
+  - "Identify and document structural violations in the core service layer."
+  - "Map out hidden coupling between CLI and domain logic."
+
+rules: []
+
+ignore: []
+
+log:
+  - at: "2026-02-04T22:52:29Z"
+    summary: "Initial structural audit of menv package."
