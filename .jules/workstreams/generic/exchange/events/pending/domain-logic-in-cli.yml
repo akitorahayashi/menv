@@ -1,0 +1,33 @@
+schema_version: 1
+
+# Metadata
+id: "g7h8i9"
+issue_id: ""
+created_at: "2024-05-22"
+author_role: "pythonista"
+confidence: "high"
+
+# Content
+title: "Domain logic and configuration leaked into CLI layer"
+statement: |
+  Core domain definitions (TAG_GROUPS, VALID_PROFILES) are defined in the CLI command module instead of a central domain model. Additionally, configuration paths like 'local_config_root' are hardcoded redundantly across multiple services, violating the Single Source of Truth principle.
+
+# Evidence supporting the observation
+evidence:
+  - path: "src/menv/commands/make.py"
+    loc:
+      - "17-27"
+    note: "TAG_GROUPS and VALID_PROFILES defined in CLI command."
+  - path: "src/menv/services/ansible_runner.py"
+    loc:
+      - "38"
+    note: "Hardcoded local_config_root path."
+  - path: "src/menv/services/config_deployer.py"
+    loc:
+      - "25"
+    note: "Redundant hardcoded local_config_root path."
+
+tags:
+  - "architecture"
+  - "ssot"
+  - "python"

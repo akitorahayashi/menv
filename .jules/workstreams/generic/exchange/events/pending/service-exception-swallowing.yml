@@ -1,0 +1,30 @@
+schema_version: 1
+
+# Metadata
+id: "d4e5f6"
+issue_id: ""
+created_at: "2024-05-22"
+author_role: "pythonista"
+confidence: "high"
+
+# Content
+title: "Services swallow exceptions and couple to Console"
+statement: |
+  Multiple services (AnsibleRunner, VersionChecker) catch system and network exceptions (FileNotFoundError, OSError, httpx.HTTPError) and return integer exit codes or None after printing directly to Console. This prevents callers from handling errors programmatically and tightly couples the service layer to the presentation layer.
+
+# Evidence supporting the observation
+evidence:
+  - path: "src/menv/services/ansible_runner.py"
+    loc:
+      - "83-93"
+    note: "Catches FileNotFoundError and KeyboardInterrupt, prints to console, and returns exit code."
+  - path: "src/menv/services/version_checker.py"
+    loc:
+      - "43"
+      - "64-70"
+    note: "Swallows HTTP errors returning None; catches OSError/FileNotFoundError returning exit code."
+
+tags:
+  - "design"
+  - "reliability"
+  - "python"
