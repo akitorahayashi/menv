@@ -5,6 +5,7 @@ from __future__ import annotations
 import tomllib
 from pathlib import Path
 
+from menv.constants import CONFIG_ROOT
 from menv.models.config import MenvConfig, VcsIdentityConfig, validate_config
 from menv.protocols.config_storage import ConfigStorageProtocol
 
@@ -20,7 +21,7 @@ class ConfigStorage(ConfigStorageProtocol):
                         Defaults to ~/.config/menv
         """
         if config_dir is None:
-            config_dir = Path.home() / ".config" / "menv"
+            config_dir = CONFIG_ROOT
         self._config_dir = config_dir
         self._config_path = config_dir / "config.toml"
 

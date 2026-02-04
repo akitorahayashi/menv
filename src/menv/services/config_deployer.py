@@ -7,6 +7,7 @@ from functools import cached_property
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from menv.constants import ROLES_DIR
 from menv.protocols.config_deployer import DeployResult
 
 if TYPE_CHECKING:
@@ -23,7 +24,7 @@ class ConfigDeployer:
             ansible_paths: Path resolver for Ansible resources.
         """
         self._ansible_paths = ansible_paths
-        self._local_config_root = Path.home() / ".config" / "menv" / "roles"
+        self._local_config_root = ROLES_DIR
 
     @cached_property
     def roles_with_config(self) -> list[str]:

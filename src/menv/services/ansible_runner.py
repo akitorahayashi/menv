@@ -9,6 +9,7 @@ from pathlib import Path
 
 from rich.console import Console
 
+from menv.constants import ROLES_DIR
 from menv.protocols.ansible_paths import AnsiblePathsProtocol
 from menv.protocols.ansible_runner import AnsibleRunnerProtocol
 from menv.services.ansible_paths import AnsiblePaths
@@ -35,7 +36,7 @@ class AnsibleRunner(AnsibleRunnerProtocol):
         ansible_dir = self._paths.ansible_dir()
         playbook_path = ansible_dir / "playbook.yml"
         config_path = ansible_dir / "ansible.cfg"
-        local_config_root = Path.home() / ".config" / "menv" / "roles"
+        local_config_root = ROLES_DIR
 
         cmd: list[str | Path] = [
             "ansible-playbook",

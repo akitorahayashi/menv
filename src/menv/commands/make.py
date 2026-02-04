@@ -8,27 +8,12 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
+from menv.models.domain import PROFILE_ALIASES, TAG_GROUPS, VALID_PROFILES
+
 if TYPE_CHECKING:
     from menv.context import AppContext
 
 console = Console()
-
-# Predefined tag groups that combine multiple tags
-# These are CLI convenience features, not duplicating SSOT
-TAG_GROUPS = {
-    "rust": ["rust-platform", "rust-tools"],
-    "python": ["python-platform", "python-tools"],
-    "nodejs": ["nodejs-platform", "nodejs-tools"],
-    "go": ["go-platform", "go-tools"],
-}
-
-# Valid profiles and their aliases
-VALID_PROFILES = {"common", "macbook", "mac-mini"}
-PROFILE_ALIASES = {
-    "mmn": "mac-mini",
-    "mbk": "macbook",
-    "cmn": "common",
-}
 
 
 def _get_roles_for_tags(app_ctx: AppContext, tags: list[str]) -> set[str]:
