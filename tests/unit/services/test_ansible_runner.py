@@ -5,6 +5,7 @@ from __future__ import annotations
 import subprocess
 import sys
 from pathlib import Path
+from typing import cast
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
@@ -78,7 +79,7 @@ class TestAnsibleRunner:
         assert env["ANSIBLE_CONFIG"] == str(mock_paths.ansible_dir() / "ansible.cfg")
 
         # Verify console output
-        mock_console.print.assert_called()
+        cast(Mock, mock_console.print).assert_called()
 
     @patch("subprocess.Popen")
     def test_run_playbook_streaming_output(
@@ -115,7 +116,7 @@ class TestAnsibleRunner:
         exit_code = runner.run_playbook("macbook")
 
         assert exit_code == 1
-        mock_console.print.assert_called_with(
+        cast(Mock, mock_console.print).assert_called_with(
             "[bold red]Error:[/] ansible-playbook not found. Please ensure Ansible is installed."
         )
 
@@ -132,7 +133,7 @@ class TestAnsibleRunner:
         exit_code = runner.run_playbook("macbook")
 
         assert exit_code == 130
-        mock_console.print.assert_called_with("\n[yellow]Interrupted by user[/]")
+        cast(Mock, mock_console.print).assert_called_with("\n[yellow]Interrupted by user[/]")
 
     @patch("subprocess.Popen")
     def test_run_playbook_failure(

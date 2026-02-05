@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from typing import cast
 from unittest.mock import Mock
 
 from typer.testing import CliRunner
@@ -24,8 +25,9 @@ class TestUpdateCommand:
         self, cli_runner: CliRunner, mock_app_context: AppContext
     ) -> None:
         """Test update when already on latest version."""
-        checker = mock_app_context.version_checker
-        # Patch methods on the mock instance
+        # Use cast(Mock, ...) to satisfy Mypy
+        checker = cast(Mock, mock_app_context.version_checker)
+        # Assign Mock objects to methods to override behavior
         checker.get_current_version = Mock(return_value="1.0.0")
         checker.get_latest_version = Mock(return_value="1.0.0")
         checker.needs_update = Mock(return_value=False)
@@ -39,7 +41,7 @@ class TestUpdateCommand:
         self, cli_runner: CliRunner, mock_app_context: AppContext
     ) -> None:
         """Test successful update when available."""
-        checker = mock_app_context.version_checker
+        checker = cast(Mock, mock_app_context.version_checker)
         checker.get_current_version = Mock(return_value="1.0.0")
         checker.get_latest_version = Mock(return_value="2.0.0")
         checker.needs_update = Mock(return_value=True)
@@ -57,7 +59,7 @@ class TestUpdateCommand:
         self, cli_runner: CliRunner, mock_app_context: AppContext
     ) -> None:
         """Test update failure."""
-        checker = mock_app_context.version_checker
+        checker = cast(Mock, mock_app_context.version_checker)
         checker.get_current_version = Mock(return_value="1.0.0")
         checker.get_latest_version = Mock(return_value="2.0.0")
         checker.needs_update = Mock(return_value=True)
@@ -72,7 +74,7 @@ class TestUpdateCommand:
         self, cli_runner: CliRunner, mock_app_context: AppContext
     ) -> None:
         """Test network error fetching latest version."""
-        checker = mock_app_context.version_checker
+        checker = cast(Mock, mock_app_context.version_checker)
         checker.get_current_version = Mock(return_value="1.0.0")
         checker.get_latest_version = Mock(return_value=None)
 

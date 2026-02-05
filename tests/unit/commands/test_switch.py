@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import subprocess
+from typing import cast
 from unittest.mock import Mock, patch
 
 from typer.testing import CliRunner
@@ -34,7 +35,8 @@ class TestSwitchCommand:
     ) -> None:
         """Test successful switch to personal profile."""
         # Setup config storage
-        mock_storage = mock_app_context.config_storage
+        mock_storage = cast(Mock, mock_app_context.config_storage)
+        # Assign Mock objects to overrides methods
         mock_storage.exists = Mock(return_value=True)
         mock_storage.get_identity = Mock(return_value={
             "name": "John Doe",
@@ -63,7 +65,7 @@ class TestSwitchCommand:
         self, cli_runner: CliRunner, mock_app_context: AppContext
     ) -> None:
         """Test switch fails if config storage does not exist."""
-        mock_storage = mock_app_context.config_storage
+        mock_storage = cast(Mock, mock_app_context.config_storage)
         mock_storage.exists = Mock(return_value=False)
 
         result = cli_runner.invoke(app, ["switch", "personal"])
@@ -75,7 +77,7 @@ class TestSwitchCommand:
         self, cli_runner: CliRunner, mock_app_context: AppContext
     ) -> None:
         """Test switch fails with invalid profile."""
-        mock_storage = mock_app_context.config_storage
+        mock_storage = cast(Mock, mock_app_context.config_storage)
         mock_storage.exists = Mock(return_value=True)
 
         result = cli_runner.invoke(app, ["switch", "invalid"])
@@ -91,7 +93,7 @@ class TestSwitchCommand:
         mock_app_context: AppContext,
     ) -> None:
         """Test switch fails if git config fails."""
-        mock_storage = mock_app_context.config_storage
+        mock_storage = cast(Mock, mock_app_context.config_storage)
         mock_storage.exists = Mock(return_value=True)
         mock_storage.get_identity = Mock(return_value={
             "name": "John",
@@ -110,7 +112,7 @@ class TestSwitchCommand:
         self, cli_runner: CliRunner, mock_app_context: AppContext
     ) -> None:
         """Test aliases (p -> personal)."""
-        mock_storage = mock_app_context.config_storage
+        mock_storage = cast(Mock, mock_app_context.config_storage)
         mock_storage.exists = Mock(return_value=True)
         mock_storage.get_identity = Mock(return_value={"name": "J", "email": "j@e.c"})
 

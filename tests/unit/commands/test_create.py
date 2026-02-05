@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+from typing import cast
 from unittest.mock import Mock
 
 from typer.testing import CliRunner
 
 from menv.context import AppContext
 from menv.main import app
+from tests.mocks import MockAnsibleRunner
 
 
 class TestCreateCommand:
@@ -45,7 +47,8 @@ class TestCreateCommand:
         self, cli_runner: CliRunner, mock_app_context: AppContext
     ) -> None:
         """Test that create runs full setup with expected calls."""
-        mock_runner = mock_app_context.ansible_runner
+        # Use cast(MockAnsibleRunner, ...) to access attributes like .calls
+        mock_runner = cast(MockAnsibleRunner, mock_app_context.ansible_runner)
 
         result = cli_runner.invoke(app, ["create", "macbook"])
 
@@ -59,15 +62,17 @@ class TestCreateCommand:
         assert len(mock_runner.calls) > 0
 
         # Verify first call is brew-formulae
-        assert mock_runner.calls[0]["tags"] == ["brew-formulae"]
-        assert mock_runner.calls[0]["profile"] == "macbook"
+        # cast(Any, ...) or just ignore type if the structure is known
+        call_info = cast(dict, mock_runner.calls[0])
+        assert call_info["tags"] == ["brew-formulae"]
+        assert call_info["profile"] == "macbook"
 
     def test_create_with_overwrite(
         self, cli_runner: CliRunner, mock_app_context: AppContext
     ) -> None:
         """Test create with overwrite flag."""
         # Setup config deployer to return success
-        mock_deployer = mock_app_context.config_deployer
+        mock_deployer = cast(Mock, mock_app_context.config_deployer)
 
         # Patch deploy_multiple_roles to verify call
         mock_deployer.deploy_multiple_roles = Mock(wraps=mock_deployer.deploy_multiple_roles)
@@ -85,7 +90,7 @@ class TestCreateCommand:
         self, cli_runner: CliRunner, mock_app_context: AppContext
     ) -> None:
         """Test that create stops if a step fails."""
-        mock_runner = mock_app_context.ansible_runner
+        mock_runner = cast(MockAnsibleRunner, mock_app_context.ansible_runner)
 
         # Make the runner fail on the first call
         mock_runner.exit_code = 1
@@ -100,7 +105,7 @@ class TestCreateCommand:
         self, cli_runner: CliRunner, mock_app_context: AppContext
     ) -> None:
         """Test that aliases are resolved (mbk -> macbook)."""
-        mock_runner = mock_app_context.ansible_runner
+        mock_runner = cast(MockAnsibleRunner, mock_app_context.ansible_runner)
 
         result = cli_runner.invoke(app, ["create", "mbk"])
 
@@ -108,4 +113,5 @@ class TestCreateCommand:
         assert "Creating macbook environment" in result.output
 
         # Verify profile passed to runner is resolved
-        assert mock_runner.calls[0]["profile"] == "macbook"
+        call_info = cast(dict, mock_runner.calls[0])
+        assert call_info["profile"] == "macbook"
