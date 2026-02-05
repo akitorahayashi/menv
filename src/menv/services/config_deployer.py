@@ -17,14 +17,19 @@ if TYPE_CHECKING:
 class ConfigDeployer:
     """Deploy role configs from package to ~/.config/menv/."""
 
-    def __init__(self, ansible_paths: AnsiblePathsProtocol) -> None:
+    def __init__(
+        self,
+        ansible_paths: AnsiblePathsProtocol,
+        local_config_root: Path | None = None,
+    ) -> None:
         """Initialize ConfigDeployer.
 
         Args:
             ansible_paths: Path resolver for Ansible resources.
+            local_config_root: Optional override for local config root.
         """
         self._ansible_paths = ansible_paths
-        self._local_config_root = ROLES_DIR
+        self._local_config_root = local_config_root or ROLES_DIR
 
     @cached_property
     def roles_with_config(self) -> list[str]:

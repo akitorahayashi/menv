@@ -53,7 +53,10 @@ class TestConfigDeployer:
         """Create a ConfigDeployer with mocked paths."""
         monkeypatch.setattr(Path, "home", lambda: temp_home)
         mock_paths = MockAnsiblePaths(ansible_dir=temp_ansible_dir)
-        return ConfigDeployer(ansible_paths=mock_paths)
+        return ConfigDeployer(
+            ansible_paths=mock_paths,
+            local_config_root=temp_home / ".config" / "menv" / "roles",
+        )
 
     def test_list_roles_returns_roles_with_config_dirs(
         self, deployer: ConfigDeployer
@@ -259,7 +262,10 @@ class TestDeployMultipleRoles:
         """Create a ConfigDeployer with mocked paths."""
         monkeypatch.setattr(Path, "home", lambda: temp_home)
         mock_paths = MockAnsiblePaths(ansible_dir=temp_ansible_dir)
-        return ConfigDeployer(ansible_paths=mock_paths)
+        return ConfigDeployer(
+            ansible_paths=mock_paths,
+            local_config_root=temp_home / ".config" / "menv" / "roles",
+        )
 
     def test_deploy_multiple_roles_deploys_all_roles(
         self, deployer: ConfigDeployer, temp_home: Path
