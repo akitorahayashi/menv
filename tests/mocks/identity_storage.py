@@ -1,25 +1,25 @@
-"""Mock ConfigStorage implementation."""
+"""Mock IdentityStorage implementation."""
 
 from __future__ import annotations
 
-from menv.models.config import MenvConfig, VcsIdentityConfig
-from menv.protocols import ConfigStorageProtocol
+from menv.models.identity_config import IdentityConfig, VcsIdentityConfig
+from menv.protocols.identity_storage import IdentityStorageProtocol
 
 
-class MockConfigStorage(ConfigStorageProtocol):
-    """In-memory mock configuration storage for testing."""
+class MockIdentityStorage(IdentityStorageProtocol):
+    """In-memory mock identity storage for testing."""
 
-    def __init__(self, config: MenvConfig | None = None) -> None:
+    def __init__(self, config: IdentityConfig | None = None) -> None:
         self._config = config
         self._config_path = "/mock/config/path/config.toml"
 
     def exists(self) -> bool:
         return self._config is not None
 
-    def load(self) -> MenvConfig | None:
+    def load(self) -> IdentityConfig | None:
         return self._config
 
-    def save(self, config: MenvConfig) -> None:
+    def save(self, config: IdentityConfig) -> None:
         self._config = config
 
     def get_identity(self, profile: str) -> VcsIdentityConfig | None:

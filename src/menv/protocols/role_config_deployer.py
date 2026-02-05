@@ -1,4 +1,4 @@
-"""Protocol for config deployment operations."""
+"""Protocol for role config deployment operations."""
 
 from __future__ import annotations
 
@@ -8,8 +8,8 @@ from typing import Protocol
 
 
 @dataclass
-class DeployResult:
-    """Result of a config deployment operation."""
+class RoleConfigCreateResult:
+    """Result of a role config creation operation."""
 
     role: str
     success: bool
@@ -17,8 +17,8 @@ class DeployResult:
     path: Path | None = None
 
 
-class ConfigDeployerProtocol(Protocol):
-    """Config deployment abstraction."""
+class RoleConfigDeployerProtocol(Protocol):
+    """Role config deployment abstraction."""
 
     @property
     def roles_with_config(self) -> list[str]:
@@ -29,26 +29,26 @@ class ConfigDeployerProtocol(Protocol):
         """
         ...
 
-    def deploy_role(self, role: str, overwrite: bool = False) -> DeployResult:
-        """Deploy config for a single role to ~/.config/menv/roles/{role}/.
+    def create_role_config(self, role: str, overwrite: bool = False) -> RoleConfigCreateResult:
+        """Create config for a single role in ~/.config/menv/roles/{role}/.
 
         Args:
-            role: The role name to deploy.
+            role: The role name to create config for.
             overwrite: If True, overwrite existing config.
 
         Returns:
-            DeployResult with success status and message.
+            RoleConfigCreateResult with success status and message.
         """
         ...
 
-    def deploy_all(self, overwrite: bool = False) -> list[DeployResult]:
-        """Deploy configs for all roles.
+    def create_all_role_configs(self, overwrite: bool = False) -> list[RoleConfigCreateResult]:
+        """Create configs for all roles.
 
         Args:
             overwrite: If True, overwrite existing configs.
 
         Returns:
-            List of DeployResult for each role.
+            List of RoleConfigCreateResult for each role.
         """
         ...
 
@@ -93,17 +93,17 @@ class ConfigDeployerProtocol(Protocol):
         """
         ...
 
-    def deploy_multiple_roles(
+    def create_multiple_role_configs(
         self, roles: list[str], overwrite: bool = False
-    ) -> list[DeployResult]:
-        """Deploy configs for multiple roles, stopping on first failure.
+    ) -> list[RoleConfigCreateResult]:
+        """Create configs for multiple roles, stopping on first failure.
 
         Args:
-            roles: List of role names to deploy.
+            roles: List of role names to create configs for.
             overwrite: If True, overwrite existing configs.
 
         Returns:
-            List of DeployResult for each role attempted.
-            Stops early if any deployment fails.
+            List of RoleConfigCreateResult for each role attempted.
+            Stops early if any creation fails.
         """
         ...

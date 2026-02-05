@@ -9,9 +9,9 @@ from menv.context import AppContext
 from tests.mocks import (
     MockAnsiblePaths,
     MockAnsibleRunner,
-    MockConfigDeployer,
-    MockConfigStorage,
+    MockIdentityStorage,
     MockPlaybook,
+    MockRoleConfigDeployer,
     MockVersionChecker,
 )
 
@@ -21,11 +21,11 @@ def mock_app_context() -> AppContext:
     """Create a mock application context."""
     ansible_paths = MockAnsiblePaths()
     return AppContext(
-        config_storage=MockConfigStorage(),
+        identity_storage=MockIdentityStorage(),
         ansible_paths=ansible_paths,
         ansible_runner=MockAnsibleRunner(),
         version_checker=MockVersionChecker(),
-        config_deployer=MockConfigDeployer(),
+        role_config_deployer=MockRoleConfigDeployer(),
         playbook=MockPlaybook(),
     )
 

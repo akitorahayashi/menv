@@ -110,7 +110,7 @@ def switch(
     app_ctx: AppContext = ctx.obj
 
     # Check if config exists
-    if not app_ctx.config_storage.exists():
+    if not app_ctx.identity_storage.exists():
         console.print("[red]Error:[/] No configuration found.")
         console.print("Run [cyan]menv config set[/] first to configure identities.")
         raise typer.Exit(code=1)
@@ -123,7 +123,7 @@ def switch(
         raise typer.Exit(code=1)
 
     # Get identity configuration
-    identity = app_ctx.config_storage.get_identity(resolved_profile)
+    identity = app_ctx.identity_storage.get_identity(resolved_profile)
     if identity is None:
         console.print(f"[red]Error:[/] Failed to load {resolved_profile} identity.")
         raise typer.Exit(code=1)

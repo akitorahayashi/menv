@@ -15,9 +15,9 @@ from menv.commands.update import update
 from menv.context import AppContext
 from menv.services.ansible_paths import AnsiblePaths
 from menv.services.ansible_runner import AnsibleRunner
-from menv.services.config_deployer import ConfigDeployer
-from menv.services.config_storage import ConfigStorage
+from menv.services.identity_storage import IdentityStorage
 from menv.services.playbook import Playbook
+from menv.services.role_config_deployer import RoleConfigDeployer
 from menv.services.version_checker import VersionChecker
 
 console = Console()
@@ -70,11 +70,11 @@ def main(
     if ctx.obj is None:
         ansible_paths = AnsiblePaths()
         ctx.obj = AppContext(
-            config_storage=ConfigStorage(),
+            identity_storage=IdentityStorage(),
             ansible_paths=ansible_paths,
             ansible_runner=AnsibleRunner(paths=ansible_paths),
             version_checker=VersionChecker(),
-            config_deployer=ConfigDeployer(ansible_paths=ansible_paths),
+            role_config_deployer=RoleConfigDeployer(ansible_paths=ansible_paths),
             playbook=Playbook(ansible_paths=ansible_paths),
         )
 

@@ -7,12 +7,12 @@ from unittest.mock import patch
 
 import pytest
 
-from menv.services.config_deployer import ConfigDeployer
+from menv.services.role_config_deployer import RoleConfigDeployer
 from tests.mocks import MockAnsiblePaths
 
 
-class TestConfigDeployer:
-    """Tests for the ConfigDeployer service."""
+class TestRoleConfigDeployer:
+    """Tests for the RoleConfigDeployer service."""
 
     @pytest.fixture
     def temp_home(self, tmp_path: Path) -> Path:
@@ -49,14 +49,14 @@ class TestConfigDeployer:
     @pytest.fixture
     def deployer(
         self, temp_ansible_dir: Path, temp_home: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> ConfigDeployer:
-        """Create a ConfigDeployer with mocked paths."""
+    ) -> RoleConfigDeployer:
+        """Create a RoleConfigDeployer with mocked paths."""
         monkeypatch.setattr(Path, "home", lambda: temp_home)
         mock_paths = MockAnsiblePaths(ansible_dir=temp_ansible_dir)
-        return ConfigDeployer(ansible_paths=mock_paths)
+        return RoleConfigDeployer(ansible_paths=mock_paths)
 
     def test_list_roles_returns_roles_with_config_dirs(
-        self, deployer: ConfigDeployer
+        self, deployer: RoleConfigDeployer
     ) -> None:
         """Test that list_roles returns roles that have config directories."""
         roles = deployer.list_roles()
@@ -68,7 +68,7 @@ class TestConfigDeployer:
         assert len(roles) == 2
 
     def test_get_local_config_path(
-        self, deployer: ConfigDeployer, temp_home: Path
+        self, deployer: RoleConfigDeployer, temp_home: Path
     ) -> None:
         """Test that local config path is correctly constructed."""
         path = deployer.get_local_config_path("rust")
@@ -76,7 +76,7 @@ class TestConfigDeployer:
         assert path == temp_home / ".config" / "menv" / "roles" / "rust"
 
     def test_get_package_config_path(
-        self, deployer: ConfigDeployer, temp_ansible_dir: Path
+        self, deployer: RoleConfigDeployer, temp_ansible_dir: Path
     ) -> None:
         """Test that package config path is correctly constructed."""
         path = deployer.get_package_config_path("rust")
@@ -84,36 +84,36 @@ class TestConfigDeployer:
         assert path == temp_ansible_dir / "roles" / "rust" / "config"
 
     def test_is_deployed_returns_false_when_not_deployed(
-        self, deployer: ConfigDeployer
+        self, deployer: RoleConfigDeployer
     ) -> None:
         """Test that is_deployed returns False when config doesn't exist."""
         assert deployer.is_deployed("rust") is False
 
     def test_is_deployed_returns_true_after_deployment(
-        self, deployer: ConfigDeployer
+        self, deployer: RoleConfigDeployer
     ) -> None:
         """Test that is_deployed returns True after successful deployment."""
-        deployer.deploy_role("rust")
+        deployer.create_role_config("rust")
 
         assert deployer.is_deployed("rust") is True
 
-    def test_deploy_role_creates_config_directory(
-        self, deployer: ConfigDeployer, temp_home: Path
+    def test_create_role_config_creates_config_directory(
+        self, deployer: RoleConfigDeployer, temp_home: Path
     ) -> None:
-        """Test that deploy_role creates the config directory."""
-        result = deployer.deploy_role("rust")
+        """Test that create_role_config creates the config directory."""
+        result = deployer.create_role_config("rust")
 
         assert result.success is True
-        assert "Deployed" in result.message
+        assert "Created config" in result.message
         expected_path = temp_home / ".config" / "menv" / "roles" / "rust"
         assert expected_path.exists()
         assert (expected_path / "common" / ".rust-version").exists()
 
-    def test_deploy_role_copies_files(
-        self, deployer: ConfigDeployer, temp_home: Path
+    def test_create_role_config_copies_files(
+        self, deployer: RoleConfigDeployer, temp_home: Path
     ) -> None:
-        """Test that deploy_role copies config files correctly."""
-        deployer.deploy_role("rust")
+        """Test that create_role_config copies config files correctly."""
+        deployer.create_role_config("rust")
 
         rust_version_path = (
             temp_home
@@ -126,12 +126,12 @@ class TestConfigDeployer:
         )
         assert rust_version_path.read_text() == "1.75.0"
 
-    def test_deploy_role_skips_if_exists_without_overwrite(
-        self, deployer: ConfigDeployer, temp_home: Path
+    def test_create_role_config_skips_if_exists_without_overwrite(
+        self, deployer: RoleConfigDeployer, temp_home: Path
     ) -> None:
-        """Test that deploy_role skips deployment if config exists."""
+        """Test that create_role_config skips deployment if config exists."""
         # First deployment
-        deployer.deploy_role("rust")
+        deployer.create_role_config("rust")
 
         # Modify the local file
         local_file = (
@@ -146,19 +146,19 @@ class TestConfigDeployer:
         local_file.write_text("1.80.0")
 
         # Second deployment without overwrite
-        result = deployer.deploy_role("rust", overwrite=False)
+        result = deployer.create_role_config("rust", overwrite=False)
 
         assert result.success is True
         assert "already exists" in result.message
         # File should not be overwritten
         assert local_file.read_text() == "1.80.0"
 
-    def test_deploy_role_overwrites_with_overwrite(
-        self, deployer: ConfigDeployer, temp_home: Path
+    def test_create_role_config_overwrites_with_overwrite(
+        self, deployer: RoleConfigDeployer, temp_home: Path
     ) -> None:
-        """Test that deploy_role overwrites config with overwrite flag."""
+        """Test that create_role_config overwrites config with overwrite flag."""
         # First deployment
-        deployer.deploy_role("rust")
+        deployer.create_role_config("rust")
 
         # Modify the local file
         local_file = (
@@ -173,54 +173,54 @@ class TestConfigDeployer:
         local_file.write_text("1.80.0")
 
         # Second deployment with overwrite
-        result = deployer.deploy_role("rust", overwrite=True)
+        result = deployer.create_role_config("rust", overwrite=True)
 
         assert result.success is True
-        assert "Deployed" in result.message
+        assert "Created config" in result.message
         # File should be overwritten with original value
         assert local_file.read_text() == "1.75.0"
 
-    def test_deploy_role_fails_for_invalid_role(self, deployer: ConfigDeployer) -> None:
-        """Test that deploy_role fails for non-existent role."""
-        result = deployer.deploy_role("nonexistent")
+    def test_create_role_config_fails_for_invalid_role(self, deployer: RoleConfigDeployer) -> None:
+        """Test that create_role_config fails for non-existent role."""
+        result = deployer.create_role_config("nonexistent")
 
         assert result.success is False
         assert "does not have a config directory" in result.message
 
-    def test_deploy_role_handles_oserror(self, deployer: ConfigDeployer) -> None:
-        """Test that deploy_role handles OSError during file operations."""
+    def test_create_role_config_handles_oserror(self, deployer: RoleConfigDeployer) -> None:
+        """Test that create_role_config handles OSError during file operations."""
         role = "rust"
 
         with patch(
-            "menv.services.config_deployer.shutil.copytree",
+            "menv.services.role_config_deployer.shutil.copytree",
             side_effect=OSError("Permission denied"),
         ):
-            result = deployer.deploy_role(role)
+            result = deployer.create_role_config(role)
 
             assert result.success is False
             assert "Permission denied" in result.message
 
-    def test_deploy_all_deploys_all_roles(self, deployer: ConfigDeployer) -> None:
-        """Test that deploy_all deploys all roles."""
-        results = deployer.deploy_all()
+    def test_create_all_role_configs_creates_all_roles(self, deployer: RoleConfigDeployer) -> None:
+        """Test that create_all_role_configs creates all roles."""
+        results = deployer.create_all_role_configs()
 
         # All results should have success=True (either deployed or not found in package)
         successful = [r for r in results if r.success]
         assert len(successful) >= 2  # At least rust and brew should succeed
 
-    def test_deploy_role_fails_for_role_without_config_directory(
-        self, deployer: ConfigDeployer
+    def test_create_role_config_fails_for_role_without_config_directory(
+        self, deployer: RoleConfigDeployer
     ) -> None:
-        """Test that deploy_role fails for a role without a config directory."""
+        """Test that create_role_config fails for a role without a config directory."""
         # python role has no config directory in our test setup
-        result = deployer.deploy_role("python")
+        result = deployer.create_role_config("python")
 
         assert result.success is False
         assert "does not have a config directory" in result.message
 
 
-class TestDeployMultipleRoles:
-    """Tests for the deploy_multiple_roles method."""
+class TestCreateMultipleRoleConfigs:
+    """Tests for the create_multiple_role_configs method."""
 
     @pytest.fixture
     def temp_home(self, tmp_path: Path) -> Path:
@@ -255,17 +255,17 @@ class TestDeployMultipleRoles:
     @pytest.fixture
     def deployer(
         self, temp_ansible_dir: Path, temp_home: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> ConfigDeployer:
-        """Create a ConfigDeployer with mocked paths."""
+    ) -> RoleConfigDeployer:
+        """Create a RoleConfigDeployer with mocked paths."""
         monkeypatch.setattr(Path, "home", lambda: temp_home)
         mock_paths = MockAnsiblePaths(ansible_dir=temp_ansible_dir)
-        return ConfigDeployer(ansible_paths=mock_paths)
+        return RoleConfigDeployer(ansible_paths=mock_paths)
 
-    def test_deploy_multiple_roles_deploys_all_roles(
-        self, deployer: ConfigDeployer, temp_home: Path
+    def test_create_multiple_role_configs_creates_all_roles(
+        self, deployer: RoleConfigDeployer, temp_home: Path
     ) -> None:
-        """Test that deploy_multiple_roles deploys all specified roles."""
-        results = deployer.deploy_multiple_roles(["rust", "shell", "go"])
+        """Test that create_multiple_role_configs creates all specified roles."""
+        results = deployer.create_multiple_role_configs(["rust", "shell", "go"])
 
         assert len(results) == 3
         assert all(r.success for r in results)
@@ -275,12 +275,12 @@ class TestDeployMultipleRoles:
         assert (temp_home / ".config" / "menv" / "roles" / "shell").exists()
         assert (temp_home / ".config" / "menv" / "roles" / "go").exists()
 
-    def test_deploy_multiple_roles_stops_on_first_failure(
-        self, deployer: ConfigDeployer, temp_home: Path
+    def test_create_multiple_role_configs_stops_on_first_failure(
+        self, deployer: RoleConfigDeployer, temp_home: Path
     ) -> None:
-        """Test that deploy_multiple_roles stops on first failure."""
+        """Test that create_multiple_role_configs stops on first failure."""
         # Include an invalid role in the middle
-        results = deployer.deploy_multiple_roles(["rust", "nonexistent", "shell"])
+        results = deployer.create_multiple_role_configs(["rust", "nonexistent", "shell"])
 
         # Should have 2 results: rust (success) and nonexistent (failure)
         assert len(results) == 2
@@ -292,18 +292,18 @@ class TestDeployMultipleRoles:
         # shell should NOT be deployed because we stopped early
         assert not (temp_home / ".config" / "menv" / "roles" / "shell").exists()
 
-    def test_deploy_multiple_roles_empty_list(self, deployer: ConfigDeployer) -> None:
-        """Test that deploy_multiple_roles with empty list returns empty results."""
-        results = deployer.deploy_multiple_roles([])
+    def test_create_multiple_role_configs_empty_list(self, deployer: RoleConfigDeployer) -> None:
+        """Test that create_multiple_role_configs with empty list returns empty results."""
+        results = deployer.create_multiple_role_configs([])
 
         assert results == []
 
-    def test_deploy_multiple_roles_with_overwrite(
-        self, deployer: ConfigDeployer, temp_home: Path
+    def test_create_multiple_role_configs_with_overwrite(
+        self, deployer: RoleConfigDeployer, temp_home: Path
     ) -> None:
-        """Test that deploy_multiple_roles respects overwrite flag."""
+        """Test that create_multiple_role_configs respects overwrite flag."""
         # First deployment
-        deployer.deploy_multiple_roles(["rust"])
+        deployer.create_multiple_role_configs(["rust"])
 
         # Modify local file
         local_file = (
@@ -318,7 +318,7 @@ class TestDeployMultipleRoles:
         local_file.write_text("modified")
 
         # Second deployment with overwrite
-        results = deployer.deploy_multiple_roles(["rust"], overwrite=True)
+        results = deployer.create_multiple_role_configs(["rust"], overwrite=True)
 
         assert len(results) == 1
         assert results[0].success is True

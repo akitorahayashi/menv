@@ -99,7 +99,7 @@ def backup(
         raise typer.Exit(code=1)
 
     # Calculate local config directory (output destination)
-    local_config_dir = app_ctx.config_deployer.get_local_config_path(role) / subpath
+    local_config_dir = app_ctx.role_config_deployer.get_local_config_path(role) / subpath
 
     command = [sys.executable, str(script_path), str(local_config_dir)]
 
@@ -112,7 +112,7 @@ def backup(
             )
             # Fallback to package definitions
             package_definitions_path = (
-                app_ctx.config_deployer.get_package_config_path(role)
+                app_ctx.role_config_deployer.get_package_config_path(role)
                 / subpath
                 / "definitions"
             )

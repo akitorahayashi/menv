@@ -2,7 +2,7 @@
 
 import pytest
 
-from menv.models.config import ConfigValidationError, validate_config
+from menv.models.identity_config import IdentityConfigValidationError, validate_config
 
 
 class TestConfigValidation:
@@ -20,7 +20,7 @@ class TestConfigValidation:
     def test_invalid_type_not_dict(self) -> None:
         """Test that non-dict input raises error."""
         with pytest.raises(
-            ConfigValidationError, match="Configuration must be a dictionary"
+            IdentityConfigValidationError, match="Configuration must be a dictionary"
         ):
             validate_config("not a dict")
 
@@ -30,7 +30,7 @@ class TestConfigValidation:
             "personal": {"name": "User", "email": "user@example.com"},
             # Missing work section
         }
-        with pytest.raises(ConfigValidationError, match="Missing section: 'work'"):
+        with pytest.raises(IdentityConfigValidationError, match="Missing section: 'work'"):
             validate_config(data)
 
     def test_section_not_dict(self) -> None:
@@ -40,7 +40,7 @@ class TestConfigValidation:
             "work": {"name": "Work", "email": "work@example.com"},
         }
         with pytest.raises(
-            ConfigValidationError, match="Section 'personal' must be a dictionary"
+            IdentityConfigValidationError, match="Section 'personal' must be a dictionary"
         ):
             validate_config(data)
 
@@ -51,7 +51,7 @@ class TestConfigValidation:
             "work": {"name": "Work", "email": "work@example.com"},
         }
         with pytest.raises(
-            ConfigValidationError, match="Missing field in 'personal': 'email'"
+            IdentityConfigValidationError, match="Missing field in 'personal': 'email'"
         ):
             validate_config(data)
 
@@ -62,7 +62,7 @@ class TestConfigValidation:
             "work": {"name": "Work", "email": "work@example.com"},
         }
         with pytest.raises(
-            ConfigValidationError, match="Field 'personal.name' must be a string"
+            IdentityConfigValidationError, match="Field 'personal.name' must be a string"
         ):
             validate_config(data)
 
@@ -73,7 +73,7 @@ class TestConfigValidation:
             "work": {"name": "Work", "email": "work@example.com"},
         }
         with pytest.raises(
-            ConfigValidationError, match="Field 'personal.name' cannot be empty"
+            IdentityConfigValidationError, match="Field 'personal.name' cannot be empty"
         ):
             validate_config(data)
 
@@ -84,6 +84,6 @@ class TestConfigValidation:
             "work": {"name": "Work", "email": "work@example.com"},
         }
         with pytest.raises(
-            ConfigValidationError, match="Field 'personal.name' cannot be empty"
+            IdentityConfigValidationError, match="Field 'personal.name' cannot be empty"
         ):
             validate_config(data)

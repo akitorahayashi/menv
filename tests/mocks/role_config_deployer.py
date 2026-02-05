@@ -1,14 +1,17 @@
-"""Mock ConfigDeployer implementation."""
+"""Mock RoleConfigDeployer implementation."""
 
 from __future__ import annotations
 
 from pathlib import Path
 
-from menv.protocols.config_deployer import ConfigDeployerProtocol, DeployResult
+from menv.protocols.role_config_deployer import (
+    RoleConfigCreateResult,
+    RoleConfigDeployerProtocol,
+)
 
 
-class MockConfigDeployer(ConfigDeployerProtocol):
-    """In-memory mock config deployer for testing."""
+class MockRoleConfigDeployer(RoleConfigDeployerProtocol):
+    """In-memory mock role config deployer for testing."""
 
     def __init__(
         self,
@@ -45,7 +48,7 @@ class MockConfigDeployer(ConfigDeployerProtocol):
         """Return list of roles with config directories."""
         return self._roles_with_config
 
-    def deploy_role(self, role: str, overwrite: bool = False) -> DeployResult:
+    def create_role_config(self, role: str, overwrite: bool = False) -> RoleConfigCreateResult:
         """Mock deploy config for a single role.
 
         Args:
@@ -53,10 +56,10 @@ class MockConfigDeployer(ConfigDeployerProtocol):
             overwrite: If True, overwrite existing config.
 
         Returns:
-            DeployResult with success status and message.
+            RoleConfigCreateResult with success status and message.
         """
         if role not in self.roles_with_config:
-            return DeployResult(
+            return RoleConfigCreateResult(
                 role=role,
                 success=False,
                 message=f"Role '{role}' does not have a config directory.",
@@ -65,7 +68,7 @@ class MockConfigDeployer(ConfigDeployerProtocol):
         local_path = self.get_local_config_path(role)
 
         if role in self._deployed_roles and not overwrite:
-            return DeployResult(
+            return RoleConfigCreateResult(
                 role=role,
                 success=True,
                 message="Config already exists (use --overwrite to overwrite).",
@@ -73,25 +76,25 @@ class MockConfigDeployer(ConfigDeployerProtocol):
             )
 
         self._deployed_roles.add(role)
-        return DeployResult(
+        return RoleConfigCreateResult(
             role=role,
             success=True,
             message=f"Deployed config to {local_path}",
             path=local_path,
         )
 
-    def deploy_all(self, overwrite: bool = False) -> list[DeployResult]:
+    def create_all_role_configs(self, overwrite: bool = False) -> list[RoleConfigCreateResult]:
         """Mock deploy configs for all roles.
 
         Args:
             overwrite: If True, overwrite existing configs.
 
         Returns:
-            List of DeployResult for each role.
+            List of RoleConfigCreateResult for each role.
         """
         results = []
         for role in self.roles_with_config:
-            result = self.deploy_role(role, overwrite=overwrite)
+            result = self.create_role_config(role, overwrite=overwrite)
             results.append(result)
         return results
 
@@ -136,22 +139,22 @@ class MockConfigDeployer(ConfigDeployerProtocol):
         """
         return list(self.roles_with_config)
 
-    def deploy_multiple_roles(
+    def create_multiple_role_configs(
         self, roles: list[str], overwrite: bool = False
-    ) -> list[DeployResult]:
-        """Deploy configs for multiple roles, stopping on first failure.
+    ) -> list[RoleConfigCreateResult]:
+        """Create configs for multiple roles, stopping on first failure.
 
         Args:
             roles: List of role names to deploy.
             overwrite: If True, overwrite existing configs.
 
         Returns:
-            List of DeployResult for each role attempted.
+            List of RoleConfigCreateResult for each role attempted.
             Stops early if any deployment fails.
         """
         results = []
         for role in roles:
-            result = self.deploy_role(role, overwrite=overwrite)
+            result = self.create_role_config(role, overwrite=overwrite)
             results.append(result)
             if not result.success:
                 break

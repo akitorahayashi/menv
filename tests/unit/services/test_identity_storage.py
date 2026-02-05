@@ -6,16 +6,20 @@ from pathlib import Path
 
 import pytest
 
-from menv.models.config import ConfigValidationError, MenvConfig, VcsIdentityConfig
-from menv.services.config_storage import ConfigStorage
+from menv.models.identity_config import (
+    IdentityConfig,
+    IdentityConfigValidationError,
+    VcsIdentityConfig,
+)
+from menv.services.identity_storage import IdentityStorage
 
 
-class TestConfigStorage:
-    """Tests for ConfigStorage."""
+class TestIdentityStorage:
+    """Tests for IdentityStorage."""
 
     def test_get_config_path_returns_string(self, tmp_path: Path) -> None:
         """Test that get_config_path returns a string path."""
-        storage = ConfigStorage(tmp_path)
+        storage = IdentityStorage(tmp_path)
         result = storage.get_config_path()
 
         assert isinstance(result, str)
@@ -23,13 +27,13 @@ class TestConfigStorage:
 
     def test_exists_returns_false_when_no_config(self, tmp_path: Path) -> None:
         """Test exists returns False when no config file."""
-        storage = ConfigStorage(tmp_path)
+        storage = IdentityStorage(tmp_path)
         assert storage.exists() is False
 
     def test_exists_returns_true_when_config_exists(self, tmp_path: Path) -> None:
         """Test exists returns True when config file exists."""
-        storage = ConfigStorage(tmp_path)
-        config = MenvConfig(
+        storage = IdentityStorage(tmp_path)
+        config = IdentityConfig(
             personal=VcsIdentityConfig(name="Test", email="test@example.com"),
             work=VcsIdentityConfig(name="Work", email="work@example.com"),
         )
@@ -39,43 +43,43 @@ class TestConfigStorage:
 
     def test_load_returns_none_when_not_exists(self, tmp_path: Path) -> None:
         """Test that load returns None when file doesn't exist."""
-        storage = ConfigStorage(tmp_path)
+        storage = IdentityStorage(tmp_path)
         result = storage.load()
         assert result is None
 
 
-class TestConfigSaveLoad:
+class TestIdentitySaveLoad:
     """Tests for saving and loading configuration."""
 
     def test_load_raises_validation_error(self, tmp_path: Path) -> None:
-        """Test that load raises ConfigValidationError for invalid file."""
+        """Test that load raises IdentityConfigValidationError for invalid file."""
         config_dir = tmp_path / "config"
         config_dir.mkdir()
         config_path = config_dir / "config.toml"
         # Invalid config (missing fields)
         config_path.write_text('[personal]\nname="User"\n')
 
-        storage = ConfigStorage(config_dir)
-        with pytest.raises(ConfigValidationError):
+        storage = IdentityStorage(config_dir)
+        with pytest.raises(IdentityConfigValidationError):
             storage.load()
 
     def test_save_raises_validation_error(self, tmp_path: Path) -> None:
-        """Test that save raises ConfigValidationError for invalid data."""
-        storage = ConfigStorage(tmp_path)
+        """Test that save raises IdentityConfigValidationError for invalid data."""
+        storage = IdentityStorage(tmp_path)
         # Invalid config (empty name)
-        config = MenvConfig(
+        config = IdentityConfig(
             personal=VcsIdentityConfig(name="", email="test@example.com"),
             work=VcsIdentityConfig(name="Work", email="work@example.com"),
         )
 
-        with pytest.raises(ConfigValidationError):
+        with pytest.raises(IdentityConfigValidationError):
             storage.save(config)
 
     def test_save_and_load_config(self, tmp_path: Path) -> None:
         """Test that config can be saved and loaded."""
-        storage = ConfigStorage(tmp_path)
+        storage = IdentityStorage(tmp_path)
 
-        config = MenvConfig(
+        config = IdentityConfig(
             personal=VcsIdentityConfig(name="Test User", email="test@example.com"),
             work=VcsIdentityConfig(name="Work User", email="work@company.com"),
         )
@@ -91,9 +95,9 @@ class TestConfigSaveLoad:
     def test_save_creates_directory(self, tmp_path: Path) -> None:
         """Test that save creates config directory if needed."""
         config_dir = tmp_path / "nested" / "config"
-        storage = ConfigStorage(config_dir)
+        storage = IdentityStorage(config_dir)
 
-        config = MenvConfig(
+        config = IdentityConfig(
             personal=VcsIdentityConfig(name="Test", email="test@example.com"),
             work=VcsIdentityConfig(name="Work", email="work@example.com"),
         )
@@ -108,9 +112,9 @@ class TestGetIdentity:
 
     def test_get_identity_personal(self, tmp_path: Path) -> None:
         """Test getting personal identity."""
-        storage = ConfigStorage(tmp_path)
+        storage = IdentityStorage(tmp_path)
 
-        config = MenvConfig(
+        config = IdentityConfig(
             personal=VcsIdentityConfig(name="Personal", email="personal@example.com"),
             work=VcsIdentityConfig(name="Work", email="work@example.com"),
         )
@@ -124,9 +128,9 @@ class TestGetIdentity:
 
     def test_get_identity_work(self, tmp_path: Path) -> None:
         """Test getting work identity."""
-        storage = ConfigStorage(tmp_path)
+        storage = IdentityStorage(tmp_path)
 
-        config = MenvConfig(
+        config = IdentityConfig(
             personal=VcsIdentityConfig(name="Personal", email="personal@example.com"),
             work=VcsIdentityConfig(name="Work", email="work@example.com"),
         )
@@ -140,9 +144,9 @@ class TestGetIdentity:
 
     def test_get_identity_invalid_profile(self, tmp_path: Path) -> None:
         """Test getting identity with invalid profile returns None."""
-        storage = ConfigStorage(tmp_path)
+        storage = IdentityStorage(tmp_path)
 
-        config = MenvConfig(
+        config = IdentityConfig(
             personal=VcsIdentityConfig(name="Personal", email="personal@example.com"),
             work=VcsIdentityConfig(name="Work", email="work@example.com"),
         )
@@ -153,7 +157,7 @@ class TestGetIdentity:
 
     def test_get_identity_no_config(self, tmp_path: Path) -> None:
         """Test getting identity when no config exists returns None."""
-        storage = ConfigStorage(tmp_path)
+        storage = IdentityStorage(tmp_path)
         identity = storage.get_identity("personal")
         assert identity is None
 
@@ -163,9 +167,9 @@ class TestSpecialCharacters:
 
     def test_save_and_load_with_quotes(self, tmp_path: Path) -> None:
         """Test that quotes in names are properly escaped."""
-        storage = ConfigStorage(tmp_path)
+        storage = IdentityStorage(tmp_path)
 
-        config = MenvConfig(
+        config = IdentityConfig(
             personal=VcsIdentityConfig(
                 name='Test "Nick" User', email="test@example.com"
             ),
@@ -179,9 +183,9 @@ class TestSpecialCharacters:
 
     def test_save_and_load_with_backslash(self, tmp_path: Path) -> None:
         """Test that backslashes in values are properly escaped."""
-        storage = ConfigStorage(tmp_path)
+        storage = IdentityStorage(tmp_path)
 
-        config = MenvConfig(
+        config = IdentityConfig(
             personal=VcsIdentityConfig(name=r"User\Name", email="test@example.com"),
             work=VcsIdentityConfig(name="Work User", email="work@example.com"),
         )

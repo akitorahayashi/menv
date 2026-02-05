@@ -9,9 +9,9 @@ if TYPE_CHECKING:
     from menv.protocols import (
         AnsiblePathsProtocol,
         AnsibleRunnerProtocol,
-        ConfigDeployerProtocol,
-        ConfigStorageProtocol,
+        IdentityStorageProtocol,
         PlaybookProtocol,
+        RoleConfigDeployerProtocol,
         VersionCheckerProtocol,
     )
 
@@ -20,9 +20,9 @@ if TYPE_CHECKING:
 class AppContext:
     """Application context container for DI."""
 
-    config_storage: ConfigStorageProtocol
+    identity_storage: IdentityStorageProtocol
     ansible_paths: AnsiblePathsProtocol
     ansible_runner: AnsibleRunnerProtocol
     version_checker: VersionCheckerProtocol
-    config_deployer: ConfigDeployerProtocol
+    role_config_deployer: RoleConfigDeployerProtocol
     playbook: PlaybookProtocol

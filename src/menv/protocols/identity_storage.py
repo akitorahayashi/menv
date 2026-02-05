@@ -1,15 +1,15 @@
-"""Configuration storage protocol definition."""
+"""Identity storage protocol definition."""
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Protocol
 
 if TYPE_CHECKING:
-    from menv.models.config import MenvConfig, VcsIdentityConfig
+    from menv.models.identity_config import IdentityConfig, VcsIdentityConfig
 
 
-class ConfigStorageProtocol(Protocol):
-    """Configuration storage abstraction."""
+class IdentityStorageProtocol(Protocol):
+    """Identity storage abstraction."""
 
     def exists(self) -> bool:
         """Check if configuration file exists.
@@ -19,7 +19,7 @@ class ConfigStorageProtocol(Protocol):
         """
         ...
 
-    def load(self) -> MenvConfig | None:
+    def load(self) -> IdentityConfig | None:
         """Load configuration from storage.
 
         Returns:
@@ -27,7 +27,7 @@ class ConfigStorageProtocol(Protocol):
         """
         ...
 
-    def save(self, config: MenvConfig) -> None:
+    def save(self, config: IdentityConfig) -> None:
         """Save configuration to storage.
 
         Args:

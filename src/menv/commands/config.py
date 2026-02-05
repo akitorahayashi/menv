@@ -8,7 +8,11 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from menv.models.config import ConfigValidationError, MenvConfig, VcsIdentityConfig
+from menv.models.identity_config import (
+    IdentityConfig,
+    IdentityConfigValidationError,
+    VcsIdentityConfig,
+)
 
 if TYPE_CHECKING:
     from menv.context import AppContext
@@ -27,14 +31,14 @@ def show_config(ctx: typer.Context) -> None:
     """Display current VCS identity configuration."""
     app_ctx: AppContext = ctx.obj
 
-    if not app_ctx.config_storage.exists():
+    if not app_ctx.identity_storage.exists():
         console.print("[yellow]No configuration found.[/]")
         console.print("Run [cyan]menv config set[/] to configure.")
         raise typer.Exit(code=1)
 
     try:
-        config = app_ctx.config_storage.load()
-    except ConfigValidationError as e:
+        config = app_ctx.identity_storage.load()
+    except IdentityConfigValidationError as e:
         console.print(f"[red]Error:[/] Invalid configuration: {e}")
         raise typer.Exit(code=1)
 
@@ -42,7 +46,7 @@ def show_config(ctx: typer.Context) -> None:
         console.print("[red]Error:[/] Failed to load configuration.")
         raise typer.Exit(code=1)
 
-    console.print(f"[dim]Config file:[/] {app_ctx.config_storage.get_config_path()}")
+    console.print(f"[dim]Config file:[/] {app_ctx.identity_storage.get_config_path()}")
     console.print()
 
     table = Table(show_header=True)
@@ -66,8 +70,8 @@ def set_config(ctx: typer.Context) -> None:
 
     # Load existing config for defaults
     try:
-        existing = app_ctx.config_storage.load()
-    except ConfigValidationError:
+        existing = app_ctx.identity_storage.load()
+    except IdentityConfigValidationError:
         console.print(
             "[yellow]Warning:[/] Existing configuration is invalid. "
             "Proceeding with defaults."
@@ -99,19 +103,19 @@ def set_config(ctx: typer.Context) -> None:
     )
 
     # Save configuration
-    config = MenvConfig(
+    config = IdentityConfig(
         personal=VcsIdentityConfig(name=personal_name, email=personal_email),
         work=VcsIdentityConfig(name=work_name, email=work_email),
     )
     try:
-        app_ctx.config_storage.save(config)
-    except ConfigValidationError as e:
+        app_ctx.identity_storage.save(config)
+    except IdentityConfigValidationError as e:
         console.print(f"[red]Error:[/] Invalid configuration: {e}")
         raise typer.Exit(code=1)
 
     console.print()
     console.print(
-        f"[green]Configuration saved to {app_ctx.config_storage.get_config_path()}[/]"
+        f"[green]Configuration saved to {app_ctx.identity_storage.get_config_path()}[/]"
     )
 
 
@@ -144,7 +148,7 @@ def create_config(
 
     if role:
         # Deploy single role
-        result = app_ctx.config_deployer.deploy_role(role, overwrite=overwrite)
+        result = app_ctx.role_config_deployer.create_role_config(role, overwrite=overwrite)
         if result.success:
             console.print(f"[green]✓[/] {result.role}: {result.message}")
         else:
@@ -152,7 +156,7 @@ def create_config(
             raise typer.Exit(code=1)
     else:
         # Deploy all roles
-        results = app_ctx.config_deployer.deploy_all(overwrite=overwrite)
+        results = app_ctx.role_config_deployer.create_all_role_configs(overwrite=overwrite)
         success_count = 0
         fail_count = 0
 

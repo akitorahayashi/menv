@@ -180,7 +180,7 @@ def create(
     console.print()
 
     # Collect all unique roles that need config deployment
-    roles_with_config = set(app_ctx.config_deployer.roles_with_config)
+    roles_with_config = set(app_ctx.role_config_deployer.roles_with_config)
     roles_to_deploy = {
         role
         for tag in FULL_SETUP_TAGS
@@ -191,7 +191,7 @@ def create(
     # Deploy configs for all roles upfront using deploy_multiple_roles
     if roles_to_deploy:
         console.print("[bold]Deploying configurations...[/]")
-        results = app_ctx.config_deployer.deploy_multiple_roles(
+        results = app_ctx.role_config_deployer.create_multiple_role_configs(
             sorted(list(roles_to_deploy)), overwrite=overwrite
         )
 

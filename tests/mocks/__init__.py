@@ -2,16 +2,16 @@
 
 from .ansible_paths import MockAnsiblePaths
 from .ansible_runner import MockAnsibleRunner
-from .config_deployer import MockConfigDeployer
-from .config_storage import MockConfigStorage
+from .identity_storage import MockIdentityStorage
 from .playbook import MockPlaybook
+from .role_config_deployer import MockRoleConfigDeployer
 from .version_checker import MockVersionChecker
 
 __all__ = [
     "MockAnsiblePaths",
     "MockAnsibleRunner",
-    "MockConfigDeployer",
-    "MockConfigStorage",
+    "MockRoleConfigDeployer",
+    "MockIdentityStorage",
     "MockPlaybook",
     "MockVersionChecker",
 ]

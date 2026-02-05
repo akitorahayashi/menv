@@ -1,16 +1,20 @@
-"""Filesystem-based configuration storage implementation."""
+"""Filesystem-based identity storage implementation."""
 
 from __future__ import annotations
 
 import tomllib
 from pathlib import Path
 
-from menv.models.config import MenvConfig, VcsIdentityConfig, validate_config
-from menv.protocols.config_storage import ConfigStorageProtocol
+from menv.models.identity_config import (
+    IdentityConfig,
+    VcsIdentityConfig,
+    validate_config,
+)
+from menv.protocols.identity_storage import IdentityStorageProtocol
 
 
-class ConfigStorage(ConfigStorageProtocol):
-    """Filesystem-based configuration storage."""
+class IdentityStorage(IdentityStorageProtocol):
+    """Filesystem-based identity storage."""
 
     def __init__(self, config_dir: Path | None = None) -> None:
         """Initialize filesystem config storage.
@@ -32,7 +36,7 @@ class ConfigStorage(ConfigStorageProtocol):
         """
         return self._config_path.exists()
 
-    def load(self) -> MenvConfig | None:
+    def load(self) -> IdentityConfig | None:
         """Load configuration from file.
 
         Returns:
@@ -46,7 +50,7 @@ class ConfigStorage(ConfigStorageProtocol):
 
         return validate_config(data)
 
-    def save(self, config: MenvConfig) -> None:
+    def save(self, config: IdentityConfig) -> None:
         """Save configuration to file.
 
         Args:

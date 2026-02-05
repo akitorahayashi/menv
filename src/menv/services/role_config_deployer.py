@@ -1,4 +1,4 @@
-"""Config deployment service implementation."""
+"""Role config deployment service implementation."""
 
 from __future__ import annotations
 
@@ -7,17 +7,17 @@ from functools import cached_property
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from menv.protocols.config_deployer import DeployResult
+from menv.protocols.role_config_deployer import RoleConfigCreateResult
 
 if TYPE_CHECKING:
     from menv.protocols.ansible_paths import AnsiblePathsProtocol
 
 
-class ConfigDeployer:
+class RoleConfigDeployer:
     """Deploy role configs from package to ~/.config/menv/."""
 
     def __init__(self, ansible_paths: AnsiblePathsProtocol) -> None:
-        """Initialize ConfigDeployer.
+        """Initialize RoleConfigDeployer.
 
         Args:
             ansible_paths: Path resolver for Ansible resources.
@@ -40,18 +40,18 @@ class ConfigDeployer:
                     found_roles.append(role_path.name)
         return sorted(found_roles)
 
-    def deploy_role(self, role: str, overwrite: bool = False) -> DeployResult:
-        """Deploy config for a single role to ~/.config/menv/roles/{role}/.
+    def create_role_config(self, role: str, overwrite: bool = False) -> RoleConfigCreateResult:
+        """Create config for a single role to ~/.config/menv/roles/{role}/.
 
         Args:
-            role: The role name to deploy.
+            role: The role name to create config for.
             overwrite: If True, overwrite existing config.
 
         Returns:
-            DeployResult with success status and message.
+            RoleConfigCreateResult with success status and message.
         """
         if role not in self.roles_with_config:
-            return DeployResult(
+            return RoleConfigCreateResult(
                 role=role,
                 success=False,
                 message=f"Role '{role}' does not have a config directory.",
@@ -59,7 +59,7 @@ class ConfigDeployer:
 
         package_config = self.get_package_config_path(role)
         if not package_config.exists():
-            return DeployResult(
+            return RoleConfigCreateResult(
                 role=role,
                 success=False,
                 message=f"Package config not found: {package_config}",
@@ -69,7 +69,7 @@ class ConfigDeployer:
 
         # Check if already deployed
         if local_config.exists() and not overwrite:
-            return DeployResult(
+            return RoleConfigCreateResult(
                 role=role,
                 success=True,
                 message="Config already exists (use --overwrite to overwrite).",
@@ -87,31 +87,31 @@ class ConfigDeployer:
             # Copy config directory
             shutil.copytree(package_config, local_config)
         except OSError as e:
-            return DeployResult(
+            return RoleConfigCreateResult(
                 role=role,
                 success=False,
-                message=f"Failed to deploy config: {e}",
+                message=f"Failed to create config: {e}",
             )
 
-        return DeployResult(
+        return RoleConfigCreateResult(
             role=role,
             success=True,
-            message=f"Deployed config to {local_config}",
+            message=f"Created config at {local_config}",
             path=local_config,
         )
 
-    def deploy_all(self, overwrite: bool = False) -> list[DeployResult]:
-        """Deploy configs for all roles.
+    def create_all_role_configs(self, overwrite: bool = False) -> list[RoleConfigCreateResult]:
+        """Create configs for all roles.
 
         Args:
             overwrite: If True, overwrite existing configs.
 
         Returns:
-            List of DeployResult for each role.
+            List of RoleConfigCreateResult for each role.
         """
         results = []
         for role in self.roles_with_config:
-            result = self.deploy_role(role, overwrite=overwrite)
+            result = self.create_role_config(role, overwrite=overwrite)
             results.append(result)
         return results
 
@@ -156,22 +156,22 @@ class ConfigDeployer:
         """
         return list(self.roles_with_config)
 
-    def deploy_multiple_roles(
+    def create_multiple_role_configs(
         self, roles: list[str], overwrite: bool = False
-    ) -> list[DeployResult]:
-        """Deploy configs for multiple roles, stopping on first failure.
+    ) -> list[RoleConfigCreateResult]:
+        """Create configs for multiple roles, stopping on first failure.
 
         Args:
-            roles: List of role names to deploy.
+            roles: List of role names to create configs for.
             overwrite: If True, overwrite existing configs.
 
         Returns:
-            List of DeployResult for each role attempted.
-            Stops early if any deployment fails.
+            List of RoleConfigCreateResult for each role attempted.
+            Stops early if any creation fails.
         """
         results = []
         for role in roles:
-            result = self.deploy_role(role, overwrite=overwrite)
+            result = self.create_role_config(role, overwrite=overwrite)
             results.append(result)
             if not result.success:
                 break
