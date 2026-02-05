@@ -39,7 +39,7 @@ fix:
     @files=$(just _find_shell_files); \
     if [ -n "$files" ]; then \
         echo "Found shell files to format"; \
-        shfmt -w -d $files; \
+        shfmt -w $files; \
     fi
     @uv run ansible-lint src/menv/ansible/ --fix || true
 
@@ -103,7 +103,6 @@ clean:
 
 # @hidden
 _find_shell_files:
-    @find . -type f \( -name "*.sh" -o -name "*.bash" \) | \
-    grep -v "\.git" | \
-    grep -v "\.uv-cache" | \
-    grep -v "\.venv"
+    @find . \
+        \( -name ".git" -o -name ".uv-cache" -o -name ".venv" -o -name ".menv" -o -name "venvs" -o -name "site-packages" -o -name "node_modules" -o -name "lib" \) -prune \
+        -o -type f \( -name "*.sh" -o -name "*.bash" \) -print
