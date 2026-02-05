@@ -33,7 +33,7 @@ PROFILE_ALIASES = {
 
 def _get_roles_for_tags(app_ctx: AppContext, tags: list[str]) -> set[str]:
     """Get unique role names for a list of tags that have config directories."""
-    roles_with_config = set(app_ctx.config_deployer.roles_with_config)
+    roles_with_config = set(app_ctx.role_config_deployer.roles_with_config)
     return {
         role
         for tag in tags
@@ -50,8 +50,8 @@ def _deploy_configs_for_roles(
     Returns True if all deployments succeeded, False otherwise.
     """
     for role in roles:
-        if overwrite or not app_ctx.config_deployer.is_deployed(role):
-            result = app_ctx.config_deployer.deploy_role(role, overwrite=overwrite)
+        if overwrite or not app_ctx.role_config_deployer.is_deployed(role):
+            result = app_ctx.role_config_deployer.create_role_config(role, overwrite=overwrite)
             if result.success:
                 # Only print a message for newly deployed or overwritten configs
                 if overwrite or "already exists" not in result.message:
