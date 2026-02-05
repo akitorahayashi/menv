@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+from unittest.mock import Mock
+
 from typer.testing import CliRunner
 
+from menv.context import AppContext
 from menv.main import app
 
 
@@ -38,37 +41,71 @@ class TestCreateCommand:
         # Should show error about missing argument
         assert result.exit_code != 0 or "PROFILE" in result.output
 
-    def test_create_macbook_alias_mbk_works(self, cli_runner: CliRunner) -> None:
-        """Test that mbk alias is accepted."""
-        result = cli_runner.invoke(app, ["create", "mbk", "--help"])
+    def test_create_runs_full_setup(
+        self, cli_runner: CliRunner, mock_app_context: AppContext
+    ) -> None:
+        """Test that create runs full setup with expected calls."""
+        mock_runner = mock_app_context.ansible_runner
 
-        # --help should show the command help without running it
-        assert result.exit_code == 0
-
-    def test_create_mac_mini_alias_mmn_works(self, cli_runner: CliRunner) -> None:
-        """Test that mmn alias is accepted."""
-        result = cli_runner.invoke(app, ["create", "mmn", "--help"])
-
-        # --help should show the command help without running it
-        assert result.exit_code == 0
-
-    def test_create_shows_verbose_option(self, cli_runner: CliRunner) -> None:
-        """Test that create shows --verbose/-v option."""
-        result = cli_runner.invoke(app, ["create", "--help"])
+        result = cli_runner.invoke(app, ["create", "macbook"])
 
         assert result.exit_code == 0
-        assert "--verbose" in result.output or "-v" in result.output
+        assert "Creating macbook environment" in result.output
+        assert "Deploying configurations" in result.output
+        assert "Environment created successfully" in result.output
 
-    def test_create_shows_overwrite_option(self, cli_runner: CliRunner) -> None:
-        """Test that create --help shows --overwrite/-o option."""
-        result = cli_runner.invoke(app, ["create", "--help"])
+        # Verify runner calls
+        # We expect multiple calls to run_playbook, one for each tag in FULL_SETUP_TAGS
+        assert len(mock_runner.calls) > 0
+
+        # Verify first call is brew-formulae
+        assert mock_runner.calls[0]["tags"] == ["brew-formulae"]
+        assert mock_runner.calls[0]["profile"] == "macbook"
+
+    def test_create_with_overwrite(
+        self, cli_runner: CliRunner, mock_app_context: AppContext
+    ) -> None:
+        """Test create with overwrite flag."""
+        # Setup config deployer to return success
+        mock_deployer = mock_app_context.config_deployer
+
+        # Patch deploy_multiple_roles to verify call
+        mock_deployer.deploy_multiple_roles = Mock(wraps=mock_deployer.deploy_multiple_roles)
+
+        result = cli_runner.invoke(app, ["create", "mac-mini", "--overwrite"])
 
         assert result.exit_code == 0
-        assert "--overwrite" in result.output or "-o" in result.output
 
-    def test_create_overwrite_option_accepted(self, cli_runner: CliRunner) -> None:
-        """Test that --overwrite option is accepted without error."""
-        result = cli_runner.invoke(app, ["create", "macbook", "--overwrite", "--help"])
+        # Verify deployer was called with overwrite=True
+        mock_deployer.deploy_multiple_roles.assert_called()
+        args, kwargs = mock_deployer.deploy_multiple_roles.call_args
+        assert kwargs["overwrite"] is True
 
-        # --help should show command help without running
+    def test_create_fails_if_runner_fails(
+        self, cli_runner: CliRunner, mock_app_context: AppContext
+    ) -> None:
+        """Test that create stops if a step fails."""
+        mock_runner = mock_app_context.ansible_runner
+
+        # Make the runner fail on the first call
+        mock_runner.exit_code = 1
+
+        result = cli_runner.invoke(app, ["create", "macbook"])
+
+        assert result.exit_code == 1
+        assert "Failed with exit code 1" in result.output
+        assert "Setup failed at step" in result.output
+
+    def test_create_handles_aliases(
+        self, cli_runner: CliRunner, mock_app_context: AppContext
+    ) -> None:
+        """Test that aliases are resolved (mbk -> macbook)."""
+        mock_runner = mock_app_context.ansible_runner
+
+        result = cli_runner.invoke(app, ["create", "mbk"])
+
         assert result.exit_code == 0
+        assert "Creating macbook environment" in result.output
+
+        # Verify profile passed to runner is resolved
+        assert mock_runner.calls[0]["profile"] == "macbook"

@@ -20,7 +20,7 @@ class MockPlaybook(PlaybookProtocol):
         """
         self._tags_map = tags_map or {
             "brew": ["brew-formulae", "brew-cask"],
-            "python": ["python-platform", "python-tools", "aider", "uv"],
+            "python": ["python-platform", "python-tools", "aider", "uv", "mlx"],
             "nodejs": ["nodejs-platform", "nodejs-tools", "llm"],
             "ruby": ["ruby"],
             "rust": ["rust-platform", "rust-tools"],
@@ -29,8 +29,9 @@ class MockPlaybook(PlaybookProtocol):
             "gh": ["gh"],
             "shell": ["shell"],
             "ssh": ["ssh"],
-            "editor": ["editor", "vscode", "cursor", "xcode"],
+            "editor": ["editor", "vscode", "cursor", "xcode", "coder"],
             "system": ["system"],
+            "ollama": ["ollama", "ollama-models"],
         }
 
         # Build reverse mapping
