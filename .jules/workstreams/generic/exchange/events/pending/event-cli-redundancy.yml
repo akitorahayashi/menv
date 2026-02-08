@@ -1,0 +1,30 @@
+schema_version: 1
+
+# Metadata
+id: "h7j2k9"
+issue_id: ""
+created_at: "2024-05-23"
+author_role: "tactician"
+confidence: "high"
+
+# Content
+title: "AGENTS.md violates SSOT with redundant CLI command documentation"
+statement: |
+  The `AGENTS.md` file contains a "CLI Commands" table that duplicates the command list and descriptions found in `README.md`. This redundancy violates the Single Source of Truth principle, creating a maintenance burden where updates must be synchronized across two files. The table in `AGENTS.md` should be removed in favor of a pointer to `README.md`, which serves as the canonical source for usage documentation.
+
+# Evidence supporting the observation
+evidence:
+  - path: "AGENTS.md"
+    loc:
+      - "5-18"
+    note: "Contains a markdown table listing CLI commands and their descriptions."
+
+  - path: "README.md"
+    loc:
+      - "38-112"
+    note: "Contains the 'Usage' section with detailed examples covering the same CLI commands."
+
+tags:
+  - "agents-contract"
+  - "ssot-violation"
+  - "documentation-redundancy"
