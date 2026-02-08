@@ -1,0 +1,49 @@
+schema_version: 2
+
+# Metadata
+id: "ae4036"
+source_events:
+  - "c9l3n6"
+  - "f0g4h7"
+title: "Clarify Taxonomy and CLI Verbs"
+label: "refacts"
+priority: "medium"
+summary: "Clarify the usage of 'Config' and 'Create' terminology to avoid confusion between Identity and Dotfiles."
+
+# Content
+problem: |
+  The codebase uses confusing terminology:
+  1. "Config" is overloaded. It refers to "User Identity" (git/vcs config) in `MenvConfig`/`VcsIdentityConfig`, but also "Application Configuration" (dotfiles) in `app_ctx.config_deployer`.
+  2. "Create" is overloaded. `menv create` provisions a full environment (complex, multi-step), while `menv config create` copies default configuration files (simple deployment).
+
+impact: |
+  - **Confusion**: Users may run the wrong command or misunderstand what "config" refers to.
+  - **Code Clarity**: Developers struggle to distinguish between identity management and dotfile deployment.
+
+desired_outcome: |
+  - Rename "User Identity" components to clearly distinguish them from "Configuration" (dotfiles). E.g., `IdentityConfig`, `IdentityStorage`.
+  - Rename `menv config` commands to reflect their purpose (e.g., `menv identity`).
+  - Rename `menv config create` to something more descriptive like `menv config deploy` or `menv config init`.
+  - Ensure consistent usage of "create" vs "deploy" vs "provision".
+
+constraints: []
+risks: []
+
+# Specifics
+affected_areas:
+  - "src/menv/models/config.py"
+  - "src/menv/services/config_storage.py"
+  - "src/menv/commands/config.py"
+
+acceptance_criteria:
+  - "Config related to identity is clearly named (e.g., IdentityConfig)."
+  - "Config related to dotfiles is clearly named (e.g., RoleConfig)."
+  - "CLI commands are intuitive and distinct."
+
+verification_commands:
+  - "menv --help" # Check command names
+  - "grep -r 'Config' src/menv/models/" # Check code terminology
+
+# Analysis Flags
+requires_deep_analysis: false
+deep_analysis_reason: ""

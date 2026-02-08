@@ -1,0 +1,46 @@
+schema_version: 2
+
+# Metadata
+id: "c49eb8"
+source_events:
+  - "h0i1j2"
+  - "v8k3m1"
+title: "Improve Test Reliability and Coverage"
+label: "tests"
+priority: "medium"
+summary: "Improve test reliability by removing fragile mirror logic and increasing coverage for core services."
+
+# Content
+problem: |
+  1. `tests/intg/test_role_integrity.py` implements a custom Python parser for Ansible files (using regexes) to validate file references. This duplicates Ansible's internal logic, making the tests fragile and prone to drift or false failures.
+  2. The `AnsibleRunner` service has critically low coverage (28%) and lacks tests for the core `run_playbook` method and error handling.
+
+impact: |
+  - **Flakiness**: Mirror logic tests can fail unexpectedly if Ansible syntax changes or complex Jinja2 expressions are used.
+  - **Coverage**: Low coverage in core services means regressions might go unnoticed.
+
+desired_outcome: |
+  - Replace the "Mirror Logic" in `test_role_integrity.py` with a more robust testing strategy (e.g., parsing with `ansible-lint` or similar, or just validating logic without parsing). Or simply remove the fragile parts if they provide little value over integration tests.
+  - Increase test coverage for `AnsibleRunner` and other core services to > 90%.
+
+constraints: []
+risks: []
+
+# Specifics
+affected_areas:
+  - "tests/intg/test_role_integrity.py"
+  - "src/menv/services/ansible_runner.py"
+  - "tests/unit/services/test_ansible_runner.py"
+
+acceptance_criteria:
+  - "Fragile regex-based parsing is removed or replaced."
+  - "AnsibleRunner has high test coverage (> 90%)."
+  - "Tests pass consistently."
+
+verification_commands:
+  - "just test"
+  - "coverage report"
+
+# Analysis Flags
+requires_deep_analysis: false
+deep_analysis_reason: ""

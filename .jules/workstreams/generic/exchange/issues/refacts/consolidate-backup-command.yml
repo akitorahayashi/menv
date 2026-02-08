@@ -1,0 +1,61 @@
+schema_version: 2
+
+# Metadata
+id: "4d2eb3"
+source_events:
+  - "a7m4d2"
+  - "b4c5d6"
+  - "bkpatn"
+  - "e7f8g9"
+  - "b3c4k5"
+  - "j9l4n2"
+  - "b9x1y3"
+  - "x7k3m2"
+title: "Consolidate Backup Command Implementation"
+label: "refacts"
+priority: "high"
+summary: "Consolidate the backup command implementation to remove ambiguity, dead code, and architecture violations."
+
+# Content
+problem: |
+  The backup command is currently fragmented and duplicated across multiple locations:
+  1. `src/menv/commands/backup.py`: A deprecated single-file implementation using subprocess calls with 0% test coverage.
+  2. `src/menv/commands/backup/`: A package-based implementation using services but violating architecture patterns (functional style).
+  3. `src/menv/ansible/scripts/system/backup-system.py`: Standalone scripts that duplicate logic found in the services.
+
+  This fragmentation creates ambiguity about the authoritative implementation, introduces dead code, and violates the Single Source of Truth principle.
+
+impact: |
+  - **Maintenance Burden**: Developers must update multiple locations to change backup logic.
+  - **Confusion**: It is unclear which implementation is active.
+  - **Risk**: The active implementation has issues (functional style instead of Protocol/Service), and the dead code poses a risk of accidental usage or regression.
+
+desired_outcome: |
+  - A single, authoritative backup command implementation located in `src/menv/commands/backup/`.
+  - Removal of the deprecated `src/menv/commands/backup.py` file.
+  - Refactoring of backup services to strictly follow the Service/Protocol pattern with dependency injection.
+  - Elimination of logic duplication between services and scripts (scripts should arguably be removed or call into shared libraries if possible, or services should call scripts if that is the design).
+  - High test coverage for the consolidated implementation.
+
+constraints: []
+risks: []
+
+# Specifics
+affected_areas:
+  - "src/menv/commands/backup.py"
+  - "src/menv/commands/backup/"
+  - "src/menv/ansible/scripts/"
+
+acceptance_criteria:
+  - "`src/menv/commands/backup.py` is deleted."
+  - "Backup command works as expected (verified via manual test or existing integration tests)."
+  - "Backup services use classes and Protocols, not functional style."
+  - "Test coverage for backup command and services is > 90%."
+
+verification_commands:
+  - "ls src/menv/commands/backup.py" # Should fail
+  - "just test" # Should pass
+
+# Analysis Flags
+requires_deep_analysis: false
+deep_analysis_reason: ""

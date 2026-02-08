@@ -1,0 +1,49 @@
+schema_version: 2
+
+# Metadata
+id: "027e6b"
+source_events:
+  - "h5j3k9"
+  - "m7n2p4"
+  - "q8r1s5"
+title: "Enhance CI/CD Pipeline"
+label: "feats"
+priority: "high"
+summary: "Enhance CI/CD pipeline by pinning dependencies, ensuring deterministic builds, and adding a release workflow."
+
+# Content
+problem: |
+  1. Critical CI actions (`actions/setup-python`, `astral-sh/setup-uv`) are referenced by mutable tags (`@v5`), exposing the pipeline to supply-chain attacks.
+  2. Linter installation (shellcheck, shfmt) is non-deterministic (uses `brew install`), potentially causing irreproducibility.
+  3. The repository lacks an automated release workflow to build and publish artifacts to GitHub Releases or PyPI.
+
+impact: |
+  - **Security**: Supply chain risks.
+  - **Stability**: Breaking changes in dependencies can break the build unexpectedly.
+  - **Release**: Manual release process is error-prone and lacks provenance.
+
+desired_outcome: |
+  - Pin all GitHub Actions to immutable SHAs.
+  - Pin linter versions or use a deterministic tool manager (like `uv tool install` or similar if applicable, or pin brew versions if possible).
+  - Add a release workflow (`.github/workflows/release.yml`) to automate artifact generation and publishing on tag push.
+
+constraints: []
+risks: []
+
+# Specifics
+affected_areas:
+  - ".github/workflows/"
+  - ".github/actions/setup-base/"
+
+acceptance_criteria:
+  - "All actions are pinned to SHAs."
+  - "Linter installation is deterministic."
+  - "A release workflow exists and builds artifacts successfully."
+
+verification_commands:
+  - "grep '@v[0-9]' .github/workflows/*.yml" # Should be empty or minimal
+  - "ls .github/workflows/release.yml"
+
+# Analysis Flags
+requires_deep_analysis: false
+deep_analysis_reason: ""

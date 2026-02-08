@@ -1,0 +1,45 @@
+schema_version: 2
+
+# Metadata
+id: "088850"
+source_events:
+  - "y9n4p1"
+  - "z2q5r8"
+title: "Fix Documentation Drift"
+label: "bugs"
+priority: "low"
+summary: "Fix discrepancies between implementation and documentation (LLM alias, Aider)."
+
+# Content
+problem: |
+  1. The `llm` shell alias symlinks `AGENTS.md` to `.claude/CLAUDE.md`, but workstation memory claims it symlinks `README.md`.
+  2. The `aider` integration is fully implemented but undocumented in the user-facing `README.md`.
+
+impact: |
+  - **Confusion**: Users may not know about the `aider` feature or the context provided to LLMs via aliases.
+  - **Inaccuracy**: Documentation is out of date with the codebase.
+
+desired_outcome: |
+  - Update `README.md` to include the `aider` feature.
+  - Verify and align the `llm` alias behavior with documentation/intent (likely update docs to reflect code, or update code if docs were correct). Given memory says "updated to symlink README", check if that was intentional. If code does AGENTS.md, maybe it should be README.md or both. Let's assume aligning docs to code or code to docs.
+  - Fix the discrepancy.
+
+constraints: []
+risks: []
+
+# Specifics
+affected_areas:
+  - "README.md"
+  - "src/menv/ansible/roles/shell/config/common/alias/llm/llm.sh"
+
+acceptance_criteria:
+  - "`aider` is documented in `README.md`."
+  - "`llm` alias behavior is consistent with documentation and intent."
+
+verification_commands:
+  - "grep 'aider' README.md"
+  - "cat src/menv/ansible/roles/shell/config/common/alias/llm/llm.sh"
+
+# Analysis Flags
+requires_deep_analysis: false
+deep_analysis_reason: ""

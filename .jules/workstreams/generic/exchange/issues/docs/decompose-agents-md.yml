@@ -1,0 +1,48 @@
+schema_version: 2
+
+# Metadata
+id: "b76170"
+source_events:
+  - "m4n5p6"
+  - "h7j2k9"
+title: "Decompose AGENTS.md and Remove Duplication"
+label: "docs"
+priority: "medium"
+summary: "Decompose AGENTS.md into nested scopes and remove redundant CLI command documentation."
+
+# Content
+problem: |
+  The `AGENTS.md` file is monolithic and contains implementation details and rules for specific sub-directories (Services, Protocols, Mocks, Ansible Roles) that belong in nested `AGENTS.md` files.
+  It also duplicates the CLI command list and descriptions found in `README.md`, violating the Single Source of Truth principle.
+
+impact: |
+  - **Bloat**: `AGENTS.md` is large and contains irrelevant information for specific contexts.
+  - **Inconsistency**: Updating CLI commands in one file requires checking the other.
+  - **Clarity**: It's harder for agents to find the relevant rules for a specific directory.
+
+desired_outcome: |
+  - Decompose `AGENTS.md` into nested `AGENTS.md` files at their respective ownership boundaries (e.g., `src/menv/services/AGENTS.md`).
+  - Remove the "CLI Commands" table from `AGENTS.md` and refer to `README.md` as the canonical source.
+
+constraints: []
+risks: []
+
+# Specifics
+affected_areas:
+  - "AGENTS.md"
+  - "README.md"
+  - "src/menv/services/AGENTS.md" (new)
+  - "src/menv/protocols/AGENTS.md" (new)
+
+acceptance_criteria:
+  - "`AGENTS.md` is significantly smaller and refers to nested files."
+  - "No duplicate CLI command table exists in `AGENTS.md`."
+  - "Nested `AGENTS.md` files contain relevant rules."
+
+verification_commands:
+  - "ls src/menv/services/AGENTS.md" # Should exist
+  - "grep 'CLI Commands' AGENTS.md" # Should not find table
+
+# Analysis Flags
+requires_deep_analysis: false
+deep_analysis_reason: ""
