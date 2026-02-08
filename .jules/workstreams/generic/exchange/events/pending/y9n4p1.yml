@@ -1,0 +1,29 @@
+schema_version: 1
+
+# Metadata
+id: "y9n4p1"
+issue_id: ""
+created_at: "2026-02-08"
+author_role: "consistency"
+confidence: "medium"
+
+# Content
+title: "Implementation of `llm` alias contradicts documented intent in Memory"
+statement: |
+  The `llm` shell alias is implemented to symlink `AGENTS.md` to `.claude/CLAUDE.md`, but workstation memory explicitly states it was updated to symlink `README.md`.
+  This indicates a potential regression, a missed update, or an error in the memory record.
+
+# Evidence supporting the observation
+evidence:
+  - path: "src/menv/ansible/roles/shell/config/common/alias/llm/llm.sh"
+    loc:
+      - "21"
+    note: "Explicitly symlinks `../AGENTS.md` to `.claude/CLAUDE.md`."
+  - path: ".jules/workstreams/generic/workstations/consistency/perspective.yml"
+    loc:
+      - "implicit"
+    note: "Workstation memory (provided as context) claims the update targeted `README.md`."
+
+tags:
+  - "drift"
+  - "shell"

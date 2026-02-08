@@ -1,0 +1,33 @@
+schema_version: 1
+
+# Metadata
+id: "z2q5r8"
+issue_id: ""
+created_at: "2026-02-08"
+author_role: "consistency"
+confidence: "high"
+
+# Content
+title: "Active `aider` feature is undocumented in user-facing README"
+statement: |
+  The `aider` integration is fully implemented in the codebase (available via `menv make aider` or `menv create` phase 5), but omitted from the `README.md` usage section.
+  Other similar tools like `ollama` and `coder` are explicitly documented.
+
+# Evidence supporting the observation
+evidence:
+  - path: "src/menv/commands/create.py"
+    loc:
+      - "50"
+    note: "Includes `aider` in `FULL_SETUP_TAGS`."
+  - path: "src/menv/ansible/playbook.yml"
+    loc:
+      - "9"
+    note: "Defines `aider` tag in `python` role."
+  - path: "README.md"
+    loc:
+      - "74-83"
+    note: "Lists `ollama`, `mlx`, `coder`, but omits `aider`."
+
+tags:
+  - "docs"
+  - "drift"
