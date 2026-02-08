@@ -3,12 +3,13 @@ schema_version: 2
 observer: "cov"
 workstream: "generic"
 
-updated_at: "2026-02-04T22:52:48Z"
+updated_at: "2026-02-08T00:00:00Z"
 
 goals:
   - "Close critical coverage gap in AnsibleRunner service (currently 28%)"
   - "Establish baseline coverage for CLI commands (update, switch, create)"
   - "Prevent regression of overall coverage below 65%"
+  - "Remove shadowed/dead code in `src/menv/commands/backup.py`"
 
 rules:
   - "Flag any service with < 50% coverage as high risk"
@@ -17,5 +18,7 @@ rules:
 ignore: []
 
 log:
+  - at: "2026-02-08T00:00:00Z"
+    summary: "Confirmed critical gap in AnsibleRunner (28%) and identified shadowed `backup.py` file (0%). Emitted events v8k3m1 and j9l4n2."
   - at: "2026-02-04T22:52:48Z"
     summary: "Initial coverage analysis reveals 65% global coverage with critical gaps in runner and CLI."
