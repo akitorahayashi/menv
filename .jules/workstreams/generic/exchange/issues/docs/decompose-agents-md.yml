@@ -31,8 +31,8 @@ risks: []
 affected_areas:
   - "AGENTS.md"
   - "README.md"
-  - "src/menv/services/AGENTS.md" (new)
-  - "src/menv/protocols/AGENTS.md" (new)
+  - "src/menv/services/AGENTS.md"
+  - "src/menv/protocols/AGENTS.md"
 
 acceptance_criteria:
   - "`AGENTS.md` is significantly smaller and refers to nested files."
