@@ -1,0 +1,30 @@
+schema_version: 1
+
+# Metadata
+id: "d8k2m5"
+issue_id: ""
+created_at: "2026-02-04"
+author_role: "taxonomy"
+confidence: "high"
+
+# Content
+title: "Duplicate Domain Constants Leaked to CLI"
+statement: |
+  Domain logic constants `VALID_PROFILES`, `PROFILE_ALIASES`, `TAG_GROUPS`, `FULL_SETUP_TAGS`, and `OPTIONAL_TASKS` are duplicated and hardcoded in CLI commands `create.py` and `make.py`. This creates inconsistencies (e.g., `make` includes "common" in profiles while `create` does not) and scatters domain knowledge across the presentation layer.
+
+# Evidence supporting the observation
+evidence:
+  - path: "src/menv/commands/create.py"
+    loc:
+      - "16-52"
+    note: "Constants FULL_SETUP_TAGS and OPTIONAL_TASKS defined in create.py"
+
+  - path: "src/menv/commands/make.py"
+    loc:
+      - "16-29"
+    note: "Constants TAG_GROUPS, VALID_PROFILES, PROFILE_ALIASES defined in make.py (duplicated from create.py)"
+
+tags:
+  - "taxonomy"
+  - "domain-leakage"
+  - "duplication"

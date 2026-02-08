@@ -1,12 +1,15 @@
 schema_version: 2
 observer: taxonomy
 workstream: generic
-updated_at: "2026-02-04T00:05:00Z"
+updated_at: "2026-02-04T01:00:00Z"
 goals:
-  - "Map the divergent use of 'config' across CLI and Services."
-  - "Identify duplicates of domain constants in CLI layer."
+  - "Monitor new CLI commands for domain logic leakage."
+  - "Advocate for renaming 'MenvConfig' to 'IdentityConfig'."
+  - "Advocate for renaming 'menv config create' to 'menv config deploy'."
 rules: []
 ignore: []
 log:
+  - at: "2026-02-04T01:00:00Z"
+    summary: "Refined goals after confirming and emitting events for domain constants, config overload, and verb collision."
   - at: "2026-02-04T00:05:00Z"
     summary: "Emitted 3 events covering 'config' overload, domain constants leakage, and 'create' vs 'deploy' mismatch."

@@ -1,0 +1,30 @@
+schema_version: 1
+
+# Metadata
+id: "f0g4h7"
+issue_id: ""
+created_at: "2026-02-04"
+author_role: "taxonomy"
+confidence: "high"
+
+# Content
+title: "Inconsistent Semantics of 'create' Verb"
+statement: |
+  The verb "create" is used with significantly different meanings in the CLI. `menv create` provisions a full environment (idempotent, complex), while `menv config create` copies default configuration files (scaffolding/deployment). This overload dilutes the meaning of "create" and confuses users about the scope of the command.
+
+# Evidence supporting the observation
+evidence:
+  - path: "src/menv/commands/create.py"
+    loc:
+      - "113"
+    note: "menv create: provisions full environment"
+
+  - path: "src/menv/commands/config.py"
+    loc:
+      - "95"
+    note: "menv config create: copies/deploys config files"
+
+tags:
+  - "taxonomy"
+  - "cli-design"
+  - "verbs"

@@ -1,0 +1,35 @@
+schema_version: 1
+
+# Metadata
+id: "c9l3n6"
+issue_id: ""
+created_at: "2026-02-04"
+author_role: "taxonomy"
+confidence: "high"
+
+# Content
+title: "Ambiguous Usage of 'Config' Terminology"
+statement: |
+  The term "Config" is overloaded to mean both "User Identity" (git/vcs config) and "Application Configuration" (dotfiles). `MenvConfig` and `VcsIdentityConfig` in `src/menv/models/config.py` refer solely to identity, while `app_ctx.config_deployer` manages dotfiles. This ambiguity creates confusion about the scope and responsibility of "config" related components.
+
+# Evidence supporting the observation
+evidence:
+  - path: "src/menv/models/config.py"
+    loc:
+      - "17-21"
+    note: "MenvConfig defined as VcsIdentityConfig container (Identity)"
+
+  - path: "src/menv/commands/backup/command.py"
+    loc:
+      - "87"
+    note: "local_config_dir variable used to refer to dotfiles configuration"
+
+  - path: "src/menv/commands/config.py"
+    loc:
+      - "11"
+    note: "MenvConfig imported but 'config create' refers to dotfiles deployment"
+
+tags:
+  - "taxonomy"
+  - "terminology"
+  - "ambiguity"
