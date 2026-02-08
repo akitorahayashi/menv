@@ -1,0 +1,21 @@
+schema_version: 1
+id: "b4c5d6"
+issue_id: ""
+created_at: "2024-05-23"
+author_role: "qa"
+confidence: "high"
+title: "Ambiguous Module Structure for Backup Command"
+statement: |
+  The repository contains both `src/menv/commands/backup.py` and `src/menv/commands/backup/` package. This violates the "1 command per file" (or "1 domain per package") clarity and introduces potential import confusion. The package `backup/` appears to be the active implementation, while `backup.py` is likely dead code or redundant.
+evidence:
+  - path: "src/menv/commands/backup.py"
+    loc:
+      - "1"
+    note: "File exists alongside package `src/menv/commands/backup/`"
+  - path: "src/menv/commands/backup/__init__.py"
+    loc:
+      - "1"
+    note: "Package exists alongside file `src/menv/commands/backup.py`"
+tags:
+  - "architecture"
+  - "confusion"

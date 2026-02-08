@@ -1,0 +1,22 @@
+schema_version: 1
+id: "h0i1j2"
+issue_id: ""
+created_at: "2024-05-23"
+author_role: "qa"
+confidence: "high"
+title: "Fragile \"Mirror Logic\" in Integrity Tests"
+statement: |
+  `tests/intg/test_role_integrity.py` implements a custom Python parser for Ansible files (using regexes) to validate file references. This duplicates Ansible's internal logic, making the tests fragile and prone to drift or false failures if Ansible syntax evolves or complex Jinja2 expressions are used.
+evidence:
+  - path: "tests/intg/test_role_integrity.py"
+    loc:
+      - "18"
+    note: "Defines SRC_PATTERN and LOOKUP_PATTERN regexes."
+  - path: "tests/intg/test_role_integrity.py"
+    loc:
+      - "43"
+    note: "`_resolve_template_literal` attempts to mimic Jinja2 resolution manually."
+tags:
+  - "anti-pattern"
+  - "test-fragility"
+  - "mirror-logic"
