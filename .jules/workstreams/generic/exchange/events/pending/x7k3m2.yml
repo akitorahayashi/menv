@@ -1,0 +1,33 @@
+schema_version: 1
+
+# Metadata
+id: "x7k3m2"
+issue_id: ""
+created_at: "2026-02-08"
+author_role: "consistency"
+confidence: "high"
+
+# Content
+title: "Deprecated `src/menv/commands/backup.py` file persists alongside new package"
+statement: |
+  The file `src/menv/commands/backup.py` exists as a deprecated artifact that duplicates and conflicts with the active `src/menv/commands/backup/` package implementation.
+  The package structure (directory with `__init__.py`) is the active implementation, while the standalone file is dead code.
+
+# Evidence supporting the observation
+evidence:
+  - path: "src/menv/commands/backup.py"
+    loc:
+      - "1-88"
+    note: "Deprecated standalone file with old dictionary-based implementation."
+  - path: "src/menv/commands/backup/command.py"
+    loc:
+      - "1-99"
+    note: "Active implementation using dataclasses and services."
+  - path: "src/menv/commands/__init__.py"
+    loc:
+      - "3"
+    note: "Imports `backup` from `menv.commands.backup.command`, confirming package usage."
+
+tags:
+  - "drift"
+  - "cleanup"
