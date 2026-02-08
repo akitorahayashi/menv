@@ -1,5 +1,4 @@
-#!/usr/bin/env python3
-"""Manage SSH keys and per-host configuration snippets."""
+"""Internal SSH key and host configuration commands."""
 
 from __future__ import annotations
 
@@ -14,7 +13,12 @@ from rich.console import Console
 VALID_KEY_TYPES = ("ed25519", "rsa", "ecdsa")
 HOST_PATTERN = re.compile(r"^[A-Za-z0-9._-]+$")
 
-app = typer.Typer(help="Manage SSH keys and per-host configuration snippets.")
+ssh_app = typer.Typer(
+    name="ssh",
+    help="Internal SSH key management.",
+    no_args_is_help=True,
+)
+
 console = Console(highlight=False)
 err_console = Console(stderr=True, highlight=False)
 
@@ -61,10 +65,16 @@ def _write_host_config(host: str, key_type: str, config_path: Path) -> None:
     os.chmod(config_path, 0o600)
 
 
-def _handle_generate_key(host: str, key_type: str) -> None:
+@ssh_app.command("gk")
+def generate_key(
+    key_type: str = typer.Argument(..., help="SSH key type.", metavar="TYPE"),
+    host: str = typer.Argument(..., help="Host alias."),
+) -> None:
+    """Generate a key and config snippet for a host."""
     if key_type not in VALID_KEY_TYPES:
         err_console.print(
-            f"Error: Unsupported key type '{key_type}' (allowed: {('|'.join(VALID_KEY_TYPES))})."
+            f"Error: Unsupported key type '{key_type}' "
+            f"(allowed: {'|'.join(VALID_KEY_TYPES)})."
         )
         raise typer.Exit(1)
 
@@ -92,7 +102,6 @@ def _handle_generate_key(host: str, key_type: str) -> None:
         _run_ssh_keygen(key_type, key_path, host)
         _write_host_config(host, key_type, config_path)
     except (subprocess.CalledProcessError, FileNotFoundError, OSError) as exc:
-        # Best-effort cleanup
         for p in (key_path, Path(str(key_path) + ".pub")):
             try:
                 if p.exists():
@@ -109,18 +118,9 @@ def _handle_generate_key(host: str, key_type: str) -> None:
         console.print(pub_key_path.read_text().strip())
 
 
-@app.command("gk")
-def generate_key(
-    key_type: str = typer.Argument(..., help="SSH key type", metavar="TYPE"),
-    host: str = typer.Argument(..., help="Host alias"),
-) -> None:
-    """Generate a key and config snippet for a host."""
-
-    _handle_generate_key(host, key_type)
-
-
-@app.command("ls")
+@ssh_app.command("ls")
 def list_hosts() -> None:
+    """List configured SSH hosts."""
     conf_dir = _conf_dir()
     if not conf_dir.exists():
         return
@@ -129,14 +129,15 @@ def list_hosts() -> None:
         console.print(conf_file.stem)
 
 
-@app.command("rm")
+@ssh_app.command("rm")
 def remove_host(
-    host: str = typer.Argument(..., help="Host alias"),
+    host: str = typer.Argument(..., help="Host alias."),
 ) -> None:
-    # Validate and constrain to conf.d
+    """Remove SSH key and config for a host."""
     if not HOST_PATTERN.match(host):
         err_console.print(f"Error: Invalid host '{host}' (allowed: [A-Za-z0-9._-]+).")
-        raise typer.Exit(1) from None
+        raise typer.Exit(1)
+
     conf_dir = _conf_dir()
     base = conf_dir.resolve()
     config_path = (conf_dir / f"{host}.conf").resolve()
@@ -169,11 +170,3 @@ def remove_host(
 
     config_path.unlink()
     console.print(f"🗑️ Removed config file for '{host}'.")
-
-
-def main() -> None:
-    app()
-
-
-if __name__ == "__main__":  # pragma: no cover - CLI entry
-    main()

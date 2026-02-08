@@ -1,16 +1,13 @@
-#!/usr/bin/env python3
-"""Backup the installed VSCode extensions to a JSON file."""
+"""Backup installed VSCode extensions to a JSON file."""
 
 from __future__ import annotations
 
-import argparse
 import json
 import os
 import shutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import List
 
 CANDIDATE_COMMANDS = (
     "code",
@@ -34,7 +31,7 @@ def detect_command() -> str:
     )
 
 
-def list_extensions(command: str) -> List[str]:
+def list_extensions(command: str) -> list[str]:
     try:
         completed = subprocess.run(
             [command, "--list-extensions"],
@@ -57,11 +54,10 @@ def list_extensions(command: str) -> List[str]:
             "If VSCode is running, close it and try again."
         ) from exc
 
-    lines = [line.strip() for line in completed.stdout.splitlines() if line.strip()]
-    return lines
+    return [line.strip() for line in completed.stdout.splitlines() if line.strip()]
 
 
-def write_backup(destination: Path, extensions: List[str]) -> None:
+def write_backup(destination: Path, extensions: list[str]) -> None:
     destination.parent.mkdir(parents=True, exist_ok=True)
     payload = {"extensions": extensions}
     destination.write_text(
@@ -69,26 +65,18 @@ def write_backup(destination: Path, extensions: List[str]) -> None:
     )
 
 
-def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "config_dir",
-        type=Path,
-        help="Configuration directory where vscode-extensions.json should be written.",
-    )
-    parser.add_argument(
-        "--output",
-        type=Path,
-        default=None,
-        help="Override the output file location.",
-    )
-    return parser.parse_args(argv)
+def run(config_dir: Path, output: Path | None = None) -> int:
+    """Execute the VSCode extensions backup.
 
+    Args:
+        config_dir: Configuration directory for output.
+        output: Optional override for output file location.
 
-def main(argv: list[str] | None = None) -> int:
-    args = parse_args(argv)
+    Returns:
+        Exit code (0 on success, 1 on failure).
+    """
     try:
-        output_file = args.output or (args.config_dir / "vscode-extensions.json")
+        output_file = output or (config_dir / "vscode-extensions.json")
         command = detect_command()
         extensions = list_extensions(command)
         write_backup(output_file, extensions)
@@ -98,7 +86,3 @@ def main(argv: list[str] | None = None) -> int:
 
     print(f"VSCode extensions list backed up to: {output_file}")
     return 0
-
-
-if __name__ == "__main__":  # pragma: no cover - CLI entrypoint
-    raise SystemExit(main())

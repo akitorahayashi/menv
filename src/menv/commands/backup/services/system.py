@@ -1,16 +1,14 @@
-#!/usr/bin/env python3
-"""Backup macOS `defaults` values into the automation-friendly YAML format."""
+"""Backup macOS ``defaults`` values into automation-friendly YAML format."""
 
 from __future__ import annotations
 
-import argparse
 import json
 import os
 import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Iterator, List, Optional
+from typing import Iterable, Iterator, Optional
 
 import yaml
 
@@ -84,7 +82,7 @@ def iter_definitions(definitions_dir: Path) -> Iterator[SettingDefinition]:
 
 
 def _run_defaults(domain: str, key: str, default: object) -> str:
-    command: List[str]
+    command: list[str]
     if key in SPECIAL_GLOBAL_KEYS:
         command = ["defaults", "read", "-g", key]
     else:
@@ -150,12 +148,11 @@ def format_value(definition: SettingDefinition, raw_value: str) -> str:
         return _format_numeric(raw_value, definition.default, as_float=True)
     if type_name == "string":
         return _format_string(raw_value, definition.key, definition.default)
-    # Fallback to JSON encoding for any other type to keep YAML valid.
     value = raw_value if raw_value else str(definition.default)
     return json.dumps(value)
 
 
-def build_entry(definition: SettingDefinition, value: str) -> List[str]:
+def build_entry(definition: SettingDefinition, value: str) -> list[str]:
     parts = [f'key: "{definition.key}"']
     if definition.domain != DEFAULT_DOMAIN:
         parts.append(f'domain: "{definition.domain}"')
@@ -163,7 +160,7 @@ def build_entry(definition: SettingDefinition, value: str) -> List[str]:
     parts.append(f"value: {value}")
     entry = "- { " + ", ".join(parts) + " }"
 
-    lines: List[str] = []
+    lines: list[str] = []
     if definition.comment:
         lines.append(f"# {definition.comment}")
     lines.append(entry)
@@ -172,7 +169,7 @@ def build_entry(definition: SettingDefinition, value: str) -> List[str]:
 
 def backup_settings(definitions_dir: Path, output_file: Path) -> None:
     output_file.parent.mkdir(parents=True, exist_ok=True)
-    lines: List[str] = ["---"]
+    lines: list[str] = ["---"]
 
     if not definitions_dir.exists():
         raise BackupError(f"Definitions directory not found: {definitions_dir}")
@@ -186,46 +183,32 @@ def backup_settings(definitions_dir: Path, output_file: Path) -> None:
     output_file.write_text("\n".join(lines), encoding="utf-8")
 
 
-def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "config_dir",
-        type=Path,
-        help="Base configuration directory containing the definitions folder.",
-    )
-    parser.add_argument(
-        "--definitions-dir",
-        type=Path,
-        default=None,
-        help="Override the location of the definitions directory.",
-    )
-    parser.add_argument(
-        "--output",
-        type=Path,
-        default=None,
-        help="Override the output file path (defaults to config_dir/system.yml).",
-    )
-    return parser.parse_args(argv)
+def run(
+    config_dir: Path,
+    definitions_dir: Path | None = None,
+    output: Path | None = None,
+) -> int:
+    """Execute the system defaults backup.
 
+    Args:
+        config_dir: Base configuration directory.
+        definitions_dir: Optional override for definitions location.
+        output: Optional override for output file path.
 
-def main(argv: list[str] | None = None) -> int:
-    args = parse_args(argv)
-    config_dir: Path = args.config_dir
-    definitions_dir = args.definitions_dir or (config_dir / "definitions")
-    output_file = args.output or (config_dir / "system.yml")
+    Returns:
+        Exit code (0 on success, 1 on failure).
+    """
+    defs = definitions_dir or (config_dir / "definitions")
+    output_file = output or (config_dir / "system.yml")
 
     try:
-        backup_settings(definitions_dir, output_file)
+        backup_settings(defs, output_file)
     except BackupError as exc:
         print(f"[ERROR] {exc}", file=sys.stderr)
         return 1
-    except Exception as exc:  # pragma: no cover - safety net for unexpected errors
+    except Exception as exc:  # pragma: no cover
         print(f"[ERROR] Unexpected failure: {exc}", file=sys.stderr)
         return 1
 
     print(f"Generated system defaults YAML: {output_file}")
     return 0
-
-
-if __name__ == "__main__":  # pragma: no cover - CLI entrypoint
-    raise SystemExit(main())
