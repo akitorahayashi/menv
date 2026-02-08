@@ -1,17 +1,16 @@
 name: 'Run Implementer'
-description: 'Run an implementer for a single issue and clean up related events'
+description: 'Run an implementer for a single issue and clean up related events (requires jlo preinstalled)'
 inputs:
   issue_file:
     description: 'Issue file path'
     required: true
-  dry_run:
+  prompt_preview:
     description: 'Show prompts without executing'
     required: false
     default: 'false'
   target_branch:
     description: 'Target branch for implementer output'
-    required: false
-    default: 'main'
+    required: true
 runs:
   using: "composite"
   steps:
@@ -19,6 +18,7 @@ runs:
       shell: bash
       env:
         ISSUE_FILE: ${{ inputs.issue_file }}
+        TARGET_BRANCH: ${{ inputs.target_branch }}
       run: |
         if [ -z "$ISSUE_FILE" ]; then
           echo "::error::issue_file is required"
@@ -28,28 +28,42 @@ runs:
           echo "::error::Issue file not found in repository: $ISSUE_FILE"
           exit 1
         fi
+        if [ -z "$TARGET_BRANCH" ]; then
+          echo "::error::target_branch is required"
+          exit 1
+        fi
 
-    - name: Install jlo
-      uses: ./.github/actions/install-jlo
+    - name: Validate runtime prerequisites
+      shell: bash
+      env:
+        PROMPT_PREVIEW: ${{ inputs.prompt_preview }}
+      run: |
+        if ! command -v jlo >/dev/null 2>&1; then
+          echo "::error::jlo is not installed in PATH. Install jlo before calling this action."
+          exit 1
+        fi
 
-    - name: Configure Git
-      if: ${{ inputs.dry_run != 'true' }}
-      uses: ./.github/actions/configure-git
+        if [ "$PROMPT_PREVIEW" != "true" ]; then
+          if [ -z "$(git config user.name || true)" ] || [ -z "$(git config user.email || true)" ]; then
+            echo "::error::Git identity is not configured. Run configure-git before non-preview implementer execution."
+            exit 1
+          fi
+        fi
 
     - name: Run implementers
       shell: bash
       env:
         ISSUE_FILE: ${{ inputs.issue_file }}
-        DRY_RUN: ${{ inputs.dry_run }}
+        PROMPT_PREVIEW: ${{ inputs.prompt_preview }}
         TARGET_BRANCH: ${{ inputs.target_branch }}
       run: |
         args=("$ISSUE_FILE")
-        [ "$DRY_RUN" = "true" ] && args+=("--dry-run")
+        [ "$PROMPT_PREVIEW" = "true" ] && args+=("--prompt-preview")
         jlo run implementers "${args[@]}" --branch "$TARGET_BRANCH"
 
     - name: Delete processed issue and source events
-      if: ${{ inputs.dry_run != 'true' }}
+      if: ${{ inputs.prompt_preview != 'true' }}
       shell: bash
       env:
         ISSUE_FILE: ${{ inputs.issue_file }}
-      run: bash .github/scripts/jules-delete-processed-issue-and-events.sh
+      run: jlo workflow workstreams clean issue "$ISSUE_FILE"
