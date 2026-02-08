@@ -1,0 +1,33 @@
+schema_version: 1
+
+# Metadata
+id: "h5j3k9"
+issue_id: ""
+created_at: "2024-05-23"
+author_role: "devops"
+confidence: "high"
+
+# Content
+title: "Unpinned GitHub Action Dependencies in setup-base"
+statement: |
+  Critical CI actions (`actions/setup-python`, `extractions/setup-just`, `astral-sh/setup-uv`) are referenced by mutable tags (`@v5`, `@v2`), exposing the pipeline to supply-chain attacks or unexpected breaking changes.
+
+# Evidence supporting the observation
+evidence:
+  - path: ".github/actions/setup-base/action.yml"
+    loc:
+      - "7"
+    note: "uses: actions/setup-python@v5"
+  - path: ".github/actions/setup-base/action.yml"
+    loc:
+      - "12"
+    note: "uses: extractions/setup-just@v2"
+  - path: ".github/actions/setup-base/action.yml"
+    loc:
+      - "16"
+    note: "uses: astral-sh/setup-uv@v5"
+
+tags:
+  - "security"
+  - "supply-chain"
+  - "reproducibility"

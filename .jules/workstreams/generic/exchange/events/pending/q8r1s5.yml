@@ -1,0 +1,25 @@
+schema_version: 1
+
+# Metadata
+id: "q8r1s5"
+issue_id: ""
+created_at: "2024-05-23"
+author_role: "devops"
+confidence: "high"
+
+# Content
+title: "Absence of Automated Artifact Release Workflow"
+statement: |
+  The repository lacks a CI workflow to build and publish release artifacts (e.g., Python wheels, sdist) to GitHub Releases or PyPI. This relies on manual processes which lack provenance and traceability.
+
+# Evidence supporting the observation
+evidence:
+  - path: ".github/workflows"
+    loc:
+      - "dir"
+    note: "absence of release.yml"
+
+tags:
+  - "automation"
+  - "artifacts"
+  - "release"

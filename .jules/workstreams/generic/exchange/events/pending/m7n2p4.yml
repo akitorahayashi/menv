@@ -1,0 +1,25 @@
+schema_version: 1
+
+# Metadata
+id: "m7n2p4"
+issue_id: ""
+created_at: "2024-05-23"
+author_role: "devops"
+confidence: "high"
+
+# Content
+title: "Non-Deterministic Linter Installation in CI"
+statement: |
+  shellcheck and shfmt are installed via brew install without version constraints in the lint-and-test workflow. This creates potential irreproducibility if newer versions introduce stricter rules or break compatibility.
+
+# Evidence supporting the observation
+evidence:
+  - path: ".github/workflows/lint-and-test.yml"
+    loc:
+      - "19"
+    note: "run: brew install shellcheck shfmt"
+
+tags:
+  - "reproducibility"
+  - "flakiness"
+  - "toolchain"
