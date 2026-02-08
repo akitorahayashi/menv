@@ -1,0 +1,26 @@
+schema_version: 1
+id: "e7f8g9"
+issue_id: ""
+created_at: "2024-05-23"
+author_role: "qa"
+confidence: "high"
+title: "Backup Services Violate Architecture Principles"
+statement: |
+  The new backup services (`system.py`, `vscode_extensions.py`) use functional programming and direct `subprocess` calls instead of following the established Service/Protocol pattern with Dependency Injection. This reduces testability (forcing monkeypatching) and consistency with the rest of the codebase.
+evidence:
+  - path: "src/menv/commands/backup/services/system.py"
+    loc:
+      - "1"
+    note: "Functional style, no class/Protocol, direct subprocess usage."
+  - path: "src/menv/commands/backup/services/vscode_extensions.py"
+    loc:
+      - "1"
+    note: "Functional style, no class/Protocol, direct subprocess usage."
+  - path: "tests/intg/roles/system/test_backup.py"
+    loc:
+      - "46"
+    note: "Tests rely on monkeypatching private `_run_defaults` function."
+tags:
+  - "architecture"
+  - "testability"
+  - "coupling"
