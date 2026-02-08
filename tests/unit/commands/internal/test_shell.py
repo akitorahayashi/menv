@@ -20,8 +20,8 @@ class TestGenGeminiAliases:
         assert result.exit_code == 0
         lines = result.output.strip().split("\n")
 
-        assert 'alias gm-pr="gemini -m gemini-3-pro-preview "' in lines
-        assert 'alias gm-fl="gemini -m gemini-3-flash-preview "' in lines
+        assert 'alias gm-pr="gemini -m gemini-3-pro-preview"' in lines
+        assert 'alias gm-fl="gemini -m gemini-3-flash-preview"' in lines
         assert 'alias gm-pr-y="gemini -m gemini-3-pro-preview -y"' in lines
         assert 'alias gm-fl-ap="gemini -m gemini-3-flash-preview -a -p"' in lines
 

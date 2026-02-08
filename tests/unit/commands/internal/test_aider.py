@@ -19,7 +19,7 @@ class TestSetModel:
         result = runner.invoke(aider_app, ["set-model", "llama3.2"])
         assert result.exit_code == 0
         assert "export AIDER_OLLAMA_MODEL=llama3.2" in result.output
-        assert 'echo "✅ Set AIDER_OLLAMA_MODEL to: llama3.2"' in result.output
+        assert "echo '✅ Set AIDER_OLLAMA_MODEL to: 'llama3.2" in result.output
 
     def test_no_arg_shows_usage(self) -> None:
         with patch.dict(os.environ, {"AIDER_OLLAMA_MODEL": "existing"}):

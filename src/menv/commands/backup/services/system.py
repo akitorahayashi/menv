@@ -148,6 +148,7 @@ def format_value(definition: SettingDefinition, raw_value: str) -> str:
         return _format_numeric(raw_value, definition.default, as_float=True)
     if type_name == "string":
         return _format_string(raw_value, definition.key, definition.default)
+    # Fallback to JSON encoding for any other type to keep YAML valid.
     value = raw_value if raw_value else str(definition.default)
     return json.dumps(value)
 

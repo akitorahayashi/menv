@@ -24,7 +24,7 @@ console = Console(highlight=False)
 err_console = Console(stderr=True, highlight=False)
 
 
-def _iter_extension_matches(extensions: list[str]) -> list[str]:
+def _collect_extension_matches(extensions: list[str]) -> list[str]:
     cwd = Path.cwd()
     results: list[str] = []
     for ext in extensions:
@@ -86,7 +86,7 @@ def run(
 
     all_targets: list[str] = []
     all_targets.extend(directories or [])
-    all_targets.extend(_iter_extension_matches(extensions or []))
+    all_targets.extend(_collect_extension_matches(extensions or []))
     all_targets.extend(files or [])
     all_targets.extend(targets or [])
 
@@ -113,7 +113,7 @@ def set_model(
 
     quoted = shlex.quote(model)
     print(f"export {MODEL_ENV}={quoted}")
-    print(f'echo "✅ Set {MODEL_ENV} to: {model}"')
+    print(f"echo '✅ Set {MODEL_ENV} to: '{quoted}")
 
 
 @aider_app.command("unset-model")

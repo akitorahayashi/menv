@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import subprocess
+from pathlib import PurePosixPath
 
 import typer
 from rich.console import Console
@@ -22,7 +23,7 @@ def delete_submodule(
     submodule_path: str = typer.Argument(..., help="Relative path to the submodule."),
 ) -> None:
     """Delete a git submodule completely."""
-    if ".." in submodule_path or submodule_path.startswith("/"):
+    if ".." in PurePosixPath(submodule_path).parts or submodule_path.startswith("/"):
         err_console.print(
             f"Error: Invalid submodule path '{submodule_path}'. "
             "Must be a relative path without '..'."

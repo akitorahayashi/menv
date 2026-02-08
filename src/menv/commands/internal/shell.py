@@ -41,7 +41,10 @@ def gen_gemini_aliases() -> None:
         for opts_key, opts_value in GEMINI_OPTIONS.items():
             separator = "-" if opts_key else ""
             alias_name = f"gm-{model_key}{separator}{opts_key}"
-            print(f'alias {alias_name}="gemini -m {model_name} {opts_value}"')
+            cmd_parts = f"gemini -m {model_name}"
+            if opts_value:
+                cmd_parts += f" {opts_value}"
+            print(f'alias {alias_name}="{cmd_parts}"')
 
 
 @shell_app.command("gen-vscode-workspace")
