@@ -16,6 +16,7 @@ from menv.commands.update import update
 from menv.context import AppContext
 from menv.services.ansible_paths import AnsiblePaths
 from menv.services.ansible_runner import AnsibleRunner
+from menv.services.backup import SystemBackupService, VSCodeBackupService
 from menv.services.config_deployer import ConfigDeployer
 from menv.services.config_storage import ConfigStorage
 from menv.services.playbook import Playbook
@@ -77,6 +78,8 @@ def main(
             version_checker=VersionChecker(),
             config_deployer=ConfigDeployer(ansible_paths=ansible_paths),
             playbook=Playbook(ansible_paths=ansible_paths),
+            system_backup=SystemBackupService(),
+            vscode_backup=VSCodeBackupService(),
         )
 
 

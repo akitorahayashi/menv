@@ -8,9 +8,6 @@ from typing import TYPE_CHECKING, Callable
 import typer
 from rich.console import Console
 
-from menv.commands.backup.services import system as system_backup
-from menv.commands.backup.services import vscode_extensions as vscode_backup
-
 if TYPE_CHECKING:
     from pathlib import Path
 
@@ -32,13 +29,13 @@ BACKUP_TARGETS: dict[str, BackupTarget] = {
         description="Backup macOS system defaults",
         role="system",
         subpath="common",
-        run=lambda **kwargs: system_backup.run(**kwargs),
+        run=lambda ctx, **kwargs: ctx.system_backup.backup(**kwargs),
     ),
     "vscode": BackupTarget(
         description="Backup VSCode extensions list",
         role="editor",
         subpath="common",
-        run=lambda **kwargs: vscode_backup.run(**kwargs),
+        run=lambda ctx, **kwargs: ctx.vscode_backup.backup(**kwargs),
     ),
 }
 
@@ -108,7 +105,7 @@ def backup(
             )
             kwargs["definitions_dir"] = package_definitions_path
 
-    exit_code = bt.run(**kwargs)
+    exit_code = bt.run(app_ctx, **kwargs)
 
     if exit_code == 0:
         console.print()

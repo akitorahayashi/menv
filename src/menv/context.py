@@ -14,6 +14,7 @@ if TYPE_CHECKING:
         PlaybookProtocol,
         VersionCheckerProtocol,
     )
+    from menv.protocols.backup import SystemBackupProtocol, VSCodeBackupProtocol
 
 
 @dataclass
@@ -26,3 +27,5 @@ class AppContext:
     version_checker: VersionCheckerProtocol
     config_deployer: ConfigDeployerProtocol
     playbook: PlaybookProtocol
+    system_backup: SystemBackupProtocol
+    vscode_backup: VSCodeBackupProtocol

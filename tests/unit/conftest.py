@@ -12,7 +12,9 @@ from tests.mocks import (
     MockConfigDeployer,
     MockConfigStorage,
     MockPlaybook,
+    MockSystemBackupService,
     MockVersionChecker,
+    MockVSCodeBackupService,
 )
 
 
@@ -27,6 +29,8 @@ def mock_app_context() -> AppContext:
         version_checker=MockVersionChecker(),
         config_deployer=MockConfigDeployer(),
         playbook=MockPlaybook(),
+        system_backup=MockSystemBackupService(),
+        vscode_backup=MockVSCodeBackupService(),
     )
 
 
@@ -44,6 +48,6 @@ class MockContextCliRunner(CliRunner):
 
 
 @pytest.fixture
-def cli_runner(mock_app_context: AppContext) -> "MockContextCliRunner":
+def cli_runner(mock_app_context: AppContext) -> MockContextCliRunner:
     """Create a CLI runner for testing Typer commands."""
     return MockContextCliRunner(mock_app_context)
