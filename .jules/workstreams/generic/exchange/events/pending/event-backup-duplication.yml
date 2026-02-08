@@ -1,0 +1,31 @@
+schema_version: 1
+id: "b3c4k5"
+issue_id: ""
+created_at: "2024-05-23"
+author_role: "data_arch"
+confidence: "high"
+title: "Backup Logic Duplication and Dead Code"
+statement: |
+  The `backup` command logic is duplicated between `src/menv/commands/backup.py` (which invokes scripts via subprocess) and `src/menv/commands/backup/command.py` (which invokes services). Additionally, the core backup logic is duplicated between `src/menv/ansible/scripts/system/backup-system.py` and `src/menv/commands/backup/services/system.py`.
+evidence:
+  - path: "src/menv/commands/backup.py"
+    loc:
+      - "file"
+    note: "Existence of duplicate command logic invoking scripts via subprocess."
+  - path: "src/menv/commands/backup/command.py"
+    loc:
+      - "file"
+    note: "Duplicate command logic invoking services."
+  - path: "src/menv/ansible/scripts/system/backup-system.py"
+    loc:
+      - "file"
+    note: "Core backup logic implementation."
+  - path: "src/menv/commands/backup/services/system.py"
+    loc:
+      - "file"
+    note: "Duplicate core backup logic implementation."
+tags:
+  - "data-model"
+  - "code-duplication"
+  - "dead-code"
+  - "ssot-violation"
