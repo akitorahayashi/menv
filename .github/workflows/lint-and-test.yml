@@ -10,15 +10,29 @@ jobs:
       contents: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.1.7
         with:
           submodules: recursive
 
       - name: Setup base environment
         uses: ./.github/actions/setup-base
 
-      - name: Install shell tools
-        run: brew install shellcheck shfmt
+      - name: Setup shfmt
+        uses: mfinelli/setup-shfmt@36a296dd392ba4e3bbe7a5eaa6e7a97f8fbbd894 # v3.2.1
+        with:
+          shfmt-version: "3.8.0"
+
+      - name: Install ShellCheck
+        run: |
+          scversion="v0.10.0"
+          arch=$(uname -m)
+          if [ "$arch" = "arm64" ]; then
+            arch="aarch64"
+          fi
+          echo "Downloading ShellCheck ${scversion} for ${arch}..."
+          wget -qO- "https://github.com/koalaman/shellcheck/releases/download/${scversion}/shellcheck-${scversion}.darwin.${arch}.tar.xz" | tar -xJv
+          sudo cp "shellcheck-${scversion}/shellcheck" /usr/local/bin/
+          shellcheck --version
 
       - name: Run tests
         run: just test
