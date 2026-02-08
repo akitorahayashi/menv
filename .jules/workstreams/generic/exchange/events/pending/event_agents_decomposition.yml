@@ -1,0 +1,45 @@
+schema_version: 1
+
+# Metadata
+id: "m4n5p6"
+issue_id: ""
+created_at: "2024-05-23"
+author_role: "tactician"
+confidence: "high"
+
+# Content
+title: "Monolithic AGENTS.md should be decomposed into nested scopes"
+statement: |
+  The root `AGENTS.md` file contains implementation details and rules for specific sub-directories (Services, Protocols, Mocks, Ansible Roles) that belong in nested `AGENTS.md` files at their respective ownership boundaries. This violates the "Nearest Scope Wins" principle and bloats the global contract with information irrelevant to other contexts. These sections should be extracted into `src/menv/services/AGENTS.md`, `src/menv/protocols/AGENTS.md`, `tests/mocks/AGENTS.md`, and role-specific AGENTS files.
+
+# Evidence supporting the observation
+evidence:
+  - path: "AGENTS.md"
+    loc:
+      - "57-62"
+    note: "Contains specific rules for Service implementation (`src/menv/services/`)."
+
+  - path: "AGENTS.md"
+    loc:
+      - "51-55"
+    note: "Contains specific rules for Protocol definitions (`src/menv/protocols/`)."
+
+  - path: "AGENTS.md"
+    loc:
+      - "64-67"
+    note: "Contains specific rules for Mock implementation (`tests/mocks/`)."
+
+  - path: "AGENTS.md"
+    loc:
+      - "69-74"
+    note: "Contains specific rules for Internal Commands (`src/menv/commands/internal/`)."
+
+  - path: "AGENTS.md"
+    loc:
+      - "100-116"
+    note: "Contains specific implementation details for the Rust Ansible role."
+
+tags:
+  - "agents-contract"
+  - "scope-decomposition"
+  - "ownership-boundary"
