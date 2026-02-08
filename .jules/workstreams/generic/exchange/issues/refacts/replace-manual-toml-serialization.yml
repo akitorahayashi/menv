@@ -1,0 +1,43 @@
+schema_version: 2
+
+# Metadata
+id: "dc5508"
+source_events:
+  - "t0m1l2"
+  - "mtomlg"
+title: "Replace Manual TOML Serialization"
+label: "refacts"
+priority: "low"
+summary: "Replace manual TOML string concatenation with a proper serialization library."
+
+# Content
+problem: |
+  `ConfigStorage` manually constructs TOML configuration files using manual string concatenation and ad-hoc escaping instead of using a serialization library like `tomli-w`. This is brittle, error-prone, and harder to maintain as the configuration schema evolves.
+
+impact: |
+  - **Fragility**: Manual escaping logic can easily break if the schema changes.
+  - **Maintenance**: Adding new fields requires updating the concatenation logic.
+
+desired_outcome: |
+  - Use a proper TOML serialization library (e.g., `tomli-w`) to generate TOML files.
+  - Eliminate the manual string concatenation logic in `ConfigStorage`.
+
+constraints: []
+risks: []
+
+# Specifics
+affected_areas:
+  - "src/menv/services/config_storage.py"
+
+acceptance_criteria:
+  - "`ConfigStorage` uses a library for TOML generation."
+  - "No manual string concatenation or escaping logic remains."
+  - "Existing configuration files are correctly parsed and preserved."
+
+verification_commands:
+  - "grep 'tomli-w' pyproject.toml" # If library added
+  - "just test" # Should pass
+
+# Analysis Flags
+requires_deep_analysis: false
+deep_analysis_reason: ""

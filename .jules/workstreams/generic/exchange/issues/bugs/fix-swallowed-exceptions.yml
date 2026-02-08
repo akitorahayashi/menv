@@ -1,0 +1,46 @@
+schema_version: 2
+
+# Metadata
+id: "a2f83a"
+source_events:
+  - "swllex"
+title: "Fix Swallowed Exceptions"
+label: "bugs"
+priority: "medium"
+summary: "Fix swallowed exceptions in core services to surface errors correctly."
+
+# Content
+problem: |
+  Core services (`AnsibleRunner`, `VersionChecker`, `AnsiblePaths`) catch broad exceptions (e.g., `Exception`, `OSError`, `FileNotFoundError`) and return default values or exit codes instead of raising meaningful exceptions. This masks the root cause of failures, prevents callers from handling specific error cases, and mixes I/O (logging) with business logic.
+
+impact: |
+  - **Debugging**: Errors are hidden, making it difficult to diagnose issues (e.g., network failure vs. parsing error).
+  - **Error Handling**: Callers cannot distinguish between different failure modes.
+  - **Anti-pattern**: Swallowing exceptions is a known bad practice.
+
+desired_outcome: |
+  - Remove exception swallowing in core services.
+  - Raise specific exceptions (e.g., `AnsibleExecutionError`, `VersionCheckError`) or propagate existing ones.
+  - Handle exceptions at the CLI layer (e.g., in `main.py` or command handlers) to print user-friendly error messages.
+
+constraints: []
+risks: []
+
+# Specifics
+affected_areas:
+  - "src/menv/services/ansible_runner.py"
+  - "src/menv/services/version_checker.py"
+  - "src/menv/services/ansible_paths.py"
+
+acceptance_criteria:
+  - "Exceptions are propagated to the caller."
+  - "Unit tests verify that exceptions are raised correctly."
+  - "CLI commands handle these exceptions gracefully."
+
+verification_commands:
+  - "grep 'except Exception' src/menv/services/*.py" # Should be minimal/justified
+  - "just test"
+
+# Analysis Flags
+requires_deep_analysis: false
+deep_analysis_reason: ""

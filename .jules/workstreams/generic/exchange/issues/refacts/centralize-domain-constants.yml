@@ -1,0 +1,44 @@
+schema_version: 2
+
+# Metadata
+id: "bc99fe"
+source_events:
+  - "d8k2m5"
+  - "d6m7n8"
+title: "Centralize Domain Constants"
+label: "refacts"
+priority: "low"
+summary: "Centralize domain constants (VALID_PROFILES, PROFILE_ALIASES) to avoid duplication in CLI commands."
+
+# Content
+problem: |
+  Domain logic constants `VALID_PROFILES`, `PROFILE_ALIASES`, and potentially others (`TAG_GROUPS`, `FULL_SETUP_TAGS`) are duplicated and hardcoded in multiple CLI commands (`create.py`, `make.py`). This creates inconsistencies and scatters domain knowledge across the presentation layer.
+
+impact: |
+  - **Inconsistency**: `menv make` supports "common" profile, while `menv create` does not (but the constant definition is duplicated).
+  - **Maintenance**: Changing a profile or alias requires updating multiple files.
+
+desired_outcome: |
+  - Centralize constants in a shared module (e.g., `src/menv/models/domain.py` or `src/menv/constants.py`).
+  - Import these constants in CLI commands instead of redefining them.
+  - Ensure a Single Source of Truth for valid profiles, aliases, and tags.
+
+constraints: []
+risks: []
+
+# Specifics
+affected_areas:
+  - "src/menv/commands/create.py"
+  - "src/menv/commands/make.py"
+
+acceptance_criteria:
+  - "`VALID_PROFILES` and `PROFILE_ALIASES` are defined once in a shared module."
+  - "CLI commands import these constants."
+  - "No duplicate definitions exist."
+
+verification_commands:
+  - "grep -r 'VALID_PROFILES' src/menv/commands/" # Should show imports, not definitions
+
+# Analysis Flags
+requires_deep_analysis: false
+deep_analysis_reason: ""
