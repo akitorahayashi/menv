@@ -9,7 +9,7 @@ import typer.testing
 
 from menv.commands.internal.aider import aider_app
 
-runner = typer.testing.CliRunner(mix_stderr=False)
+runner = typer.testing.CliRunner()
 
 
 class TestSetModel:

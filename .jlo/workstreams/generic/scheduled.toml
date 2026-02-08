@@ -21,5 +21,5 @@ roles = [
 
 [innovators]
 roles = [
-  { name = "recruiter", enabled = true },
+  { name = "recruiter", enabled = false },
 ]
