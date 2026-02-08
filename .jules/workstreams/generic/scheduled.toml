@@ -10,10 +10,16 @@ roles = [
   { name = "cov", enabled = true },
   { name = "devops", enabled = true },
   { name = "consistency", enabled = true },
+  { name = "tactician", enabled = true },
   { name = "pythonista", enabled = true },
 ]
 
 [deciders]
 roles = [
   { name = "triage_generic", enabled = true },
+]
+
+[innovators]
+roles = [
+  { name = "recruiter", enabled = false },
 ]
