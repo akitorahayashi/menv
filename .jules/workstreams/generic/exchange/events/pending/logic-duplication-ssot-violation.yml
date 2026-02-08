@@ -1,0 +1,37 @@
+schema_version: 1
+
+id: "b9x1y3"
+issue_id: ""
+created_at: "2026-02-04"
+author_role: "structural_arch"
+confidence: "high"
+
+title: "Logic duplication in backup command"
+statement: |
+  The backup command logic (specifically for system defaults and VSCode extensions) is implemented in three separate locations: as standalone scripts in `src/menv/ansible/scripts`, as a single-file CLI command in `src/menv/commands/backup.py`, and as service modules in `src/menv/commands/backup/services/`. This violates the Single Source of Truth principle and makes maintenance error-prone.
+
+evidence:
+  - path: "src/menv/commands/backup.py"
+    loc:
+      - "126-149"
+    note: "Backup implementation using subprocess to call scripts."
+
+  - path: "src/menv/ansible/scripts/system/backup-system.py"
+    loc:
+      - "1-140"
+    note: "Standalone script implementation of system backup."
+
+  - path: "src/menv/commands/backup/services/system.py"
+    loc:
+      - "1-140"
+    note: "Service-based implementation of system backup (near-duplicate of script)."
+
+  - path: "src/menv/commands/backup/services/vscode_extensions.py"
+    loc:
+      - "1-60"
+    note: "Service-based implementation of VSCode backup."
+
+tags:
+  - "duplication"
+  - "ssot-violation"
+  - "maintenance"

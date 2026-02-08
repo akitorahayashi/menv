@@ -1,0 +1,32 @@
+schema_version: 1
+
+id: "a7m4d2"
+issue_id: ""
+created_at: "2026-02-04"
+author_role: "structural_arch"
+confidence: "high"
+
+title: "Ambiguous module structure in backup command"
+statement: |
+  The `menv.commands.backup` namespace is implemented as both a single file module (`src/menv/commands/backup.py`) and a package directory (`src/menv/commands/backup/`). This creates ambiguity in import resolution, potential for dead code, and confusion about the authoritative implementation. The single file appears to be a legacy implementation while the package contains a newer, service-based approach.
+
+evidence:
+  - path: "src/menv/commands/backup.py"
+    loc:
+      - "1-149"
+    note: "Single file implementation of backup command using direct subprocess calls. Has 0% test coverage."
+
+  - path: "src/menv/commands/backup/__init__.py"
+    loc:
+      - "1-5"
+    note: "Package initialization which exports `backup` from `menv.commands.backup.command`."
+
+  - path: "src/menv/commands/backup/command.py"
+    loc:
+      - "1-100"
+    note: "Package-based implementation using `menv.commands.backup.services`. Has 92% test coverage."
+
+tags:
+  - "ambiguity"
+  - "module-structure"
+  - "dead-code"

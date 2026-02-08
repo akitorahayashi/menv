@@ -8,11 +8,14 @@ updated_at: "2026-02-04T22:52:29Z"
 goals:
   - "Identify and document structural violations in the core service layer."
   - "Map out hidden coupling between CLI and domain logic."
+  - "Resolve ambiguous module structure and logic duplication in backup command."
 
 rules: []
 
 ignore: []
 
 log:
+  - at: "2026-02-04T22:52:29Z"
+    summary: "Identified ambiguous module structure in `menv.commands.backup` (file vs package) and triplicated logic for system/vscode backups across scripts, services, and CLI commands. Emitted events a7m4d2 and b9x1y3."
   - at: "2026-02-04T22:52:29Z"
     summary: "Initial structural audit of menv package."
