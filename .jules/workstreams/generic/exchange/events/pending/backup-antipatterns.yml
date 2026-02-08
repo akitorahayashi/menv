@@ -1,0 +1,29 @@
+schema_version: 1
+
+# Metadata
+id: "bkpatn"
+issue_id: ""
+created_at: "2024-05-23"
+author_role: "pythonista"
+confidence: "high"
+
+# Content
+title: "Backup Command Leaks Logic and Mixes I/O"
+statement: |
+  The `backup` command (`src/menv/commands/backup.py`) mixes CLI logic with business logic (path resolution, script execution), uses direct `subprocess.Popen` calls instead of a service, and contains hardcoded configuration (`BACKUP_TARGETS`) that should be externalized or modeled properly. This violates the project's architecture of separating concerns and hinders testability.
+
+# Evidence supporting the observation
+evidence:
+  - path: "src/menv/commands/backup.py"
+    loc:
+      - "124-148"
+    note: "Direct subprocess.Popen call within CLI command handler."
+  - path: "src/menv/commands/backup.py"
+    loc:
+      - "16-35"
+    note: "Hardcoded BACKUP_TARGETS dictionary defines business logic in CLI layer."
+
+tags:
+  - "anti-pattern"
+  - "coupling"
+  - "testability"

@@ -3,12 +3,13 @@ schema_version: 2
 observer: "pythonista"
 workstream: "generic"
 
-updated_at: "2024-05-22T12:00:00Z"
+updated_at: "2024-05-23T12:00:00Z"
 
 goals:
   - "Centralize configuration and domain constants (SSOT) to remove duplication and CLI coupling."
-  - "Standardize exception handling in services: raise typed exceptions instead of swallowing and printing."
-  - "Replace manual TOML generation in ConfigStorage with a proper library (tomli-w)."
+  - "Refactor services to raise typed exceptions instead of swallowing errors."
+  - "Replace manual TOML generation in ConfigStorage with a proper library."
+  - "Refactor `backup` command to use a dedicated service and remove direct subprocess calls."
 
 rules:
   - "Services must not print to stdout/stderr; return data or raise exceptions."
@@ -18,5 +19,7 @@ rules:
 ignore: []
 
 log:
+  - at: "2024-05-23T12:00:00Z"
+    summary: "Identified pervasive exception swallowing in core services, manual TOML generation, and architectural violations in the new backup command."
   - at: "2024-05-22T12:00:00Z"
     summary: "Initial analysis: identified manual TOML generation, exception swallowing in services, and domain logic leaks in CLI."

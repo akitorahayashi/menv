@@ -1,0 +1,25 @@
+schema_version: 1
+
+# Metadata
+id: "mtomlg"
+issue_id: ""
+created_at: "2024-05-23"
+author_role: "pythonista"
+confidence: "high"
+
+# Content
+title: "Manual TOML Generation in ConfigStorage"
+statement: |
+  `ConfigStorage` constructs TOML configuration files using manual string concatenation and custom escaping logic instead of using a serialization library like `tomli-w` or similar. This is brittle, prone to escaping errors, and harder to maintain as the configuration schema evolves.
+
+# Evidence supporting the observation
+evidence:
+  - path: "src/menv/services/config_storage.py"
+    loc:
+      - "59-75"
+    note: "Manually formats strings into TOML format with custom _escape function."
+
+tags:
+  - "anti-pattern"
+  - "maintainability"
+  - "configuration"
