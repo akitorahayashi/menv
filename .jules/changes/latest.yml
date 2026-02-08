@@ -1,0 +1,41 @@
+schema_version: 1
+
+id: "x7m2p9"
+created_at: "2024-05-23T10:00:00Z"
+
+range:
+  from_commit: "2ed720d285c2a07b3cf2ce42da1438516fcfa439"  # exclusive base
+  to_commit: "51b6d7a49897a1b3698797740c0836d2b50171f0"    # inclusive head
+  selection_mode: bootstrap  # Allowed: incremental, bootstrap
+  selection_detail: "Last 20 commits with non-.jules/ changes"  # Non-empty when selection_mode is bootstrap
+  excluded_paths:
+    - .jules/
+
+stats:
+  commits_total: 5
+  commits_included: 5
+  files_changed: 83
+  insertions: 3786
+  deletions: 835
+
+# Bounded sample list (sha + subject only). Not exhaustive; use stats for scale.
+commits:
+  - sha: "6b0a27c"
+    subject: "Merge remote-tracking branch 'origin/main' into jules"
+  - sha: "eb88794"
+    subject: "feat: add backup command for system settings and VSCode extensions (#302)"
+  - sha: "127506c"
+    subject: "fix: update jlo version tag to v7.6.0"
+  - sha: "cdebaf8"
+    subject: "docs: update README and AGENTS.md to match implementation (#296)"
+  - sha: "2a8c022"
+    subject: "fix: update jlo version tag to v7.5.0 and enhance error handling in version management tests"
+
+summary:
+  overview: "Introduced a backup command for exporting macOS system defaults and VSCode extensions, updated documentation to match implementation, and bumped jlo versions with improved error handling."
+  notable_changes:
+    - "Added backup command supporting system and vscode targets"
+    - "Updated README.md and AGENTS.md to align with implementation"
+    - "Bumped jlo version tag to v7.6.0 (and v7.5.0)"
+    - "Enhanced error handling in version management tests"
+  truncation_note: ""  # Non-empty when commits_total > commits_included
