@@ -13,7 +13,7 @@
 ## Communication
 
 - When reporting completed work or providing routine responses, avoid unnecessary tokens and keep responses concise and clear.
-- Your answer must be based on the context of the repository, Research is required before answering.
+- Your answer must be based on the context of the repository. Research is required before answering.
 - Problem reports are grounded in user-stated assumptions and verified repository context.
 - Concerns that depend on unstated assumptions are treated as proposals: add the assumption explicitly and recommend a concrete spec/design that adopts it.
 - Recommendations prioritize reducing user decision load. Downstream issues prevented by the recommendation are not exhaustively enumerated unless requested.

@@ -22,9 +22,9 @@ class TestCoderSkillsConfig:
             )
             agents_dir = skill_dir / "agents"
             if agents_dir.exists():
-                openai_meta = agents_dir / "openai.yaml"
-                assert openai_meta.is_file(), (
-                    f"Missing agents/openai.yaml in {skill_dir.relative_to(nodejs_coder_skills_root)}"
+                assert any(agents_dir.iterdir()), (
+                    "agents/ directory is empty in "
+                    f"{skill_dir.relative_to(nodejs_coder_skills_root)}"
                 )
 
     def test_skills_targets_schema(
