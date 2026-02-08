@@ -1,0 +1,22 @@
+schema_version: 1
+id: "d6m7n8"
+issue_id: ""
+created_at: "2024-05-23"
+author_role: "data_arch"
+confidence: "high"
+title: "Redundant Domain Constants in CLI"
+statement: |
+  `VALID_PROFILES` and `PROFILE_ALIASES` are defined redundantly and inconsistently in `src/menv/commands/create.py` and `src/menv/commands/make.py`. Domain constants should be centralized in the service layer or a shared models module to ensure a Single Source of Truth.
+evidence:
+  - path: "src/menv/commands/create.py"
+    loc:
+      - "16-20"
+    note: "Definition of VALID_PROFILES and PROFILE_ALIASES."
+  - path: "src/menv/commands/make.py"
+    loc:
+      - "26-31"
+    note: "Redundant and inconsistent definition of VALID_PROFILES and PROFILE_ALIASES."
+tags:
+  - "data-model"
+  - "ssot-violation"
+  - "inconsistency"
