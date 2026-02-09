@@ -111,9 +111,12 @@ def create(
 
     # Validate profile
     if resolved_profile not in MACHINE_PROFILES:
+        machine_aliases = sorted(
+            alias for alias, p in PROFILE_ALIASES.items() if p in MACHINE_PROFILES
+        )
         console.print(
             f"[bold red]Error:[/] Invalid profile '{profile}'. "
-            f"Valid profiles: {', '.join(sorted(MACHINE_PROFILES))} (aliases: mbk, mmn)"
+            f"Valid profiles: {', '.join(sorted(MACHINE_PROFILES))} (aliases: {', '.join(machine_aliases)})"
         )
         raise typer.Exit(code=1)
 
