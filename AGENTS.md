@@ -35,12 +35,12 @@ tests/
 
 Please refer to the `AGENTS.md` files in specific directories for detailed rules:
 
+- [Internal Commands](src/menv/commands/internal/AGENTS.md)
 - [Models](src/menv/models/AGENTS.md)
 - [Protocols](src/menv/protocols/AGENTS.md)
+- [Rust Role](src/menv/ansible/roles/rust/AGENTS.md)
 - [Services](src/menv/services/AGENTS.md)
 - [Mocks](tests/mocks/AGENTS.md)
-- [Internal Commands](src/menv/commands/internal/AGENTS.md)
-- [Rust Role](src/menv/ansible/roles/rust/AGENTS.md)
 - [Testing](tests/AGENTS.md)
 
 ## Architecture Principles
