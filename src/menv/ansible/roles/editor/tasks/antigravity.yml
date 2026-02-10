@@ -1,7 +1,7 @@
 ---
 - name: "Install Google Antigravity"
   community.general.homebrew_cask:
-    name: google-antigravity
+    name: antigravity
     state: present
 
 - name: "Ensure Antigravity User directory exists"
