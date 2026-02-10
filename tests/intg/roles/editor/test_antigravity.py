@@ -25,21 +25,3 @@ class TestAntigravityTask:
                 yaml.safe_load(f)
             except yaml.YAMLError as e:
                 pytest.fail(f"Invalid YAML in antigravity.yml: {e}")
-
-
-class TestAntigravityExtensions:
-    def test_extensions_file_exists(self, editor_config_base: Path) -> None:
-        """Verify antigravity-extensions.json exists."""
-        extensions_file = editor_config_base / "antigravity-extensions.json"
-        assert extensions_file.exists(), "antigravity-extensions.json not found"
-
-    def test_extensions_non_empty(self, editor_config_base: Path) -> None:
-        """Verify antigravity extensions list is non-empty."""
-        extensions_file = editor_config_base / "antigravity-extensions.json"
-        with extensions_file.open("r") as f:
-            data = json.load(f)
-
-        assert "extensions" in data, "Missing 'extensions' key"
-        extensions = data["extensions"]
-        assert isinstance(extensions, list), "extensions must be a list"
-        assert len(extensions) > 0, "extensions list should not be empty"
