@@ -1,0 +1,13 @@
+{
+  "extensions": [
+    "github.copilot",
+    "github.copilot-chat",
+    "ms-python.debugpy",
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "analytic-signal.preview-tiff",
+    "mushan.vscode-paste-image",
+    "nefrob.vscode-just-syntax",
+    "tomoki1207.pdf"
+  ]
+}
