@@ -96,42 +96,6 @@ menv make brew-formulae mbk -o  # Force overwrite configs
 #   python → python-platform, python-tools
 #   nodejs → nodejs-platform, nodejs-tools
 
-**Short tag aliases (optional):**
-
-| Canonical Tag | Alias | Scope |
-| --- | --- | --- |
-| `antigravity` | `agy` | Editor |
-| `vscode` | `co` | Editor |
-| `cursor` | `cur` | Editor |
-| `xcode` | `xc` | Editor |
-| `coder` | `cdr` | Node.js |
-| `nodejs-platform` | `nd-p` | Node.js |
-| `nodejs-tools` | `nd-t` | Node.js |
-| `python-platform` | `py-p` | Python |
-| `python-tools` | `py-t` | Python |
-| `aider` | `ai` | Python |
-| `rust-platform` | `rs-p` | Rust |
-| `rust-tools` | `rs-t` | Rust |
-| `go-platform` | `go-p` | Go |
-| `go-tools` | `go-t` | Go |
-| `brew-formulae` | `brew-f` | Brew |
-| `brew-cask` | `brew-c` | Brew |
-| `system` | `sys` | System |
-| `shell` | `sh` | Shell |
-| `ruby` | `rb` | Ruby |
-| `ollama` | `ol` | LLM |
-| `ollama-models` | `ol-m` | LLM |
-
-Examples:
-
-```sh
-menv make agy
-menv make nd-p
-menv make brew-f mbk
-menv make ol-m
-```
-```
-
 **Backup commands:**
 
 ```sh
