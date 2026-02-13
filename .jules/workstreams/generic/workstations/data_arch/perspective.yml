@@ -3,20 +3,21 @@ schema_version: 2
 observer: "data_arch"
 workstream: "generic"
 
-updated_at: "2024-05-23T11:00:00Z"
+updated_at: "2026-02-13T20:55:00Z"
 
 goals:
-  - "Eliminate manual TOML serialization in ConfigStorage."
-  - "Resolve duplicate backup logic and dead code in `menv.commands.backup`."
-  - "Migrate domain constants (TAG_GROUPS, VALID_PROFILES) from CLI to Service layer."
-  - "Consolidate redundant configuration paths to establish SSOT."
+  - "Advocate for compositional configuration pattern in Ansible roles (e.g. Brew)."
+  - "Monitor migration of Tag Groups to Playbook Service SSOT."
+  - "Promote Pydantic adoption for strict model validation."
 
 rules: []
 
 ignore: []
 
 log:
-  - at: "2024-05-23T11:00:00Z"
-    summary: "Emitted events for manual TOML serialization, backup logic duplication, and redundant domain constants. Confirmed severe code duplication in backup command."
+  - at: "2026-02-13T20:55:00Z"
+    summary: "Emitted events for Brew config duplication, Tag Groups coupling, and fragile model validation. Verified backup/constants issues have existing open refactors."
   - at: "2026-02-04T22:53:12Z"
     summary: "Initial inspection identified manual TOML serialization, SSOT violations in config paths, and domain logic leakage in CLI."
+  - at: "2024-05-23T11:00:00Z"
+    summary: "Emitted events for manual TOML serialization, backup logic duplication, and redundant domain constants. Confirmed severe code duplication in backup command."

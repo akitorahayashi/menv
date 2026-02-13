@@ -1,0 +1,19 @@
+schema_version: 1
+
+# Metadata
+id: "d4e5f6"
+issue_id: ""
+created_at: "2026-02-13"
+author_role: "data_arch"
+confidence: "high"
+
+# Content
+title: "Tag Groups SSOT Violation"
+statement: |
+  `TAG_GROUPS` definitions are hardcoded in `menv.constants`, creating a split authority for tag definitions. While `playbook.yml` (via `Playbook` service) is the SSOT for tags, tag *aggregations* are externalized, causing coupling between CLI and constants.
+
+evidence:
+  - path: "src/menv/constants.py"
+    loc:
+      - "25-30"
+    note: "`TAG_GROUPS` defines tag aggregations independently of the Playbook service."

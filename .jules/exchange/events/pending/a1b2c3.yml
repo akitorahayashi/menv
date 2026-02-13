@@ -1,0 +1,23 @@
+schema_version: 1
+
+# Metadata
+id: "a1b2c3"
+issue_id: ""
+created_at: "2026-02-13"
+author_role: "data_arch"
+confidence: "high"
+
+# Content
+title: "Brew Configuration Duplication"
+statement: |
+  The Ansible Brew role forces configuration duplication by using `first_found` lookup, which selects only the first matching Brewfile (profile-specific OR common) rather than merging them. This prevents compositional configuration and requires profile-specific configurations to duplicate all common dependencies.
+
+evidence:
+  - path: "src/menv/ansible/roles/brew/tasks/formulae.yml"
+    loc:
+      - "11-13"
+    note: "Uses `first_found` to pick a single Brewfile, ignoring others."
+  - path: "src/menv/ansible/roles/brew/tasks/cask.yml"
+    loc:
+      - "11-13"
+    note: "Same pattern for casks prevents composition."
