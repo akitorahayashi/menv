@@ -1,0 +1,19 @@
+schema_version: 1
+
+# Metadata
+id: "g7h8i9"
+issue_id: ""
+created_at: "2026-02-13"
+author_role: "data_arch"
+confidence: "medium"
+
+# Content
+title: "Fragile Model Validation"
+statement: |
+  `src/menv/models/config.py` relies on manual, imperative validation logic and `TypedDict` instead of a robust validation library like Pydantic. This increases maintenance effort and risk of validation gaps.
+
+evidence:
+  - path: "src/menv/models/config.py"
+    loc:
+      - "26-64"
+    note: "Manual `validate_config` function checks dictionary keys and types explicitly."
