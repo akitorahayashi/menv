@@ -1,0 +1,33 @@
+schema_version: 1
+id: "cfgovr"
+issue_id: ""
+created_at: "2026-02-13"
+author_role: "taxonomy"
+confidence: "high"
+
+title: "Term Overload: 'Config' used for both Identity and Role Dotfiles"
+statement: |
+  The term "Config" is overloaded and ambiguous, referring to two distinct concepts:
+  1. "User Identity" (Git name/email) managed via `menv config show/set` and `ConfigStorage`.
+  2. "Role Configuration" (dotfiles/settings) managed via `menv config create` and `ConfigDeployer`.
+  This violates the "One Concept, One Preferred Term" principle and confuses users about what `menv config` actually manages.
+
+evidence:
+  - path: "src/menv/commands/config.py"
+    loc:
+      - "config_app (Typer app)"
+      - "show_config (command)"
+      - "create_config (command)"
+    note: "The `config` command group mixes identity management (`show`, `set`) with dotfile deployment (`create`)."
+
+  - path: "src/menv/services/config_storage.py"
+    loc:
+      - "ConfigStorage (class)"
+      - "get_identity (method)"
+    note: "`ConfigStorage` primarily manages identity profiles (personal/work) but is named generically."
+
+  - path: "src/menv/services/config_deployer.py"
+    loc:
+      - "ConfigDeployer (class)"
+      - "deploy_role (method)"
+    note: "`ConfigDeployer` manages role configuration files, sharing the 'Config' name but unrelated to identity."

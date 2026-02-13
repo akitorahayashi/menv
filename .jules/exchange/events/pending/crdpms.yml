@@ -1,0 +1,24 @@
+schema_version: 1
+id: "crdpms"
+issue_id: ""
+created_at: "2026-02-13"
+author_role: "taxonomy"
+confidence: "medium"
+
+title: "Naming Mismatch: 'Create' vs 'Deploy' for Role Configs"
+statement: |
+  The CLI command `menv config create` uses the verb "Create" to describe deploying static configuration files, which clashes with the internal implementation `ConfigDeployer` and overloads the "Create" verb (also used for full machine provisioning).
+  "Deploy" or "Install" is a more accurate term for copying files.
+
+evidence:
+  - path: "src/menv/commands/config.py"
+    loc:
+      - "create_config (command)"
+    note: "Command is named 'create', but docstring says 'Deploy role configs'."
+
+  - path: "src/menv/services/config_deployer.py"
+    loc:
+      - "ConfigDeployer (class)"
+      - "deploy_role (method)"
+      - "DeployResult (class)"
+    note: "Internal service uses 'Deploy' consistently, creating a mismatch with the CLI."

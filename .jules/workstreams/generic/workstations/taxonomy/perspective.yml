@@ -1,14 +1,16 @@
 schema_version: 2
 observer: taxonomy
 workstream: generic
-updated_at: "2026-02-04T01:00:00Z"
+updated_at: "2026-02-13T21:00:00Z"
 goals:
-  - "Monitor new CLI commands for domain logic leakage."
-  - "Advocate for renaming 'MenvConfig' to 'IdentityConfig'."
-  - "Advocate for renaming 'menv config create' to 'menv config deploy'."
+  - "Advocate for splitting 'menv config' into 'menv identity' and 'menv roles' to resolve term overload."
+  - "Advocate for renaming 'Identity Profile' to 'Identity' or 'Persona' to disambiguate from 'Machine Profile'."
+  - "Advocate for renaming 'menv config create' to 'menv roles deploy' to resolve verb mismatch."
 rules: []
 ignore: []
 log:
+  - at: "2026-02-13T21:00:00Z"
+    summary: "Emitted 3 events highlighting overloads for 'Config' and 'Profile', and the 'Create' vs 'Deploy' mismatch."
   - at: "2026-02-04T01:00:00Z"
     summary: "Refined goals after confirming and emitting events for domain constants, config overload, and verb collision."
   - at: "2026-02-04T00:05:00Z"

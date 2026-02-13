@@ -1,0 +1,31 @@
+schema_version: 1
+id: "prfovr"
+issue_id: ""
+created_at: "2026-02-13"
+author_role: "taxonomy"
+confidence: "high"
+
+title: "Term Overload: 'Profile' used for both Machine Targets and Identity"
+statement: |
+  The term "Profile" is overloaded and ambiguous, referring to two distinct concepts:
+  1. "Machine Target" (e.g., macbook, mac-mini) used in `menv create`.
+  2. "User Identity" (e.g., personal, work) used in `menv switch`.
+  This creates confusion (e.g., users might try to "switch" to a machine or "create" an identity).
+
+evidence:
+  - path: "src/menv/constants.py"
+    loc:
+      - "MACHINE_PROFILES"
+      - "PROFILE_ALIASES"
+    note: "Defines 'Profile' as a machine target (e.g., 'macbook')."
+
+  - path: "src/menv/commands/switch.py"
+    loc:
+      - "switch (command)"
+      - "PROFILE_ALIASES (local constant)"
+    note: "Defines 'Profile' as a user identity (e.g., 'personal')."
+
+  - path: "src/menv/services/config_storage.py"
+    loc:
+      - "get_identity (method)"
+    note: "Uses 'profile' argument to mean identity, clashing with domain constants."
