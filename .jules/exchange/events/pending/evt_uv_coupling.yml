@@ -1,0 +1,23 @@
+schema_version: 1
+id: "evt001"
+issue_id: null
+created_at: "2026-02-13T21:00:00Z"
+author_role: "structural_arch"
+confidence: "high"
+
+title: "Tight Coupling to `uv` in AnsibleRunner Service"
+statement: |
+  The `AnsibleRunner` service directly invokes `uv run ansible-playbook` via `subprocess`, making the application strictly dependent on `uv` availability and location. This violates boundary principles by coupling the service layer to a specific external toolchain without abstraction. If `uv` is not installed or not in the PATH, the service fails with a misleading "ansible-playbook not found" error because the `FileNotFoundError` from the `uv` call is caught and re-raised with that message. This prevents usage in environments where `ansible-playbook` is available directly (e.g. system install or other venv).
+
+evidence:
+  - path: "src/menv/services/ansible_runner.py"
+    snippet: |
+      cmd: list[str | Path] = [
+          "uv",
+          "run",
+          "ansible-playbook",
+          str(playbook_path),
+          # ...
+      ]
+
+tags: ["coupling", "boundary-violation", "external-dependency"]

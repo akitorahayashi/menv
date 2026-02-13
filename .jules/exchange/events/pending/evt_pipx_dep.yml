@@ -1,0 +1,20 @@
+schema_version: 1
+id: "evt003"
+issue_id: null
+created_at: "2026-02-13T21:00:00Z"
+author_role: "structural_arch"
+confidence: "high"
+
+title: "Hardcoded pipx Dependency in VersionChecker Service"
+statement: |
+  The `VersionChecker` service assumes the application is installed and managed via `pipx` by directly invoking `pipx upgrade menv`. This creates a tight coupling to a specific package manager in the service layer, preventing alternative installation methods (e.g., system package, dev setup, other venv managers) or requiring them to use `pipx` just for updates. The update mechanism should be abstracted or configurable.
+
+evidence:
+  - path: "src/menv/services/version_checker.py"
+    snippet: |
+      result = subprocess.run(
+          ["pipx", "upgrade", "menv"],
+          check=False,
+      )
+
+tags: ["coupling", "external-dependency", "portability"]
