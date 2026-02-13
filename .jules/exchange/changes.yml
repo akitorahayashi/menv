@@ -1,0 +1,19 @@
+schema_version: 1
+created_at: "2026-02-13T20:44:00Z"
+
+summaries:
+  - title: "Ansible Playbook Enhancements"
+    scope: "src/menv/ansible/, src/menv/services/ansible_runner.py"
+    impact: "Improved developer experience with shorthand aliases for Ansible tags and support for executing playbooks using `uv`."
+  - title: "Effective Prompter Skill & Python Compatibility"
+    scope: "src/menv/ansible/roles/coder/skills/, pyproject.toml"
+    impact: "Added 'Effective Prompter' skill and extended Python support to 3.13/3.14."
+  - title: "Google Antigravity Integration"
+    scope: "src/menv/ansible/roles/editor/, src/menv/ansible/playbook.yml"
+    impact: "Enabled Google Antigravity integration with new editor configurations and skill targets."
+  - title: "Core Error Handling Improvements"
+    scope: "src/menv/exceptions.py, src/menv/services/, src/menv/commands/"
+    impact: "Replaced error swallowing/codes with a proper exception hierarchy (`MenvError`) for better reliability and debugging."
+  - title: "Codebase Modernization & Cleanup"
+    scope: "src/menv/constants.py, src/menv/services/config_storage.py"
+    impact: "Centralized domain constants and adopted `tomli-w` for robust TOML serialization."
