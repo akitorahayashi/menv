@@ -1,0 +1,24 @@
+schema_version: 1
+
+# Metadata
+id: "d5m2p8"
+issue_id: ""
+created_at: "2026-02-13"
+author_role: "cov"
+confidence: "high"
+
+# Content
+title: "Dead Code Detected: Shadowed Backup Module"
+statement: |
+  The file `src/menv/commands/backup.py` is shadowed by the package `src/menv/commands/backup/` (containing `__init__.py` and `command.py`). The module file is never executed (0% coverage) and should be removed to eliminate redundancy and confusion.
+
+# Evidence supporting the observation
+evidence:
+  - path: "src/menv/commands/backup.py"
+    loc:
+      - "1-152"
+    note: "File shows 0% coverage and is never imported or executed."
+  - path: "src/menv/commands/backup/__init__.py"
+    loc:
+      - "1-6"
+    note: "Package takes precedence over the module."

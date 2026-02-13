@@ -1,0 +1,32 @@
+schema_version: 1
+
+# Metadata
+id: "c3q6j7"
+issue_id: ""
+created_at: "2026-02-13"
+author_role: "cov"
+confidence: "high"
+
+# Content
+title: "Critical Coverage Gaps in CLI Entry Points"
+statement: |
+  Core CLI commands show critically low test coverage: `update` (22%), `switch` (26%), `create` (30%), and `config` (32%). These are the primary user interfaces and high-risk regression areas that need immediate attention.
+
+# Evidence supporting the observation
+evidence:
+  - path: "src/menv/commands/update.py"
+    loc:
+      - "22-52"
+    note: "22% coverage"
+  - path: "src/menv/commands/switch.py"
+    loc:
+      - "36-163"
+    note: "26% coverage"
+  - path: "src/menv/commands/create.py"
+    loc:
+      - "53-215"
+    note: "30% coverage"
+  - path: "src/menv/commands/config.py"
+    loc:
+      - "35-175"
+    note: "32% coverage"
