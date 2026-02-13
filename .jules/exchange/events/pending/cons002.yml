@@ -1,0 +1,12 @@
+id: cons002
+issue_id: null
+created_at: "2026-02-13T21:00:00Z"
+author_role: consistency
+confidence: medium
+title: "menv make xcode is undocumented"
+statement: "The `menv make xcode` command (tag: `xcode`) exists and is part of `FULL_SETUP_TAGS`, but is not documented in the README.md under the 'Editors' section or available commands."
+evidence:
+  - "src/menv/constants.py: FULL_SETUP_TAGS includes 'xcode'"
+  - "src/menv/ansible/roles/editor/tasks/xcode.yml: Ansible task implementation"
+  - "README.md: Editors section omits 'xcode'"
+tags: ["documentation", "make-command", "xcode"]

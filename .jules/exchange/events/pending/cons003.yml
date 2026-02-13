@@ -1,0 +1,12 @@
+id: cons003
+issue_id: null
+created_at: "2026-02-13T21:00:00Z"
+author_role: consistency
+confidence: high
+title: "Workstation memory references non-existent menv identity command"
+statement: "The workstation memory incorrectly references a `menv identity` command (alias `id`) for managing VCS identity. The codebase implements this functionality via `menv config set`."
+evidence:
+  - "src/menv/main.py: No 'identity' command registered"
+  - "src/menv/commands/config.py: Implements 'set_config' for VCS identity"
+  - "README.md: Documents 'menv config set' for VCS identity"
+tags: ["memory-drift", "identity-command"]
