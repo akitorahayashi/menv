@@ -5,14 +5,17 @@ This file defines the binding rules for Jules agents operating in this repositor
 ## Authority
 
 - This file is authoritative for global rules and shared conventions.
-- Each layer contract is authoritative for layer-specific workflows and schemas:
+- Each layer contract is authoritative for layer-specific rules and schemas:
   - `.jules/roles/narrator/contracts.yml`
   - `.jules/roles/observers/contracts.yml`
-  - `.jules/roles/deciders/contracts.yml`
-  - `.jules/roles/planners/contracts.yml`
-  - `.jules/roles/implementers/contracts.yml`
-  - `.jules/roles/innovators/contracts_creation.yml`
-  - `.jules/roles/innovators/contracts_refinement.yml`
+  - `.jules/roles/decider/contracts.yml`
+  - `.jules/roles/planner/contracts.yml`
+  - `.jules/roles/implementer/contracts.yml`
+  - `.jules/roles/integrator/contracts.yml`
+  - `.jules/roles/innovators/contracts.yml`
+
+- **Role Definitions**: Defined in `.jlo/` (Control Plane).
+  - `.jlo/roles/<layer>/roles/<role>/role.yml`
 
 If a required contract file is missing or conflicts with another contract, execution stops and the
 conflict is reported.
@@ -25,62 +28,58 @@ conflict is reported.
 
 ## Changes Feed
 
-The Narrator layer produces `.jules/changes/latest.yml`, summarizing recent codebase changes.
+The Narrator layer produces `.jules/exchange/changes.yml`, summarizing recent codebase changes.
 
-- `.jules/changes/latest.yml` is overwritten in-place (no time-series).
+- `.jules/exchange/changes.yml` is overwritten in-place (no time-series).
 - Narrator excludes `.jules/` from all diffs and path lists.
-- Observers receive this context automatically when present.
-- Schema is defined by `.jules/roles/narrator/schemas/change.yml`.
+- Observers may use this only as a secondary hint after baseline repository inspection.
+- Schema is defined by `.jules/roles/narrator/schemas/changes.yml`.
 
-## Workstream Model
+## Exchange Model
 
-Workstreams isolate events and issues so that decider rules do not mix across unrelated operational areas.
+Jules uses a flat exchange model for handing off events and requirements between layers. The exchange is located in `.jules/exchange/`.
 
-- Observers and deciders declare their destination workstream via the `workstream` runtime context variable.
-- If the workstream directory is missing, execution fails fast.
-- Planners and implementers do not declare a workstream; the issue file path is authoritative.
-
-Workstream directories:
-
-- Events (Observer output, Decider input):
-  - `.jules/workstreams/<workstream>/exchange/events/<state>/*.yml` (state directories defined by the scaffold)
-- Issues (Decider/Planner output, Implementer input):
-  - `.jules/workstreams/<workstream>/exchange/issues/<label>/*.yml`
+- **Events** (Observer output, Decider input):
+  - `.jules/exchange/events/<state>/*.yml` (states: `pending`, `decided`)
+- **Requirements** (Decider/Planner output, Implementer input):
+  - `.jules/exchange/requirements/*.yml`
+- **Innovator Rooms**:
+  - `.jules/exchange/innovators/<persona>/` (contains proposals and comments)
 
 ## Workspace Data Flow
 
-The pipeline is file-based and uses local issues as the handoff point:
+The pipeline is file-based and uses local requirements as the handoff point:
 
-`narrator -> observers -> deciders -> [planners] -> implementers`
+`narrator -> observers -> decider -> [planner] -> implementer`
 
-Narrator runs first, producing `.jules/changes/latest.yml` for observer context.
+Narrator runs first, producing `.jules/exchange/changes.yml` as a secondary hint for observer triage.
 
 After decider output:
-- Issues with `requires_deep_analysis: false` are ready for implementation.
-- Issues with `requires_deep_analysis: true` trigger deep analysis by planners.
-- Implementers are invoked via workflow dispatch with a local issue file. Scheduled workflows may dispatch implementers according to repository policy.
+- Requirements with `requires_deep_analysis: false` are ready for implementation.
+- Requirements with `requires_deep_analysis: true` trigger deep analysis by planner.
+- Implementer is invoked via `jlo run implementer` with a local requirement file. Scheduled workflows may dispatch implementer according to repository policy.
 
-## Issue Identity and Deduplication
+## Requirement Identity and Deduplication
 
-- Issue filenames use stable kebab-case identifiers, not dates (e.g. `auth-inconsistency.yml`).
-- Observers check open issues before emitting events to avoid duplicates.
-- Deciders link related events to issues (populating `source_events` in the issue).
-- Events are preserved in the workstream until an implementation workflow removes them.
+- Requirement filenames use stable kebab-case identifiers, not dates (e.g. `auth-inconsistency.yml`).
+- Observers check existing requirements before emitting events to avoid duplicates.
+- Decider links related events to requirements (populating `source_events` in the requirement).
+- Events are preserved in the exchange until an implementation workflow removes them.
 
 ## Deep Analysis
 
-When an issue requires deep analysis:
+When a requirement requires deep analysis:
 - `requires_deep_analysis: true` must have a non-empty `deep_analysis_reason` field.
-- Planners expand the issue and set `requires_deep_analysis: false`.
+- Planner expands the requirement and sets `requires_deep_analysis: false`.
 - The original rationale is preserved and expanded with findings.
 
 ## File Rules
 
 - YAML only (`.yml`) and English only.
 - Artifacts are created by copying the corresponding schema and filling its fields:
-  - Changes: `.jules/roles/narrator/schemas/change.yml`
+  - Changes: `.jules/roles/narrator/schemas/changes.yml`
   - Events: `.jules/roles/observers/schemas/event.yml`
-  - Issues: `.jules/roles/deciders/schemas/issue.yml`
+  - Requirements: `.jules/roles/decider/schemas/requirements.yml`
 
 ## Git And Branch Rules
 
@@ -90,21 +89,24 @@ Branch names:
 
 - Narrator: `jules-narrator-<id>`
 - Observers: `jules-observer-<id>`
-- Deciders: `jules-decider-<id>`
-- Planners: `jules-planner-<id>`
-- Implementers: `jules-implementer-<label>-<id>-<short_description>`
+- Decider: `jules-decider-<id>`
+- Planner: `jules-planner-<id>`
+- Implementer: `jules-implementer-<label>-<id>-<short_description>`
+- Integrator: `jules-integrator-<timestamp>-<id>`
 
 `<id>` is 6 lowercase alphanumeric characters unless the layer contract specifies otherwise.
 
-`<label>` is an issue label defined in `.jules/github-labels.json` (e.g., `bugs`, `feats`).
+`<label>` is a requirement label defined in `.jules/github-labels.json` (e.g., `bugs`, `feats`).
 
 ## Safety Boundaries
 
-- Narrator modifies only `.jules/changes/latest.yml`.
-- Observers, Deciders, and Planners modify only `.jules/`.
-- Implementers modify only what the issue specifies, run the verification command, then
-  create a pull request for human review.
+- Narrator modifies only `.jules/exchange/changes.yml`.
+- Observers, Decider, and Planner modify only `.jules/`.
+- Implementer modifies only what the requirement specifies, runs the verification command, then
+  creates a pull request for human review.
+- Integrator merges implementer branches contextually and creates a single integration pull request
+  for human review.
 
 ## Forbidden By Default
 
-- `.github/workflows/` is not modified unless explicitly required by the issue.
+- `.github/workflows/` is not modified unless explicitly required by the requirement.
