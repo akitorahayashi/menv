@@ -1,47 +1,47 @@
 # Rules
 
-## Coding
+## Conduct
 
-- Remove obsolete and deprecated code during feature work and refactoring.
-- Use names that express a single, unambiguous responsibility.
-- Derive enumerable values from authoritative sources.
-- Keep fallback behavior explicit, opt-in, and observable.
-- Justify necessity by direct contribution to purpose.
-- Complete explicitly requested tasks end-to-end.
-- Match validation depth and evidence to scope and intent.
+### Design
 
-## Design
+- When adding new features or refactoring, removing old modules and deprecated features is mandatory. Identify and eliminate all sources of technical debt, bugs, and complexity.
+- Never define class or file names with ambiguous responsibilities, such as base, common, core, utils, or helpers.
+- Every file and class name must identify its single, specific responsibility. Names that merely restate a package or directory scope attract unrelated concerns and become "God Classes."
+- Never hardcode enumerable values. Generate these dynamically from the authoritative source (catalog, registry, schema) to ensure extensibility and eliminate maintenance burden.
+- Silent fallbacks are not recommended. Any fallback should be explicit, opt-in, and surfaced as a failure or a clearly logged, reviewed decision.
+- Prioritize UX simplicity over excessive configuration.
+- Prefer systemic fixes over patches: state the invariant and owning component first, then fix it at that boundary so all call sites benefit, without adding workaround paths.
 
-- Enforce single ownership for each concern.
-- Keep layer responsibilities explicit and non-overlapping.
-- Preserve one-way dependency direction and block boundary violations.
-- Maximize cohesion within modules and minimize cross-module coupling.
-- Prevent semantic overlap in module vocabulary.
-- Prefer consolidation over parallel abstractions.
-- Retire legacy paths when a new boundary model is adopted.
+### Implementation
 
-## Communication
+- Complete tasks that has been ordered to be performed without interruption or discretionary refusal.
+- Do not inventory changes after implementation (unnecessary retrospection using git diff, git status, etc. is prohibited). After implementation, only perform evidential verification (testing, etc.).
+- Prioritize validating the appropriate scope; provide minimal evidence unless intent dictates otherwise.
 
-- Prioritize engineering correctness and critical reasoning.
-- Ground recommendations in repository context and verified evidence.
-- Treat unstated assumptions as explicit proposals.
-- Minimize user decision load.
-- Ask clarifying questions only when uncertainty changes outcomes.
-- Update plans when direction changes.
-- Keep routine responses concise.
-
-## Documentation
+### Documentation
 
 - All development-related documentation must be written in English.
-- Keep LLM-facing documentation concise and essential.
-- Use declarative documentation that describes current state.
-- Preserve correct existing content while integrating updates without duplication.
+- Keep documentation for LLM (AGENTS.md, CLAUDE.md, etc.) concise for token efficiency. Focus on essential information only.
+- Documentation is written in a declarative style describing the current state. Imperative or changelog-style descriptions are avoided.
+- Declarative updates preserve existing, correct content and integrate new content where appropriate, without duplication. Avoid ripping and replacing everything.
+- Avoid using ** to emphasize something in Markdown. Organize information clearly using hierarchical displays such as headings.
+
+### Communication
+
+- Your answer must be based on the context of the repository, The beginning of a conversation requires research before answering.
+- Pursue engineering correctness, do not pander to the author or current state of the repository, and maintain a critical and rational perspective.
+- Concerns that depend on unstated assumptions are treated as proposals: add the assumption explicitly and recommend a concrete spec/design that adopts it.
+- Recommendations prioritize reducing user decision load. Downstream issues prevented by the recommendation are not exhaustively enumerated unless requested.
+- When considering whether something is unnecessary, validate its necessity by its contribution to a purpose, rather than using the excuse that "it's being used elsewhere.".
+- Clarifying questions are asked only when uncertainty materially changes the recommendation or implementation.
+- If there is a change of direction in the discussion about the plan you created, edit the plan rather than simply reiterating it.
+- When reporting completed work or providing routine responses, avoid unnecessary tokens and keep responses concise and clear.
+
+### Safety
+
+- Commands that discard uncommitted changes (for example `git checkout -- <path>`, `git restore`, `git reset`) are only run after explicit user approval.
+
+## User specific
+
 - `.mx/*.md` files are context-file storage. Do not read them unless the user explicitly instructs you to do so.
-
-## Safety
-
-- Commands that discard uncommitted changes require explicit user approval.
-
-## Operational Directives
-
-Operational intent embedded in command text is authoritative and must be followed as intended.
+- While maintaining a critical and rational perspective on design and architecture, you must strictly follow operational instructions embedded in terminal commands. For example, if a user uses `echo` to convey a directive or modifies a test command, execute the intended action rather than the literal command. In these operational contexts, user intent overrides command appearance.
