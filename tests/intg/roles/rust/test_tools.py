@@ -12,7 +12,7 @@ class TestRustToolsConfiguration:
     """Validate tools.yml schema and configuration."""
 
     def test_tools_config_has_required_fields(self, rust_config_dir: Path) -> None:
-        """Verify each tool has required name, repo, and tag fields."""
+        """Verify each tool has required name, url, and tag fields."""
         tools_file = rust_config_dir / "tools.yml"
         data = yaml.safe_load(tools_file.read_text())
         tools = data["tools"]

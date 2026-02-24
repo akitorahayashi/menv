@@ -137,6 +137,7 @@
       asset="{{ item.name }}-{{ rust_platform_os }}-{{ rust_platform_arch }}"
       gh release download "{{ item.tag }}" -R "${repo}" --pattern "${asset}" --dir /tmp --clobber
       install -m 0755 "/tmp/${asset}" "{{ rust_tools_bin_dir }}/{{ item.name }}"
+      rm -f "/tmp/${asset}"
     executable: /bin/bash
   loop: "{{ rust_tools_config.tools }}"
   loop_control:
