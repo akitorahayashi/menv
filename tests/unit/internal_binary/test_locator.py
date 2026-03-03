@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import os
 import stat
 from pathlib import Path
 from unittest.mock import patch
@@ -41,9 +40,7 @@ class TestLocate:
             with pytest.raises(FileNotFoundError, match="not found"):
                 locator.locate()
 
-    def test_raises_permission_error_when_not_executable(
-        self, tmp_path: Path
-    ) -> None:
+    def test_raises_permission_error_when_not_executable(self, tmp_path: Path) -> None:
         key = locator._platform_key()
         binary_dir = tmp_path / key
         binary_dir.mkdir(parents=True)
