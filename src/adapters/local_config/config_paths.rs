@@ -1,11 +1,15 @@
 //! Configuration path resolution.
+//!
+//! The base path is `~/.config/` — the project convention for macOS.
+//! Ansible roles reference `local_config_root` as an extra var and expect
+//! `~/.config/menv/roles/`, so this path must not change.
 
 use std::path::PathBuf;
 
 fn config_base() -> PathBuf {
-    dirs::config_dir()
-        .or_else(|| dirs::home_dir().map(|h| h.join(".config")))
-        .expect("config directory must be resolvable")
+    dirs::home_dir()
+        .expect("home directory must be resolvable")
+        .join(".config")
 }
 
 /// Default path to the mev configuration file.
