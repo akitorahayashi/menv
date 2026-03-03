@@ -14,10 +14,11 @@ class TestInternalAppRouting:
 
     def test_no_args_shows_help(self) -> None:
         result = runner.invoke(internal_app, [])
-        # Typer with no_args_is_help returns exit code 0 or 2 depending on
-        # invoke_without_command; usage text is always shown.
-        assert "Usage" in result.output or "internal" in result.output.lower()
+        assert result.exit_code in (0, 2)
+        assert "Usage:" in result.output
+        assert "internal" in result.output.lower()
 
     def test_unknown_subcommand_fails(self) -> None:
         result = runner.invoke(internal_app, ["nonexistent"])
         assert result.exit_code != 0
+        assert "No such command" in result.output

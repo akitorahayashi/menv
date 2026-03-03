@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import os
 import platform
+from importlib import resources
 from pathlib import Path
 
 
@@ -23,7 +24,7 @@ def _platform_key() -> str:
 
 def _bundled_binaries_root() -> Path:
     """Return the root path for bundled binary storage."""
-    return Path(__file__).resolve().parent.parent / "bundled_binaries"
+    return Path(str(resources.files("menv").joinpath("bundled_binaries")))
 
 
 def locate() -> Path:

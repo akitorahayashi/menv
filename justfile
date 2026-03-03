@@ -71,8 +71,9 @@ build-internal:
     platform="${system}-${machine}"
     dest_dir="{{ repo_root }}/src/menv/bundled_binaries/${platform}"
     mkdir -p "$dest_dir"
-    cargo build --release --manifest-path "{{ repo_root }}/crates/menv-internal/Cargo.toml"
-    cp "{{ repo_root }}/crates/menv-internal/target/release/menv-internal" "$dest_dir/menv-internal"
+    target_dir="{{ repo_root }}/crates/menv-internal/target"
+    cargo build --release --target-dir "$target_dir" --manifest-path "{{ repo_root }}/crates/menv-internal/Cargo.toml"
+    cp "$target_dir/release/menv-internal" "$dest_dir/menv-internal"
     chmod +x "$dest_dir/menv-internal"
     echo "✅ Built menv-internal -> ${dest_dir}/menv-internal"
 

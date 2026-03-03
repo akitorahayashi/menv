@@ -39,9 +39,14 @@ pub fn run(cmd: SshCommand) -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn home_dir() -> PathBuf {
-    std::env::var("HOME")
-        .map(PathBuf::from)
-        .unwrap_or_else(|_| dirs::home_dir().unwrap_or_else(|| PathBuf::from("/")))
+    if let Ok(home) = std::env::var("HOME") {
+        return PathBuf::from(home);
+    }
+    if let Some(home) = dirs::home_dir() {
+        return home;
+    }
+    eprintln!("Error: Could not determine home directory.");
+    std::process::exit(1);
 }
 
 fn ssh_dir() -> PathBuf {
@@ -198,6 +203,12 @@ fn remove_host(host: &str) -> Result<(), Box<dyn std::error::Error>> {
     }
 
     if let Some(ref id_file) = identity_file {
+        let ssh_base = ssh_dir().canonicalize().unwrap_or_else(|_| ssh_dir());
+        let candidate = id_file.canonicalize().unwrap_or_else(|_| id_file.clone());
+        if !candidate.starts_with(&ssh_base) {
+            eprintln!("Error: Refusing to remove key outside {}.", ssh_base.display());
+            std::process::exit(1);
+        }
         let pub_file = id_file.with_extension("pub");
         for path in [id_file.as_path(), pub_file.as_path()] {
             if path.exists() {

@@ -2,16 +2,22 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
 from menv.commands.internal import dispatch
 
 
+@dataclass
+class _RunResult:
+    returncode: int
+
+
 class TestDispatch:
-    def test_raises_file_not_found_when_binary_missing(self, tmp_path: Path) -> None:
+    def test_raises_file_not_found_when_binary_missing(self) -> None:
         with patch.object(
             dispatch,
             "locate",
@@ -33,8 +39,7 @@ class TestDispatch:
         fake_binary = tmp_path / "menv-internal"
         fake_binary.write_text("fake")
 
-        mock_result = MagicMock()
-        mock_result.returncode = 42
+        mock_result = _RunResult(returncode=42)
 
         with (
             patch.object(dispatch, "locate", return_value=fake_binary),
@@ -51,8 +56,7 @@ class TestDispatch:
         fake_binary = tmp_path / "menv-internal"
         fake_binary.write_text("fake")
 
-        mock_result = MagicMock()
-        mock_result.returncode = 0
+        mock_result = _RunResult(returncode=0)
 
         with (
             patch.object(dispatch, "locate", return_value=fake_binary),

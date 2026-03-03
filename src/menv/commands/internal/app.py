@@ -36,8 +36,16 @@ def _internal_callback(ctx: typer.Context) -> None:
         return
 
     # Forward everything after "internal" to the Rust binary
-    args = sys.argv[sys.argv.index("internal") + 1 :]
-    code = dispatch(args)
+    try:
+        internal_idx = sys.argv.index("internal")
+    except ValueError:
+        return
+
+    args = sys.argv[internal_idx + 1 :]
+    try:
+        code = dispatch(args)
+    except (FileNotFoundError, PermissionError):
+        return
     raise typer.Exit(code)
 
 

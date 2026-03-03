@@ -76,9 +76,7 @@ fn collect_extension_matches(extensions: &[String]) -> Vec<String> {
             let mut matched: Vec<String> = entries
                 .filter_map(|e| e.ok())
                 .filter(|p| p.is_file())
-                .filter_map(|p| {
-                    p.strip_prefix(&cwd).ok().map(|rel| rel.to_string_lossy().into_owned())
-                })
+                .map(|p| p.strip_prefix(&cwd).unwrap_or(p.as_path()).to_string_lossy().into_owned())
                 .collect();
             matched.sort();
             results.extend(matched);
@@ -106,21 +104,15 @@ fn run_aider(
 
     let provider_model = if model.contains('/') { model } else { format!("ollama/{model}") };
 
-    let mut command_args: Vec<String> = vec![
-        "aider".into(),
-        "--model".into(),
-        provider_model,
-        "--no-auto-commit".into(),
-        "--no-gitignore".into(),
-    ];
+    let mut command = Command::new("aider");
+    command.arg("--model").arg(provider_model).arg("--no-auto-commit").arg("--no-gitignore");
 
     if yolo {
-        command_args.push("--yes".into());
+        command.arg("--yes");
     }
 
     if let Some(msg) = message {
-        command_args.push("--message".into());
-        command_args.push(msg);
+        command.arg("--message").arg(msg);
     }
 
     let mut all_targets: Vec<String> = Vec::new();
@@ -128,14 +120,14 @@ fn run_aider(
     all_targets.extend(collect_extension_matches(&extensions));
     all_targets.extend(files);
     all_targets.extend(targets);
-    command_args.extend(all_targets);
+    command.args(all_targets);
 
-    let status = Command::new(&command_args[0]).args(&command_args[1..]).status();
+    let status = command.status();
 
     match status {
         Ok(s) => std::process::exit(s.code().unwrap_or(1)),
         Err(e) => {
-            eprintln!("Error: failed to execute {:?}: {e}", command_args[0]);
+            eprintln!("Error: failed to execute \"aider\": {e}");
             std::process::exit(1);
         }
     }
