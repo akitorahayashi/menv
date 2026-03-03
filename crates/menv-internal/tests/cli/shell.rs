@@ -1,13 +1,10 @@
-use assert_cmd::Command;
+use assert_cmd::cargo_bin_cmd;
 use predicates::prelude::*;
 
 #[test]
 fn gen_gemini_aliases_produces_expected_output() {
-    let output = Command::cargo_bin("menv-internal")
-        .unwrap()
-        .args(["shell", "gen-gemini-aliases"])
-        .assert()
-        .success();
+    let output =
+        cargo_bin_cmd!("menv-internal").args(["shell", "gen-gemini-aliases"]).assert().success();
 
     let stdout = String::from_utf8(output.get_output().stdout.clone()).unwrap();
     let lines: Vec<&str> = stdout.trim().lines().collect();
@@ -25,8 +22,7 @@ fn gen_gemini_aliases_produces_expected_output() {
 #[test]
 fn gen_vscode_workspace_creates_file() {
     let dir = tempfile::tempdir().unwrap();
-    Command::cargo_bin("menv-internal")
-        .unwrap()
+    cargo_bin_cmd!("menv-internal")
         .current_dir(dir.path())
         .args(["shell", "gen-vscode-workspace", "../path1", "/abs/path2"])
         .assert()

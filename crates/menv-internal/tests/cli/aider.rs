@@ -1,10 +1,9 @@
-use assert_cmd::Command;
+use assert_cmd::cargo_bin_cmd;
 use predicates::prelude::*;
 
 #[test]
 fn run_without_model_env_exits_1() {
-    Command::cargo_bin("menv-internal")
-        .unwrap()
+    cargo_bin_cmd!("menv-internal")
         .args(["aider", "run"])
         .env_remove("AIDER_OLLAMA_MODEL")
         .assert()
@@ -15,8 +14,7 @@ fn run_without_model_env_exits_1() {
 
 #[test]
 fn set_model_without_arg_exits_1() {
-    Command::cargo_bin("menv-internal")
-        .unwrap()
+    cargo_bin_cmd!("menv-internal")
         .args(["aider", "set-model"])
         .assert()
         .failure()
@@ -26,8 +24,7 @@ fn set_model_without_arg_exits_1() {
 
 #[test]
 fn set_model_with_arg_prints_export() {
-    Command::cargo_bin("menv-internal")
-        .unwrap()
+    cargo_bin_cmd!("menv-internal")
         .args(["aider", "set-model", "llama3.2"])
         .assert()
         .success()
@@ -36,8 +33,7 @@ fn set_model_with_arg_prints_export() {
 
 #[test]
 fn unset_model_when_set_prints_unset() {
-    Command::cargo_bin("menv-internal")
-        .unwrap()
+    cargo_bin_cmd!("menv-internal")
         .args(["aider", "unset-model"])
         .env("AIDER_OLLAMA_MODEL", "test-model")
         .assert()
@@ -47,8 +43,7 @@ fn unset_model_when_set_prints_unset() {
 
 #[test]
 fn unset_model_when_not_set_prints_already() {
-    Command::cargo_bin("menv-internal")
-        .unwrap()
+    cargo_bin_cmd!("menv-internal")
         .args(["aider", "unset-model"])
         .env_remove("AIDER_OLLAMA_MODEL")
         .assert()
