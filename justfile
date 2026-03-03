@@ -58,6 +58,25 @@ check: fix
     @uv run ansible-lint src/menv/ansible/
 
 # ==============================================================================
+# BUILD
+# ==============================================================================
+
+# Build menv-internal and place binary in bundled_binaries
+build-internal:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    system="$(uname -s | tr '[:upper:]' '[:lower:]')"
+    machine="$(uname -m | tr '[:upper:]' '[:lower:]')"
+    [[ "$machine" == "arm64" ]] && machine="aarch64"
+    platform="${system}-${machine}"
+    dest_dir="{{ repo_root }}/src/menv/bundled_binaries/${platform}"
+    mkdir -p "$dest_dir"
+    cargo build --release --manifest-path "{{ repo_root }}/crates/menv-internal/Cargo.toml"
+    cp "{{ repo_root }}/crates/menv-internal/target/release/menv-internal" "$dest_dir/menv-internal"
+    chmod +x "$dest_dir/menv-internal"
+    echo "✅ Built menv-internal -> ${dest_dir}/menv-internal"
+
+# ==============================================================================
 # TESTING
 # ==============================================================================
 
