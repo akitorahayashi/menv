@@ -8,6 +8,7 @@ arguments and exit codes.
 
 from __future__ import annotations
 
+import importlib.resources
 import os
 import platform
 import subprocess
@@ -28,7 +29,7 @@ def _locate_binary() -> Path:
     """Locate the bundled ``mev`` binary for the current platform.
 
     Resolution order:
-    1. ``bundled_binaries/<platform>/mev`` relative to this package.
+    1. Package resource via importlib.resources (installed via pipx).
     2. ``src/menv/bundled_binaries/<platform>/mev`` for repository dev mode.
 
     Raises:
@@ -36,12 +37,25 @@ def _locate_binary() -> Path:
         PermissionError: Binary exists but is not executable.
     """
     key = _platform_key()
-    candidates = [
-        # Installed via pipx (hatch force-include places it relative to package root)
-        Path(__file__).resolve().parent.parent / "menv" / "bundled_binaries" / key / "mev",
-        # Repository development mode (running from source checkout)
-        Path(__file__).resolve().parent.parent.parent / "src" / "menv" / "bundled_binaries" / key / "mev",
-    ]
+    candidates: list[Path] = []
+
+    # Installed via pipx — use importlib.resources for proper package resolution
+    try:
+        ref = importlib.resources.files("menv").joinpath("bundled_binaries", key, "mev")
+        resource_path = Path(str(ref))
+        candidates.append(resource_path)
+    except (ModuleNotFoundError, TypeError):
+        pass
+
+    # Repository development mode (running from source checkout)
+    candidates.append(
+        Path(__file__).resolve().parent.parent.parent
+        / "src"
+        / "menv"
+        / "bundled_binaries"
+        / key
+        / "mev",
+    )
 
     for candidate in candidates:
         if candidate.exists():

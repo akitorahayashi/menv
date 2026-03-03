@@ -2,20 +2,18 @@
 
 use std::path::PathBuf;
 
+fn config_base() -> PathBuf {
+    dirs::config_dir()
+        .or_else(|| dirs::home_dir().map(|h| h.join(".config")))
+        .expect("config directory must be resolvable")
+}
+
 /// Default path to the mev configuration file.
 pub fn default_config_path() -> PathBuf {
-    dirs::home_dir()
-        .expect("home directory must be resolvable")
-        .join(".config")
-        .join("menv")
-        .join("config.json")
+    config_base().join("menv").join("config.json")
 }
 
 /// Default path to the local config root for deployed role configs.
 pub fn local_config_root() -> PathBuf {
-    dirs::home_dir()
-        .expect("home directory must be resolvable")
-        .join(".config")
-        .join("menv")
-        .join("roles")
+    config_base().join("menv").join("roles")
 }

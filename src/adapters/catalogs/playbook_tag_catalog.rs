@@ -11,6 +11,11 @@ pub struct PlaybookTagCatalog {
 }
 
 impl PlaybookTagCatalog {
+    /// Empty catalog for contexts that don't need tag resolution.
+    pub fn empty() -> Self {
+        Self { tags_by_role: HashMap::new(), tag_to_role: HashMap::new() }
+    }
+
     /// Load from a playbook.yml file.
     pub fn from_file(playbook_path: &PathBuf) -> Result<Self, Box<dyn std::error::Error>> {
         let content = std::fs::read_to_string(playbook_path)?;
@@ -28,18 +33,30 @@ impl PlaybookTagCatalog {
                             .and_then(|v| v.as_str())
                             .map(|s| s.to_string());
 
-                        let tags: Vec<String> = mapping
-                            .get(serde_yaml::Value::String("tags".to_string()))
-                            .and_then(|v| v.as_sequence())
-                            .map(|seq| {
-                                seq.iter()
+                        let tags: Vec<String> =
+                            match mapping.get(serde_yaml::Value::String("tags".to_string())) {
+                                Some(v) if v.as_sequence().is_some() => v
+                                    .as_sequence()
+                                    .unwrap()
+                                    .iter()
                                     .filter_map(|v| v.as_str().map(|s| s.to_string()))
-                                    .collect()
-                            })
-                            .unwrap_or_default();
+                                    .collect(),
+                                Some(v) if v.as_str().is_some() => {
+                                    vec![v.as_str().unwrap().to_string()]
+                                }
+                                _ => Vec::new(),
+                            };
 
                         if let Some(name) = role_name {
                             for tag in &tags {
+                                if let Some(existing) = tag_to_role.get(tag)
+                                    && existing != &name
+                                {
+                                    return Err(format!(
+                                        "duplicate tag '{tag}': owned by both '{existing}' and '{name}'"
+                                    )
+                                    .into());
+                                }
                                 tag_to_role.insert(tag.clone(), name.clone());
                             }
                             tags_by_role.insert(name, tags);

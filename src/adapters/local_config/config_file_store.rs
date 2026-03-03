@@ -1,4 +1,4 @@
-//! Configuration file store using TOML on disk.
+//! Configuration file store using JSON on disk.
 
 use std::path::PathBuf;
 
@@ -28,12 +28,23 @@ impl ConfigStore for ConfigFileStore {
     }
 
     fn save(&self, config: &MevConfig) -> Result<(), AppError> {
-        if let Some(parent) = self.config_path.parent() {
-            std::fs::create_dir_all(parent)?;
-        }
+        let parent = self
+            .config_path
+            .parent()
+            .ok_or_else(|| AppError::Config("config path has no parent directory".to_string()))?;
+        std::fs::create_dir_all(parent)?;
+
         let content = serde_json::to_string_pretty(config)
             .map_err(|e| AppError::Config(format!("failed to serialize config: {e}")))?;
-        std::fs::write(&self.config_path, content)?;
+
+        // Atomic write: write to temp file in same directory, then rename.
+        let tmp_path = parent.join(".config.json.tmp");
+        std::fs::write(&tmp_path, &content)
+            .map_err(|e| AppError::Config(format!("failed to write temp config: {e}")))?;
+        std::fs::rename(&tmp_path, &self.config_path).map_err(|e| {
+            let _ = std::fs::remove_file(&tmp_path);
+            AppError::Config(format!("failed to rename temp config: {e}"))
+        })?;
         Ok(())
     }
 

@@ -38,4 +38,18 @@ impl AppContext {
             version_source: CargoPkgVersion,
         })
     }
+
+    /// Construct a config-only context (no ansible asset resolution needed).
+    pub fn for_config() -> Self {
+        Self {
+            ansible_executor: AnsibleProcessExecutor::new(
+                PathBuf::new(),
+                config_paths::local_config_root(),
+            ),
+            tag_catalog: PlaybookTagCatalog::empty(),
+            role_catalog: FsRoleCatalog::new(PathBuf::new()),
+            config_store: ConfigFileStore::new(config_paths::default_config_path()),
+            version_source: CargoPkgVersion,
+        }
+    }
 }

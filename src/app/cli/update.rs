@@ -5,7 +5,10 @@ use crate::domain::ports::version_source::VersionSource;
 
 pub fn run() -> Result<(), AppError> {
     let source = crate::adapters::version::cargo_pkg_version::CargoPkgVersion;
+    run_with_source(&source)
+}
 
+pub fn run_with_source(source: &dyn VersionSource) -> Result<(), AppError> {
     let current = source.current_version()?;
     println!("Current version: {current}");
 

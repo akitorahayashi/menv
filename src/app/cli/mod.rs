@@ -47,7 +47,7 @@ enum Commands {
     Update,
 
     /// Backup system settings or configurations.
-    #[command(alias = "bk")]
+    #[command(alias = "bk", hide = true)]
     Backup(BackupArgs),
 
     /// Internal commands used by shell aliases.

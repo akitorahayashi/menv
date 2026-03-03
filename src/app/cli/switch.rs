@@ -4,7 +4,6 @@ use std::process::Command;
 
 use clap::Args;
 
-use crate::adapters::package_assets::ansible_asset_locator;
 use crate::app::AppContext;
 use crate::domain::config;
 use crate::domain::error::AppError;
@@ -17,8 +16,7 @@ pub struct SwitchArgs {
 }
 
 pub fn run(args: SwitchArgs) -> Result<(), AppError> {
-    let ansible_dir = ansible_asset_locator::locate_ansible_dir()?;
-    let ctx = AppContext::new(ansible_dir).map_err(|e| AppError::Config(e.to_string()))?;
+    let ctx = AppContext::for_config();
 
     if !ctx.config_store.exists() {
         eprintln!("No configuration found.");
@@ -52,8 +50,12 @@ pub fn run(args: SwitchArgs) -> Result<(), AppError> {
 
     // Jujutsu configuration (optional — skip if jj not installed)
     if which::which("jj").is_ok() {
-        let _ = run_jj_config("user.name", &identity.name);
-        let _ = run_jj_config("user.email", &identity.email);
+        if let Err(e) = run_jj_config("user.name", &identity.name) {
+            eprintln!("Warning: jj config user.name failed: {e}");
+        }
+        if let Err(e) = run_jj_config("user.email", &identity.email) {
+            eprintln!("Warning: jj config user.email failed: {e}");
+        }
     }
 
     // Show current configuration

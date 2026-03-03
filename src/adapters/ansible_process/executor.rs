@@ -1,6 +1,5 @@
 //! Ansible playbook execution through process invocation.
 
-use std::io::{BufRead, BufReader};
 use std::path::Path;
 use std::process::{Command, Stdio};
 
@@ -30,6 +29,13 @@ impl AnsibleExecutor for AnsibleProcessExecutor {
             });
         }
 
+        if !config_path.exists() {
+            return Err(AppError::AnsibleExecution {
+                message: format!("ansible.cfg not found: {}", config_path.display()),
+                exit_code: None,
+            });
+        }
+
         let mut cmd = Command::new("uv");
         cmd.arg("run")
             .arg("ansible-playbook")
@@ -55,23 +61,11 @@ impl AnsibleExecutor for AnsibleProcessExecutor {
         }
 
         cmd.env("ANSIBLE_CONFIG", &config_path);
-        cmd.stdout(Stdio::piped());
-        cmd.stderr(Stdio::piped());
+        cmd.stdout(Stdio::inherit());
+        cmd.stderr(Stdio::inherit());
 
-        let mut child = cmd.spawn().map_err(|e| AppError::AnsibleExecution {
-            message: format!("failed to spawn ansible-playbook: {e}"),
-            exit_code: None,
-        })?;
-
-        if let Some(stdout) = child.stdout.take() {
-            let reader = BufReader::new(stdout);
-            for line in reader.lines().map_while(Result::ok) {
-                println!("{line}");
-            }
-        }
-
-        let status = child.wait().map_err(|e| AppError::AnsibleExecution {
-            message: format!("failed to wait for ansible-playbook: {e}"),
+        let status = cmd.status().map_err(|e| AppError::AnsibleExecution {
+            message: format!("failed to run ansible-playbook: {e}"),
             exit_code: None,
         })?;
 

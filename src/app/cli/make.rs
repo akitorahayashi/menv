@@ -23,10 +23,6 @@ pub struct MakeArgs {
     /// Enable verbose output.
     #[arg(short, long)]
     pub verbose: bool,
-
-    /// Overwrite existing configuration files.
-    #[arg(short, long)]
-    pub overwrite: bool,
 }
 
 pub fn run(args: MakeArgs) -> Result<(), AppError> {

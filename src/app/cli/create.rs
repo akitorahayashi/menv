@@ -7,7 +7,6 @@ use crate::app::AppContext;
 use crate::domain::error::AppError;
 use crate::domain::execution_plan::ExecutionPlan;
 use crate::domain::ports::ansible_executor::AnsibleExecutor;
-use crate::domain::ports::role_catalog::RoleCatalog;
 use crate::domain::ports::tag_catalog::TagCatalog;
 use crate::domain::profile;
 use crate::domain::tag::FULL_SETUP_TAGS;
@@ -20,10 +19,6 @@ pub struct CreateArgs {
     /// Enable verbose output.
     #[arg(short, long)]
     pub verbose: bool,
-
-    /// Overwrite existing configuration files.
-    #[arg(short, long)]
-    pub overwrite: bool,
 }
 
 pub fn run(args: CreateArgs) -> Result<(), AppError> {
@@ -48,18 +43,6 @@ pub fn run(args: CreateArgs) -> Result<(), AppError> {
     println!("mev: Creating {resolved} environment");
     println!("This will run {} tasks.", plan.tags.len());
     println!();
-
-    // Deploy configs for roles that need it
-    let roles_with_config: std::collections::HashSet<String> =
-        ctx.role_catalog.roles_with_config().into_iter().collect();
-    let _roles_to_deploy: std::collections::HashSet<String> = plan
-        .tags
-        .iter()
-        .filter_map(|tag| ctx.tag_catalog.role_for_tag(tag))
-        .filter(|role| roles_with_config.contains(role))
-        .collect();
-
-    // Config deployment is handled by ansible roles themselves via local_config_root
 
     // Execute each tag
     for (i, tag) in plan.tags.iter().enumerate() {

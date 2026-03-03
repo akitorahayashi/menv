@@ -14,4 +14,6 @@ fn needs_update_detects_difference() {
     let source = mev::adapters::version::cargo_pkg_version::CargoPkgVersion;
     assert!(source.needs_update("0.1.0", "0.2.0"));
     assert!(!source.needs_update("1.0.0", "1.0.0"));
+    // Downgrade must not trigger update
+    assert!(!source.needs_update("1.0.0", "0.9.0"));
 }

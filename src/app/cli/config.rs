@@ -116,31 +116,61 @@ fn run_set() -> Result<(), AppError> {
     Ok(())
 }
 
-fn run_create(role: Option<String>, _overwrite: bool) -> Result<(), AppError> {
+fn run_create(role: Option<String>, overwrite: bool) -> Result<(), AppError> {
     let ansible_dir = ansible_asset_locator::locate_ansible_dir()?;
-    let ctx = AppContext::new(ansible_dir).map_err(|e| AppError::Config(e.to_string()))?;
+    let ctx = AppContext::new(ansible_dir.clone()).map_err(|e| AppError::Config(e.to_string()))?;
 
-    let available = ctx.role_catalog.roles_with_config();
+    let available = ctx.role_catalog.roles_with_config()?;
 
-    if let Some(role_name) = role {
+    let roles_to_deploy = if let Some(role_name) = role {
         if !available.contains(&role_name) {
             return Err(AppError::Config(format!(
                 "role '{role_name}' has no config directory. Available: {}",
                 available.join(", ")
             )));
         }
-        println!("✓ {role_name}: config available");
+        vec![role_name]
     } else {
         if available.is_empty() {
             println!("No roles with config directories found.");
             return Ok(());
         }
-        for role_name in &available {
-            println!("✓ {role_name}: config available");
+        available
+    };
+
+    let local_config_root = crate::adapters::local_config::config_paths::local_config_root();
+
+    for role_name in &roles_to_deploy {
+        let source = ansible_dir.join("roles").join(role_name).join("config");
+        let target = local_config_root.join(role_name);
+
+        if target.exists() && !overwrite {
+            println!("  {role_name}: config exists (use --overwrite to replace)");
+            continue;
         }
-        println!();
-        println!("Found {} roles with config directories.", available.len());
+        if target.exists() {
+            std::fs::remove_dir_all(&target).map_err(|e| {
+                AppError::Config(format!("failed to remove existing config for {role_name}: {e}"))
+            })?;
+        }
+        copy_dir_recursive(&source, &target)?;
+        println!("✓ {role_name}: config deployed");
     }
 
+    Ok(())
+}
+
+fn copy_dir_recursive(src: &std::path::Path, dst: &std::path::Path) -> Result<(), AppError> {
+    std::fs::create_dir_all(dst)?;
+    for entry in std::fs::read_dir(src)? {
+        let entry = entry?;
+        let src_path = entry.path();
+        let dst_path = dst.join(entry.file_name());
+        if src_path.is_dir() {
+            copy_dir_recursive(&src_path, &dst_path)?;
+        } else {
+            std::fs::copy(&src_path, &dst_path)?;
+        }
+    }
     Ok(())
 }

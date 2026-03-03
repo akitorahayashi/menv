@@ -374,6 +374,7 @@ dependencies = [
  "dirs",
  "menv-internal",
  "predicates",
+ "semver",
  "serde",
  "serde_json",
  "serde_yaml",

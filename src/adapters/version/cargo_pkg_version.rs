@@ -16,7 +16,10 @@ impl VersionSource for CargoPkgVersion {
     }
 
     fn needs_update(&self, current: &str, latest: &str) -> bool {
-        current != latest
+        match (semver::Version::parse(current), semver::Version::parse(latest)) {
+            (Ok(cur), Ok(lat)) => lat > cur,
+            _ => current != latest,
+        }
     }
 
     fn run_upgrade(&self) -> Result<(), AppError> {

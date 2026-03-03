@@ -29,6 +29,7 @@ src/
 ├── lib.rs                 # Library root
 ├── app/
 │   ├── cli/               # clap argument contracts (1 file per command)
+│   │   └── mod.rs         # Single owner of clap parser and command dispatch
 │   ├── commands/           # Orchestration units per command domain
 │   ├── context.rs          # Dependency wiring (ports → adapters)
 │   └── api.rs              # Stable library entrypoints
@@ -69,6 +70,7 @@ tests/
 The `menv` entrypoint in `pyproject.toml` still points to `menv.main:app` for backward compatibility.
 The `mev` entrypoint delegates to the Rust binary via `python/mev_bootstrap/launcher.py`.
 Runtime command ownership belongs to the Rust implementation.
+The Python dispatch boundary (`menv.commands.internal.dispatch`) remains stable for backward compatibility.
 
 ## Architecture Principles
 
