@@ -5,7 +5,7 @@
 //! import these directly via `mev::api::*`.
 
 use crate::adapters::ansible::locator;
-use crate::adapters::version::cargo_pkg_version::CargoPkgVersion;
+use crate::adapters::version_source::cargo::CargoVersion;
 use crate::app::AppContext;
 use crate::app::commands;
 use crate::domain::error::AppError;
@@ -89,7 +89,7 @@ pub fn switch(profile: &str) -> Result<(), AppError> {
 
 /// Check for and install updates to the mev CLI.
 pub fn update() -> Result<(), AppError> {
-    let source = CargoPkgVersion;
+    let source = CargoVersion;
     commands::update::execute(&source)
 }
 
