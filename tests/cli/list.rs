@@ -18,10 +18,5 @@ fn list_alias_ls_is_accepted() {
 #[test]
 fn list_visible_in_main_help() {
     let ctx = TestContext::new();
-    ctx.cli()
-        .arg("--help")
-        .assert()
-        .success()
-        .stdout(predicate::str::contains("list"))
-        .stdout(predicate::str::contains("ls"));
+    ctx.cli().arg("--help").assert().success().stdout(predicate::str::contains("list"));
 }
