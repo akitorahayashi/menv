@@ -15,7 +15,7 @@ Installable via `pipx` through a thin Python launcher that delegates to the preb
 | Adapters | `src/adapters/` | Process execution, file I/O, catalog loading, package asset resolution |
 | Internal dep | `crates/menv-internal/` | Internal command domain implementations reused by mev |
 | Python bootstrap | `python/mev_bootstrap/` | Thin launcher delegating to bundled binary |
-| Distribution binary | `src/menv/bundled_binaries/` | Prebuilt executable for pipx install |
+| Distribution assets | `src/assets/` | Bundled binaries and ansible assets for dev and packaging |
 
 ## CLI Commands
 
@@ -66,18 +66,16 @@ tests/
 └── security.rs + security/ # Input validation contracts
 ```
 
-## Legacy Python Surface
+## Python Surface
 
-`src/menv/` contains the original Python CLI implementation (Typer).
-The `menv` entrypoint in `pyproject.toml` still points to `menv.main:app` for backward compatibility.
-The `mev` entrypoint delegates to the Rust binary via `python/mev_bootstrap/launcher.py`.
+Python ownership is limited to `python/mev_bootstrap/launcher.py`.
+The launcher resolves packaged assets, sets `MEV_ANSIBLE_DIR`, and executes the bundled Rust binary.
 Runtime command ownership belongs to the Rust implementation.
-The Python dispatch boundary (`menv.commands.internal.dispatch`) remains stable for backward compatibility.
 
 ## Architecture Principles
 
 ### Directory Naming
-- **No ambiguous names**: `core/`, `utils/`, `helpers/` are forbidden
+- No ambiguous names: `core/`, `utils/`, `helpers/` are forbidden
 - Every file must belong to a clear, specific category
 
 ## Design Rules

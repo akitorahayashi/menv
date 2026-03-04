@@ -1,9 +1,9 @@
 # menv-internal Development Overview
 
 ## Project Summary
-`menv-internal` is the latency-sensitive runtime binary for `menv` internal commands.
-It provides the `aider`, `shell`, `ssh`, and `vcs` command domains invoked by `menv internal ...`
-through the Python dispatch boundary.
+`menv-internal` is the latency-sensitive runtime binary for `mev` internal commands.
+It provides the `aider`, `shell`, `ssh`, and `vcs` command domains invoked by `mev internal ...`
+through the Rust CLI boundary.
 
 ## Tech Stack
 - Language: Rust
@@ -28,4 +28,4 @@ through the Python dispatch boundary.
 - Single binary with four subcommand domains: aider, shell, ssh, vcs
 - `app/cli/mod.rs` owns the clap parser and dispatch
 - Each domain is a sibling module in `app/cli/`
-- Invoked by the Python `menv.commands.internal.dispatch` module
+- Invoked by the Rust `mev` CLI internal subcommand dispatch

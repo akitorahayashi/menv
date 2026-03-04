@@ -3,7 +3,7 @@
 //! Resolution order:
 //! 1. `MEV_ANSIBLE_DIR` environment variable (explicit override).
 //! 2. Walk up from the current executable checking both development layout
-//!    (`src/menv/ansible/`) and installed package layout (`ansible/`).
+//!    (`src/assets/ansible/`) and packaged layout (`assets/ansible/`).
 //! 3. `CARGO_MANIFEST_DIR` fallback for `cargo run` development workflows.
 //!
 //! On failure, the error includes all searched candidate paths for diagnosis.
@@ -30,15 +30,15 @@ pub fn locate_ansible_dir() -> Result<PathBuf, AppError> {
         let mut candidate = exe.parent().map(|p| p.to_path_buf());
         for _ in 0..6 {
             if let Some(ref dir) = candidate {
-                // Development layout: <repo>/src/menv/ansible/
-                let dev_path = dir.join("src").join("menv").join("ansible");
+                // Development layout: <repo>/src/assets/ansible/
+                let dev_path = dir.join("src").join("assets").join("ansible");
                 if is_valid_ansible_dir(&dev_path) {
                     return Ok(dev_path);
                 }
                 searched.push(dev_path);
 
-                // Installed package layout: <site-packages>/menv/ansible/
-                let installed_path = dir.join("ansible");
+                // Packaged layout: <site-packages>/.../assets/ansible/
+                let installed_path = dir.join("assets").join("ansible");
                 if is_valid_ansible_dir(&installed_path) {
                     return Ok(installed_path);
                 }
@@ -51,7 +51,7 @@ pub fn locate_ansible_dir() -> Result<PathBuf, AppError> {
 
     // 3. CARGO_MANIFEST_DIR fallback (cargo run / cargo test).
     if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
-        let ansible_dir = PathBuf::from(&manifest_dir).join("src").join("menv").join("ansible");
+        let ansible_dir = PathBuf::from(&manifest_dir).join("src").join("assets").join("ansible");
         if is_valid_ansible_dir(&ansible_dir) {
             return Ok(ansible_dir);
         }

@@ -43,13 +43,13 @@ __pycache__/
 
 .claude/settings.local.json
 reference/*
-src/menv/.ansible/*
+src/assets/.ansible/*
 
 # Rust build artifacts
 target/
 
 # Bundled binaries (built, not committed)
-src/menv/bundled_binaries/*/menv-internal
+src/assets/bundled_binaries/*/mev
 
 # Coverage
 .coverage

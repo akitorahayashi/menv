@@ -1,7 +1,7 @@
-//! `menv-internal` — latency-sensitive internal command runtime for `menv`.
+//! `menv-internal` — latency-sensitive internal command runtime for `mev`.
 //!
 //! This binary provides the `aider`, `shell`, `ssh`, and `vcs` command domains
-//! invoked by `menv internal ...` through a Python dispatch boundary.
+//! invoked by `mev internal ...` through the Rust CLI boundary.
 
 pub mod app;
 

@@ -30,7 +30,7 @@ def _locate_binary() -> Path:
 
     Resolution order:
     1. Package resource via importlib.resources (installed via pipx).
-    2. ``src/menv/bundled_binaries/<platform>/mev`` for repository dev mode.
+    2. ``src/assets/bundled_binaries/<platform>/mev`` for repository dev mode.
 
     Raises:
         FileNotFoundError: Binary is missing for this platform.
@@ -41,7 +41,9 @@ def _locate_binary() -> Path:
 
     # Installed via pipx — use importlib.resources for proper package resolution
     try:
-        ref = importlib.resources.files("menv").joinpath("bundled_binaries", key, "mev")
+        ref = importlib.resources.files("mev_bootstrap").joinpath(
+            "assets", "bundled_binaries", key, "mev"
+        )
         resource_path = Path(str(ref))
         candidates.append(resource_path)
     except (ModuleNotFoundError, TypeError):
@@ -51,7 +53,7 @@ def _locate_binary() -> Path:
     candidates.append(
         Path(__file__).resolve().parent.parent.parent
         / "src"
-        / "menv"
+        / "assets"
         / "bundled_binaries"
         / key
         / "mev",
@@ -74,15 +76,52 @@ def _locate_binary() -> Path:
     )
 
 
+def _locate_ansible_dir() -> Path:
+    """Locate packaged ansible assets for the Rust runtime.
+
+    Resolution order:
+    1. Package resource via importlib.resources (installed via pipx).
+    2. ``src/assets/ansible`` for repository dev mode.
+    """
+    candidates: list[Path] = []
+
+    try:
+        ref = importlib.resources.files("mev_bootstrap").joinpath("assets", "ansible")
+        candidates.append(Path(str(ref)))
+    except (ModuleNotFoundError, TypeError):
+        pass
+
+    candidates.append(
+        Path(__file__).resolve().parent.parent.parent / "src" / "assets" / "ansible"
+    )
+
+    for candidate in candidates:
+        if (
+            candidate.joinpath("playbook.yml").exists()
+            and candidate.joinpath("roles").is_dir()
+        ):
+            return candidate
+
+    searched = "\n  ".join(str(c) for c in candidates)
+    raise FileNotFoundError(
+        "Packaged ansible assets were not found.\n"
+        f"Searched:\n  {searched}\n"
+        "Ensure src/assets/ansible is included in package build artifacts."
+    )
+
+
 def main() -> None:
     """Entry point: locate and exec the bundled mev binary."""
     try:
         binary = _locate_binary()
+        ansible_dir = _locate_ansible_dir()
     except (FileNotFoundError, PermissionError) as exc:
         print(f"mev-bootstrap: {exc}", file=sys.stderr)
         sys.exit(127)
 
-    result = subprocess.run([str(binary), *sys.argv[1:]], check=False)
+    env = os.environ.copy()
+    env["MEV_ANSIBLE_DIR"] = str(ansible_dir)
+    result = subprocess.run([str(binary), *sys.argv[1:]], check=False, env=env)
     sys.exit(result.returncode)
 
 
