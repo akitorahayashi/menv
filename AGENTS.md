@@ -42,9 +42,11 @@ src/
 │   └── execution_plan.rs   # Deterministic ansible plan construction
 ├── adapters/
 │   ├── ansible_process/    # Binary resolution and process execution
+│   ├── backup/             # System defaults and VSCode extension backup
 │   ├── catalogs/           # Dynamic tag/role loading from playbook.yml
 │   ├── local_config/       # JSON config persistence
 │   ├── package_assets/     # Asset root resolution (dev + packaged)
+│   ├── vcs/                # Git and Jujutsu identity configuration
 │   └── version/            # Version information source
 ├── assets/                 # Embedded static resources
 └── testing/                # In-process test doubles
