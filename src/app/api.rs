@@ -11,6 +11,7 @@ use crate::app::commands;
 use crate::domain::error::AppError;
 use crate::domain::ports::version_source::VersionSource;
 
+pub use crate::domain::backup::BackupTarget;
 pub use crate::domain::config::VcsIdentity;
 pub use crate::domain::error::AppError as Error;
 pub use crate::domain::execution_plan::ExecutionPlan;
@@ -98,4 +99,15 @@ pub fn update() -> Result<(), AppError> {
 #[allow(dead_code)]
 pub(crate) fn update_with_source(source: &dyn VersionSource) -> Result<(), AppError> {
     commands::update::execute(source)
+}
+
+// =============================================================================
+// Backup
+// =============================================================================
+
+/// Backup a system setting or configuration target.
+pub fn backup(target: &str) -> Result<(), AppError> {
+    let ansible_dir = ansible_asset_locator::locate_ansible_dir()?;
+    let ctx = AppContext::new(ansible_dir).map_err(|e| AppError::Config(e.to_string()))?;
+    commands::backup::execute(&ctx, target)
 }

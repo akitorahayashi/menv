@@ -1,7 +1,12 @@
-//! Version source from Cargo package metadata.
+//! Version source from Cargo package metadata with GitHub release check and pipx upgrade.
+
+use std::process::Command;
 
 use crate::domain::error::AppError;
 use crate::domain::ports::version_source::VersionSource;
+
+const GITHUB_RELEASES_URL: &str =
+    "https://api.github.com/repos/akitorahayashi/menv/releases/latest";
 
 pub struct CargoPkgVersion;
 
@@ -11,8 +16,26 @@ impl VersionSource for CargoPkgVersion {
     }
 
     fn latest_version(&self) -> Result<String, AppError> {
-        // Version checking against remote is deferred to phase 3.
-        Err(AppError::VersionCheck("remote version check not yet implemented".to_string()))
+        let output = Command::new("curl")
+            .args(["-sSL", "-H", "Accept: application/vnd.github.v3+json", GITHUB_RELEASES_URL])
+            .output()
+            .map_err(|e| AppError::VersionCheck(format!("failed to fetch latest version: {e}")))?;
+
+        if !output.status.success() {
+            return Err(AppError::VersionCheck(
+                "failed to fetch latest version from GitHub".to_string(),
+            ));
+        }
+
+        let body = String::from_utf8_lossy(&output.stdout);
+        let data: serde_json::Value = serde_json::from_str(&body)
+            .map_err(|e| AppError::VersionCheck(format!("failed to parse release data: {e}")))?;
+
+        let tag = data["tag_name"]
+            .as_str()
+            .ok_or_else(|| AppError::VersionCheck("no tag_name in release data".to_string()))?;
+
+        Ok(tag.trim_start_matches('v').to_string())
     }
 
     fn needs_update(&self, current: &str, latest: &str) -> bool {
@@ -23,6 +46,25 @@ impl VersionSource for CargoPkgVersion {
     }
 
     fn run_upgrade(&self) -> Result<(), AppError> {
-        Err(AppError::VersionCheck("upgrade not yet implemented".to_string()))
+        println!("Upgrading menv via pipx...");
+
+        let status = Command::new("pipx").args(["upgrade", "menv"]).status().map_err(|e| {
+            if e.kind() == std::io::ErrorKind::NotFound {
+                AppError::VersionCheck(
+                    "pipx not found. Please ensure pipx is installed.".to_string(),
+                )
+            } else {
+                AppError::VersionCheck(format!("failed to run pipx: {e}"))
+            }
+        })?;
+
+        if !status.success() {
+            return Err(AppError::VersionCheck(format!(
+                "pipx upgrade failed with exit code {}",
+                status.code().unwrap_or(-1)
+            )));
+        }
+
+        Ok(())
     }
 }
