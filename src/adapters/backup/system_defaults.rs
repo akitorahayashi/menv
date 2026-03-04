@@ -52,10 +52,16 @@ pub fn execute(definitions_dir: &Path, output_file: &Path) -> Result<(), AppErro
     }
 
     let definitions = load_definitions(definitions_dir)?;
+    if definitions.is_empty() {
+        return Err(AppError::Backup(format!(
+            "no setting definitions found in {}",
+            definitions_dir.display()
+        )));
+    }
     let mut lines = vec!["---".to_string()];
 
     for def in &definitions {
-        let raw_value = read_defaults(&def.domain, &def.key, &def.default);
+        let raw_value = read_defaults(&def.domain, &def.key, &def.default)?;
         let formatted = format_value(def, &raw_value);
         lines.extend(build_entry(def, &formatted));
     }
@@ -98,7 +104,7 @@ fn load_definitions(dir: &Path) -> Result<Vec<SettingDefinition>, AppError> {
     Ok(definitions)
 }
 
-fn read_defaults(domain: &str, key: &str, default: &serde_yaml::Value) -> String {
+fn read_defaults(domain: &str, key: &str, default: &serde_yaml::Value) -> Result<String, AppError> {
     let output = if SPECIAL_GLOBAL_KEYS.contains(&key) {
         Command::new("defaults").args(["read", "-g", key]).output()
     } else {
@@ -106,8 +112,23 @@ fn read_defaults(domain: &str, key: &str, default: &serde_yaml::Value) -> String
     };
 
     match output {
-        Ok(o) if o.status.success() => String::from_utf8_lossy(&o.stdout).trim().to_string(),
-        _ => value_to_string(default),
+        Ok(o) if o.status.success() => {
+            Ok(String::from_utf8_lossy(&o.stdout).trim().to_string())
+        }
+        Ok(o) => {
+            let stderr = String::from_utf8_lossy(&o.stderr);
+            if stderr.contains("does not exist") {
+                Ok(value_to_string(default))
+            } else {
+                Err(AppError::Backup(format!(
+                    "defaults read failed for domain='{domain}', key='{key}': {}",
+                    stderr.trim()
+                )))
+            }
+        }
+        Err(e) => Err(AppError::Backup(format!(
+            "failed to execute defaults for domain='{domain}', key='{key}': {e}"
+        ))),
     }
 }
 
@@ -169,6 +190,8 @@ fn format_numeric(raw_value: &str, default: &serde_yaml::Value, as_float: bool) 
     };
     if as_float {
         target.parse::<f64>().map(|f| f.to_string()).unwrap_or(target)
+    } else if let Ok(i) = target.parse::<i64>() {
+        i.to_string()
     } else {
         target.parse::<f64>().map(|f| (f as i64).to_string()).unwrap_or(target)
     }
@@ -206,7 +229,8 @@ fn build_entry(def: &SettingDefinition, value: &str) -> Vec<String> {
 
     let mut lines = Vec::new();
     if let Some(ref comment) = def.comment {
-        lines.push(format!("# {comment}"));
+        let safe_comment = comment.replace(['\n', '\r'], " ");
+        lines.push(format!("# {safe_comment}"));
     }
     lines.push(entry);
     lines

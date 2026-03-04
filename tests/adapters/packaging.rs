@@ -25,7 +25,7 @@ fn python_bootstrap_launcher_exists() {
 #[test]
 fn bundled_binaries_directory_exists() {
     let dir = project_root().join("src").join("menv").join("bundled_binaries");
-    assert!(dir.exists(), "bundled_binaries directory missing: {}", dir.display());
+    assert!(dir.is_dir(), "bundled_binaries directory missing: {}", dir.display());
 }
 
 #[test]

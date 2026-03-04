@@ -30,10 +30,8 @@ fn switch_requires_profile_argument() {
 }
 
 #[test]
-fn switch_rejects_unknown_profile() {
+fn switch_without_config_fails_gracefully() {
     let ctx = TestContext::new();
-    // Without config present, switch fails before profile validation.
-    // With config present (covered by security tests), it rejects invalid profiles.
     ctx.cli().args(["switch", "invalid"]).assert().failure();
 }
 
