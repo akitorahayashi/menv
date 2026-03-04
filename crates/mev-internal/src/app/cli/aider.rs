@@ -205,3 +205,46 @@ fn shell_quote(s: &str) -> String {
     }
     format!("'{}'", s.replace('\'', "'\"'\"'"))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn shell_quote_passes_through_safe_strings() {
+        assert_eq!(shell_quote("llama3.2"), "llama3.2");
+        assert_eq!(shell_quote("model-name_v1"), "model-name_v1");
+    }
+
+    #[test]
+    fn shell_quote_wraps_strings_with_special_chars() {
+        let result = shell_quote("my model");
+        assert!(result.starts_with('\''));
+    }
+
+    #[test]
+    fn shell_quote_empty_string() {
+        assert_eq!(shell_quote(""), "''");
+    }
+
+    #[test]
+    fn set_model_with_valid_model_succeeds() {
+        let result = set_model(Some("llama3.2".to_string()));
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn unset_model_when_env_not_set_succeeds() {
+        env::remove_var(MODEL_ENV);
+        let result = unset_model();
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn unset_model_when_env_set_succeeds() {
+        env::set_var(MODEL_ENV, "test-model");
+        let result = unset_model();
+        env::remove_var(MODEL_ENV);
+        assert!(result.is_ok());
+    }
+}

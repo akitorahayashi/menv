@@ -5,8 +5,7 @@ use std::process::Command;
 use crate::domain::error::AppError;
 use crate::domain::ports::version_source::VersionSource;
 
-const GITHUB_RELEASES_URL: &str =
-    "https://api.github.com/repos/akitorahayashi/menv/releases/latest";
+const GITHUB_RELEASES_URL: &str = "https://api.github.com/repos/akitorahayashi/mev/releases/latest";
 
 pub struct CargoPkgVersion;
 
@@ -22,7 +21,7 @@ impl VersionSource for CargoPkgVersion {
                 "-H",
                 "Accept: application/vnd.github.v3+json",
                 "-H",
-                "User-Agent: menv-cli",
+                "User-Agent: mev-cli",
                 GITHUB_RELEASES_URL,
             ])
             .output()
@@ -61,9 +60,9 @@ impl VersionSource for CargoPkgVersion {
         // Rust binaries + packaged assets such as ansible content), so the updater
         // must refresh the same installation boundary. A cargo-based self-update
         // would only target Rust artifacts and can diverge from the pipx runtime.
-        println!("Upgrading menv via pipx...");
+        println!("Upgrading mev via pipx...");
 
-        let status = Command::new("pipx").args(["upgrade", "menv"]).status().map_err(|e| {
+        let status = Command::new("pipx").args(["upgrade", "mev"]).status().map_err(|e| {
             if e.kind() == std::io::ErrorKind::NotFound {
                 AppError::VersionCheck(
                     "pipx not found. Please ensure pipx is installed.".to_string(),

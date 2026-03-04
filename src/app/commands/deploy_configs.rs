@@ -1,7 +1,7 @@
 //! Shared config deployment from ansible roles to local config root.
 //!
 //! Replicates Python `_deploy_configs_for_roles`: before ansible execution,
-//! ensures each role's config directory is deployed to `~/.config/menv/roles/`.
+//! ensures each role's config directory is deployed to `~/.config/mev/roles/`.
 
 use std::collections::HashSet;
 use std::path::Path;

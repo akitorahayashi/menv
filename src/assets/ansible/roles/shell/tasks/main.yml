@@ -14,14 +14,14 @@
     force: true
 
 # --- create symbolic links for all files in local_config_root/shell/common/alias/
-- name: "Clean and recreate ~/.menv/alias directory"
+- name: "Clean and recreate ~/.mev/alias directory"
   ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/.menv/alias"
+    path: "{{ ansible_env.HOME }}/.mev/alias"
     state: absent
 
-- name: "Create ~/.menv/alias directory"
+- name: "Create ~/.mev/alias directory"
   ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/.menv/alias"
+    path: "{{ ansible_env.HOME }}/.mev/alias"
     state: directory
     mode: "0755"
 
@@ -39,9 +39,9 @@
          | map('replace', local_config_root + '/shell/common/alias/', '')
          | map('dirname') | unique | reject('equalto', '.') | list }}
 
-- name: "Create subdirectories in ~/.menv/alias"
+- name: "Create subdirectories in ~/.mev/alias"
   ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/.menv/alias/{{ item }}"
+    path: "{{ ansible_env.HOME }}/.mev/alias/{{ item }}"
     state: directory
     mode: "0755"
   loop: "{{ shell_config_subdirs }}"
@@ -50,7 +50,7 @@
   ansible.builtin.file:
     src: "{{ item.path }}"
     dest: >-
-      {{ ansible_env.HOME }}/.menv/alias/{{ item.path | replace(local_config_root + '/shell/common/alias/', '') }}
+      {{ ansible_env.HOME }}/.mev/alias/{{ item.path | replace(local_config_root + '/shell/common/alias/', '') }}
     state: link
     force: true
   loop: "{{ shell_config_files.files }}"

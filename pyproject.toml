@@ -1,5 +1,5 @@
 [project]
-name = "menv"
+name = "mev"
 version = "1.0.0"
 description = "macOS development environment provisioning CLI"
 authors = [{ name = "akitorahayashi" }]

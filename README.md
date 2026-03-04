@@ -29,7 +29,7 @@ Rust-first architecture with a thin Python launcher for `pipx` distribution.
 ### Installation
 
 ```sh
-pipx install git+https://github.com/akitorahayashi/menv.git
+pipx install git+https://github.com/akitorahayashi/mev.git
 ```
 
 ### Usage
@@ -72,7 +72,7 @@ Configuration:
 ```sh
 mev config set            # Configure VCS identities interactively
 mev config show           # Show current configuration
-mev config create         # Deploy all role configs to ~/.config/menv/
+mev config create         # Deploy all role configs to ~/.config/mev/
 mev config create rust    # Deploy only rust role config
 mev cf set                # Shorthand
 ```

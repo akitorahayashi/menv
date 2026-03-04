@@ -56,24 +56,24 @@ enum Commands {
     Internal(InternalCommand),
 }
 
-/// Internal subcommands delegated to `menv-internal`.
+/// Internal subcommands delegated to `mev-internal`.
 #[derive(Subcommand)]
 enum InternalCommand {
     /// Aider integration helpers.
     #[command(subcommand)]
-    Aider(menv_internal::app::cli::aider::AiderCommand),
+    Aider(mev_internal::app::cli::aider::AiderCommand),
 
     /// Shell helper generators.
     #[command(subcommand)]
-    Shell(menv_internal::app::cli::shell::ShellCommand),
+    Shell(mev_internal::app::cli::shell::ShellCommand),
 
     /// SSH key and host configuration.
     #[command(subcommand)]
-    Ssh(menv_internal::app::cli::ssh::SshCommand),
+    Ssh(mev_internal::app::cli::ssh::SshCommand),
 
     /// VCS helpers.
     #[command(subcommand)]
-    Vcs(menv_internal::app::cli::vcs::VcsCommand),
+    Vcs(mev_internal::app::cli::vcs::VcsCommand),
 }
 
 /// Entry point for the CLI.
@@ -99,10 +99,10 @@ pub fn run() {
 
 fn run_internal(cmd: InternalCommand) -> Result<(), AppError> {
     let result = match cmd {
-        InternalCommand::Aider(c) => menv_internal::app::cli::aider::run(c),
-        InternalCommand::Shell(c) => menv_internal::app::cli::shell::run(c),
-        InternalCommand::Ssh(c) => menv_internal::app::cli::ssh::run(c),
-        InternalCommand::Vcs(c) => menv_internal::app::cli::vcs::run(c),
+        InternalCommand::Aider(c) => mev_internal::app::cli::aider::run(c),
+        InternalCommand::Shell(c) => mev_internal::app::cli::shell::run(c),
+        InternalCommand::Ssh(c) => mev_internal::app::cli::ssh::run(c),
+        InternalCommand::Vcs(c) => mev_internal::app::cli::vcs::run(c),
     };
     result.map_err(|e| AppError::Config(e.to_string()))
 }

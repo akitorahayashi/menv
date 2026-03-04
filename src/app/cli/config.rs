@@ -15,7 +15,7 @@ pub enum ConfigCommand {
     /// Set VCS identity configuration interactively.
     Set,
 
-    /// Deploy role configs to ~/.config/menv/roles/.
+    /// Deploy role configs to ~/.config/mev/roles/.
     #[command(alias = "cr")]
     Create {
         /// Role name to deploy config for. If omitted, deploys all roles.

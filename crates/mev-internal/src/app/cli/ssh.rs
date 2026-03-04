@@ -222,3 +222,45 @@ fn remove_host(host: &str) -> Result<(), Box<dyn std::error::Error>> {
     println!("🗑️ Removed config file for '{host}'.");
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn valid_hosts_are_accepted() {
+        assert!(is_valid_host("example.com"));
+        assert!(is_valid_host("my-host"));
+        assert!(is_valid_host("host_1"));
+    }
+
+    #[test]
+    fn invalid_host_with_space_is_rejected() {
+        assert!(!is_valid_host("bad host!"));
+    }
+
+    #[test]
+    fn invalid_host_empty_is_rejected() {
+        assert!(!is_valid_host(""));
+    }
+
+    #[test]
+    fn valid_key_types_are_known() {
+        assert!(VALID_KEY_TYPES.contains(&"ed25519"));
+        assert!(VALID_KEY_TYPES.contains(&"rsa"));
+        assert!(VALID_KEY_TYPES.contains(&"ecdsa"));
+    }
+
+    #[test]
+    fn invalid_key_type_is_not_known() {
+        assert!(!VALID_KEY_TYPES.contains(&"invalid-type"));
+    }
+
+    #[test]
+    fn list_hosts_succeeds_when_conf_dir_absent() {
+        let dir = tempfile::tempdir().unwrap();
+        std::env::set_var("HOME", dir.path());
+        let result = list_hosts();
+        assert!(result.is_ok());
+    }
+}

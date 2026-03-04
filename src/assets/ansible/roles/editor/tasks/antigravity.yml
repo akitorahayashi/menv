@@ -43,5 +43,5 @@
     mode: "0755"
 
 # Note: Agent skills deployment is handled by nodejs/coder role via skills-targets.yml
-# Skills are automatically deployed from ~/.config/menv/roles/nodejs/common/coder/skills/
+# Skills are automatically deployed from ~/.config/mev/roles/nodejs/common/coder/skills/
 # to ~/.config/google/antigravity/skills/ when the 'coder' role runs

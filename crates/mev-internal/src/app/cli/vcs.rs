@@ -19,8 +19,12 @@ pub fn run(cmd: VcsCommand) -> Result<(), Box<dyn std::error::Error>> {
     }
 }
 
+fn is_valid_submodule_path(path: &str) -> bool {
+    !path.starts_with('/') && !path.contains("..")
+}
+
 fn delete_submodule(submodule_path: &str) -> Result<(), Box<dyn std::error::Error>> {
-    if submodule_path.starts_with('/') || submodule_path.contains("..") {
+    if !is_valid_submodule_path(submodule_path) {
         eprintln!(
             "Error: Invalid submodule path '{submodule_path}'. \
              Must be a relative path without '..'."
@@ -68,4 +72,24 @@ fn delete_submodule(submodule_path: &str) -> Result<(), Box<dyn std::error::Erro
 
     println!("✅ Submodule {submodule_path} deleted successfully.");
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn absolute_path_is_rejected() {
+        assert!(!is_valid_submodule_path("/absolute/path"));
+    }
+
+    #[test]
+    fn parent_traversal_is_rejected() {
+        assert!(!is_valid_submodule_path("../escape/path"));
+    }
+
+    #[test]
+    fn relative_path_is_accepted() {
+        assert!(is_valid_submodule_path("vendor/some-dep"));
+    }
 }

@@ -1,14 +1,14 @@
-# menv-internal Development Overview
+# mev-internal Development Overview
 
 ## Project Summary
-`menv-internal` is the latency-sensitive runtime binary for `mev` internal commands.
+`mev-internal` is the latency-sensitive library crate for `mev` internal commands.
 It provides the `aider`, `shell`, `ssh`, and `vcs` command domains invoked by `mev internal ...`
 through the Rust CLI boundary.
 
 ## Tech Stack
 - Language: Rust
 - CLI Parsing: clap
-- Development Dependencies: assert_cmd, predicates
+- Development Dependencies: tempfile, serde_json
 
 ## Coding Standards
 - Formatter: rustfmt (max width 100, edition 2024)
@@ -25,7 +25,7 @@ through the Rust CLI boundary.
 - Test: cargo test --all-targets --all-features
 
 ## Architectural Highlights
-- Single binary with four subcommand domains: aider, shell, ssh, vcs
+- Library crate with four command domains: aider, shell, ssh, vcs
 - `app/cli/mod.rs` owns the clap parser and dispatch
 - Each domain is a sibling module in `app/cli/`
-- Invoked by the Rust `mev` CLI internal subcommand dispatch
+- Consumed as a dependency by the `mev` CLI internal subcommand dispatch

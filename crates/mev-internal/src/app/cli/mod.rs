@@ -8,9 +8,9 @@ pub mod vcs;
 use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
-#[command(name = "menv-internal")]
+#[command(name = "mev-internal")]
 #[command(version)]
-#[command(about = "Internal command runtime for menv")]
+#[command(about = "Internal command runtime for mev")]
 struct Cli {
     #[command(subcommand)]
     command: Commands,

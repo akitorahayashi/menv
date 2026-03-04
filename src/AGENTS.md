@@ -12,7 +12,7 @@ See [root AGENTS.md](../AGENTS.md) for project overview.
 | Adapters | src/adapters/ | Process execution, file I/O, catalog loading, package asset resolution |
 | Assets | src/assets/ | Embedded static resources |
 | Testing | src/testing/ | In-process test doubles and builders |
-| Internal dep | crates/menv-internal/ | Internal command domain implementations reused by mev |
+| Internal dep | crates/mev-internal/ | Internal command domain implementations reused by mev |
 
 ## app structure
 
