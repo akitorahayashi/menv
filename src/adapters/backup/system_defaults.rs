@@ -72,11 +72,17 @@ pub fn execute(definitions_dir: &Path, output_file: &Path) -> Result<(), AppErro
 }
 
 fn load_definitions(dir: &Path) -> Result<Vec<SettingDefinition>, AppError> {
-    let mut paths: Vec<_> = std::fs::read_dir(dir)?
-        .filter_map(Result::ok)
-        .map(|e| e.path())
-        .filter(|p| p.extension().and_then(|ext| ext.to_str()) == Some("yml"))
-        .collect();
+    let mut paths = Vec::new();
+    for entry in std::fs::read_dir(dir)? {
+        let path = entry
+            .map_err(|e| {
+                AppError::Backup(format!("failed to read entry in {}: {e}", dir.display()))
+            })?
+            .path();
+        if path.extension().and_then(|ext| ext.to_str()) == Some("yml") {
+            paths.push(path);
+        }
+    }
     paths.sort();
 
     let mut definitions = Vec::new();
@@ -140,15 +146,19 @@ fn format_bool(raw_value: &str, default: &serde_yaml::Value) -> String {
     if matches!(v.as_str(), "0" | "false" | "no") {
         return "false".to_string();
     }
-    if let serde_yaml::Value::Bool(b) = default {
+    if let Some(b) = default.as_bool() {
         return b.to_string();
     }
-    if let serde_yaml::Value::String(s) = default
-        && !s.is_empty()
-    {
-        return s.trim().to_lowercase();
+    if let Some(s) = default.as_str() {
+        let s_lower = s.trim().to_lowercase();
+        if matches!(s_lower.as_str(), "1" | "true" | "yes") {
+            return "true".to_string();
+        }
+        if matches!(s_lower.as_str(), "0" | "false" | "no") {
+            return "false".to_string();
+        }
     }
-    if v.is_empty() { "false".to_string() } else { v }
+    "false".to_string()
 }
 
 fn format_numeric(raw_value: &str, default: &serde_yaml::Value, as_float: bool) -> String {

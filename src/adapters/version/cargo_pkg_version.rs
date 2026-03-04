@@ -17,14 +17,24 @@ impl VersionSource for CargoPkgVersion {
 
     fn latest_version(&self) -> Result<String, AppError> {
         let output = Command::new("curl")
-            .args(["-sSL", "-H", "Accept: application/vnd.github.v3+json", GITHUB_RELEASES_URL])
+            .args([
+                "-sSL",
+                "-H",
+                "Accept: application/vnd.github.v3+json",
+                "-H",
+                "User-Agent: menv-cli",
+                GITHUB_RELEASES_URL,
+            ])
             .output()
             .map_err(|e| AppError::VersionCheck(format!("failed to fetch latest version: {e}")))?;
 
         if !output.status.success() {
-            return Err(AppError::VersionCheck(
-                "failed to fetch latest version from GitHub".to_string(),
-            ));
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            return Err(AppError::VersionCheck(format!(
+                "failed to fetch latest version from GitHub (exit code: {}): {}",
+                output.status.code().unwrap_or(-1),
+                stderr.trim()
+            )));
         }
 
         let body = String::from_utf8_lossy(&output.stdout);
