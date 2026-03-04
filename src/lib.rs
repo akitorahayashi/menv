@@ -13,3 +13,6 @@ pub(crate) mod testing;
 
 /// Entry point for the CLI.
 pub use app::cli::run as cli;
+
+/// Stable library API for programmatic consumers.
+pub use app::api;

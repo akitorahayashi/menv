@@ -37,7 +37,7 @@ pub fn execute(
         &ctx.role_catalog,
     )?;
 
-    println!("Running: {tag_input}");
+    println!("Running tags: {}", plan.tags.join(", "));
     if profile != "common" {
         println!("Profile: {profile}");
     }

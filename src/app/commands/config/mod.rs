@@ -35,7 +35,7 @@ pub fn set(ctx: &AppContext) -> Result<(), AppError> {
     println!("Configure mev VCS identities");
     println!();
 
-    let existing = if ctx.config_store.exists() { ctx.config_store.load().ok() } else { None };
+    let existing = if ctx.config_store.exists() { Some(ctx.config_store.load()?) } else { None };
 
     let (p_name_default, p_email_default, w_name_default, w_email_default) = match &existing {
         Some(cfg) => (
@@ -97,12 +97,21 @@ pub fn create(ctx: &AppContext, role: Option<String>, overwrite: bool) -> Result
             println!("  {role_name}: config exists (use --overwrite to replace)");
             continue;
         }
+        let staging = ctx.local_config_root.join(format!(".{role_name}.staging"));
+        if staging.exists() {
+            std::fs::remove_dir_all(&staging).map_err(|e| {
+                AppError::Config(format!("failed to clean staging for {role_name}: {e}"))
+            })?;
+        }
+        copy_dir_recursive(&source, &staging)?;
         if target.exists() {
             std::fs::remove_dir_all(&target).map_err(|e| {
                 AppError::Config(format!("failed to remove existing config for {role_name}: {e}"))
             })?;
         }
-        copy_dir_recursive(&source, &target)?;
+        std::fs::rename(&staging, &target).map_err(|e| {
+            AppError::Config(format!("failed to activate config for {role_name}: {e}"))
+        })?;
         println!("✓ {role_name}: config deployed");
     }
 

@@ -44,8 +44,8 @@ pub fn execute(ctx: &AppContext, profile: &str, verbose: bool) -> Result<(), App
 
         ctx.ansible_executor
             .run_playbook(profile, std::slice::from_ref(tag), plan.verbose)
-            .inspect_err(|_e| {
-                eprintln!("Failed at step {step}/{total}: {tag}");
+            .inspect_err(|e| {
+                eprintln!("Failed at step {step}/{total}: {tag}: {e}");
             })?;
         println!("  ✓ Completed");
     }

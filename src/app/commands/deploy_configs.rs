@@ -38,7 +38,10 @@ pub fn deploy_for_tags(
         }
 
         let source = ansible_dir.join("roles").join(&role).join("config");
-        copy_dir_recursive(&source, &target)?;
+        if let Err(e) = copy_dir_recursive(&source, &target) {
+            let _ = std::fs::remove_dir_all(&target);
+            return Err(e);
+        }
         println!("  Deployed config for {role}");
     }
 
@@ -47,6 +50,12 @@ pub fn deploy_for_tags(
 
 /// Recursively copy a directory tree.
 pub fn copy_dir_recursive(src: &Path, dst: &Path) -> Result<(), AppError> {
+    if !src.is_dir() {
+        return Err(AppError::Config(format!(
+            "config source directory is missing: {}",
+            src.display()
+        )));
+    }
     std::fs::create_dir_all(dst)?;
     for entry in std::fs::read_dir(src)? {
         let entry = entry?;

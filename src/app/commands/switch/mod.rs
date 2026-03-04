@@ -59,23 +59,25 @@ pub fn execute(ctx: &AppContext, profile_input: &str) -> Result<(), AppError> {
 }
 
 fn run_git_config(key: &str, value: &str) -> Result<(), AppError> {
-    let status = Command::new("git")
+    let output = Command::new("git")
         .args(["config", "--global", key, value])
         .output()
         .map_err(|e| AppError::Config(format!("failed to run git config: {e}")))?;
-    if !status.status.success() {
-        return Err(AppError::Config(format!("git config --global {key} failed")));
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr).trim().to_string();
+        return Err(AppError::Config(format!("git config --global {key} failed: {stderr}")));
     }
     Ok(())
 }
 
 fn run_jj_config(key: &str, value: &str) -> Result<(), AppError> {
-    let status = Command::new("jj")
+    let output = Command::new("jj")
         .args(["config", "set", "--user", key, value])
         .output()
         .map_err(|e| AppError::Config(format!("failed to run jj config: {e}")))?;
-    if !status.status.success() {
-        return Err(AppError::Config(format!("jj config set {key} failed")));
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr).trim().to_string();
+        return Err(AppError::Config(format!("jj config set {key} failed: {stderr}")));
     }
     Ok(())
 }
