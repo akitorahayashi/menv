@@ -13,7 +13,10 @@ pub fn execute(source: &dyn VersionSource) -> Result<(), AppError> {
 
     println!();
     println!("✓ Upgrade command completed.");
-    println!("Run `mev --version` in a new shell to verify the installed version.");
+    println!(
+        "Run `{} --version` in a new shell to verify the installed version.",
+        env!("CARGO_PKG_NAME")
+    );
 
     Ok(())
 }

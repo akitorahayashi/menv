@@ -18,15 +18,18 @@ impl VersionSource for PipxVersionSource {
         // Rust binaries + packaged assets such as ansible content), so the updater
         // must refresh the same installation boundary. A cargo-based self-update
         // would only target Rust artifacts and can diverge from the pipx runtime.
-        println!("Upgrading mev via pipx...");
+        println!("Upgrading {} via pipx...", env!("CARGO_PKG_NAME"));
 
-        let status = Command::new("pipx").args(["upgrade", "mev"]).status().map_err(|e| {
-            if e.kind() == std::io::ErrorKind::NotFound {
-                AppError::Update("pipx not found. Please ensure pipx is installed.".to_string())
-            } else {
-                AppError::Update(format!("failed to run pipx: {e}"))
-            }
-        })?;
+        let status = Command::new("pipx")
+            .args(["upgrade", env!("CARGO_PKG_NAME")])
+            .status()
+            .map_err(|e| {
+                if e.kind() == std::io::ErrorKind::NotFound {
+                    AppError::Update("pipx not found. Please ensure pipx is installed.".to_string())
+                } else {
+                    AppError::Update(format!("failed to run pipx: {e}"))
+                }
+            })?;
 
         if !status.success() {
             return Err(AppError::Update(format!(
