@@ -29,7 +29,6 @@ jobs:
 
   coverage:
     name: Coverage
-    continue-on-error: true
     uses: ./.github/workflows/collect-coverage.yml
 
   build:
