@@ -5,7 +5,6 @@ use std::path::{Path, PathBuf};
 use serde::Deserialize;
 
 use crate::app::AppContext;
-use crate::domain::backup::BackupTarget;
 use crate::domain::error::AppError;
 use crate::domain::ports::fs::FsPort;
 use crate::domain::ports::macos_defaults::MacosDefaultsPort;
@@ -30,6 +29,44 @@ fn default_domain() -> String {
     DEFAULT_DOMAIN.to_string()
 }
 
+#[derive(Clone, Copy)]
+enum BackupTarget {
+    System,
+    Vscode,
+}
+
+impl BackupTarget {
+    fn from_input(s: &str) -> Option<Self> {
+        match s {
+            "system" => Some(Self::System),
+            "vscode" | "vscode-extensions" => Some(Self::Vscode),
+            _ => None,
+        }
+    }
+
+    fn all() -> &'static [(&'static str, &'static str)] {
+        &[("system", "Backup macOS system defaults"), ("vscode", "Backup VSCode extensions list")]
+    }
+
+    fn description(self) -> &'static str {
+        match self {
+            Self::System => "Backup macOS system defaults",
+            Self::Vscode => "Backup VSCode extensions list",
+        }
+    }
+
+    fn role(self) -> &'static str {
+        match self {
+            Self::System => "system",
+            Self::Vscode => "editor",
+        }
+    }
+
+    fn subpath(self) -> &'static str {
+        "common"
+    }
+}
+
 enum DefinitionsDirResolution {
     Local(PathBuf),
     PackageDefault { resolved_dir: PathBuf, missing_local_dir: PathBuf },
@@ -43,7 +80,7 @@ pub fn execute(ctx: &AppContext, target_input: &str) -> Result<(), AppError> {
     }
 
     let target = BackupTarget::from_input(target_input).ok_or_else(|| {
-        let valid: Vec<_> = BackupTarget::all().iter().map(|t| t.name()).collect();
+        let valid: Vec<_> = BackupTarget::all().iter().map(|(name, _)| *name).collect();
         AppError::Backup(format!(
             "unknown backup target '{target_input}'. Valid targets: {}",
             valid.join(", ")
@@ -307,8 +344,8 @@ fn resolve_definitions_dir(
 fn list_targets() {
     println!("Available backup targets:");
     println!();
-    for target in BackupTarget::all() {
-        println!("  {:<8} - {}", target.name(), target.description());
+    for (name, description) in BackupTarget::all() {
+        println!("  {name:<8} - {description}");
     }
     println!();
     println!("Usage: mev backup <target>");
