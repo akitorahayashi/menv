@@ -17,13 +17,10 @@ impl FsPort for StdFs {
     }
 
     fn read_dir(&self, path: &Path) -> Result<Vec<PathBuf>, AppError> {
-        let entries = std::fs::read_dir(path).map_err(AppError::Io)?;
-        let mut paths = Vec::new();
-        for entry in entries {
-            let entry = entry.map_err(AppError::Io)?;
-            paths.push(entry.path());
-        }
-        Ok(paths)
+        std::fs::read_dir(path)
+            .map_err(AppError::Io)?
+            .map(|entry| entry.map(|e| e.path()).map_err(AppError::Io))
+            .collect()
     }
 
     fn write(&self, path: &Path, content: &[u8]) -> Result<(), AppError> {

@@ -22,10 +22,11 @@ impl VscodePort for VscodeCli {
             )?;
 
         if !output.status.success() {
-            return Err(AppError::Backup(
-                "failed to list VSCode extensions. If VSCode is running, close it and try again"
-                    .to_string(),
-            ));
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            return Err(AppError::Backup(format!(
+                "failed to list VSCode extensions: {}",
+                stderr.trim()
+            )));
         }
 
         let stdout = String::from_utf8_lossy(&output.stdout);

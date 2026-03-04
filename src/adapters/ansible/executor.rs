@@ -44,6 +44,13 @@ impl AnsibleAdapter {
 
 impl AnsiblePort for AnsibleAdapter {
     fn run_playbook(&self, profile: &str, tags: &[String], verbose: bool) -> Result<(), AppError> {
+        if self.ansible_dir.as_os_str().is_empty() {
+            return Err(AppError::AnsibleExecution {
+                message: "ansible adapter not initialised (no ansible_dir)".to_string(),
+                exit_code: None,
+            });
+        }
+
         let playbook_path = self.ansible_dir.join("playbook.yml");
         let config_path = self.ansible_dir.join("ansible.cfg");
 
@@ -106,24 +113,26 @@ impl AnsiblePort for AnsibleAdapter {
     }
 
     fn roles_with_config(&self) -> Result<Vec<String>, AppError> {
+        if self.roles_dir.as_os_str().is_empty() {
+            return Ok(Vec::new());
+        }
+
         let entries = std::fs::read_dir(&self.roles_dir).map_err(|e| {
             AppError::Config(format!(
                 "failed to read roles directory '{}': {e}",
                 self.roles_dir.display()
             ))
         })?;
-        let mut roles = Vec::new();
-        for entry in entries {
-            let entry =
-                entry.map_err(|e| AppError::Config(format!("failed to read role entry: {e}")))?;
-            let path = entry.path();
-            if path.is_dir()
-                && path.join("config").is_dir()
-                && let Some(name) = path.file_name().and_then(|n| n.to_str())
-            {
-                roles.push(name.to_string());
-            }
-        }
+        let mut roles: Vec<String> = entries
+            .filter_map(|entry| {
+                let path = entry.ok()?.path();
+                if path.is_dir() && path.join("config").is_dir() {
+                    path.file_name()?.to_str().map(String::from)
+                } else {
+                    None
+                }
+            })
+            .collect();
         roles.sort();
         Ok(roles)
     }
@@ -155,31 +164,26 @@ fn load_catalog(playbook_path: &PathBuf) -> Result<Catalog, Box<dyn std::error::
     let content = std::fs::read_to_string(playbook_path)?;
     let docs: Vec<serde_yaml::Value> = serde_yaml::from_str(&content)?;
 
-    let mut tags_by_role = HashMap::new();
+    let role_key = serde_yaml::Value::String("role".to_string());
+    let tags_key = serde_yaml::Value::String("tags".to_string());
+
+    let mut tags_by_role: HashMap<String, Vec<String>> = HashMap::new();
     let mut tag_to_role = HashMap::new();
 
     for doc in &docs {
         if let Some(roles) = doc.get("roles").and_then(|r| r.as_sequence()) {
             for role_entry in roles {
                 if let Some(mapping) = role_entry.as_mapping() {
-                    let role_name = mapping
-                        .get(serde_yaml::Value::String("role".to_string()))
-                        .and_then(|v| v.as_str())
-                        .map(|s| s.to_string());
+                    let role_name =
+                        mapping.get(&role_key).and_then(|v| v.as_str()).map(|s| s.to_string());
 
-                    let tags: Vec<String> =
-                        match mapping.get(serde_yaml::Value::String("tags".to_string())) {
-                            Some(v) if v.as_sequence().is_some() => v
-                                .as_sequence()
-                                .unwrap()
-                                .iter()
-                                .filter_map(|v| v.as_str().map(|s| s.to_string()))
-                                .collect(),
-                            Some(v) if v.as_str().is_some() => {
-                                vec![v.as_str().unwrap().to_string()]
-                            }
-                            _ => Vec::new(),
-                        };
+                    let tags: Vec<String> = match mapping.get(&tags_key) {
+                        Some(serde_yaml::Value::Sequence(seq)) => {
+                            seq.iter().filter_map(|v| v.as_str().map(|s| s.to_string())).collect()
+                        }
+                        Some(serde_yaml::Value::String(s)) => vec![s.clone()],
+                        _ => Vec::new(),
+                    };
 
                     if let Some(name) = role_name {
                         for tag in &tags {
@@ -193,7 +197,7 @@ fn load_catalog(playbook_path: &PathBuf) -> Result<Catalog, Box<dyn std::error::
                             }
                             tag_to_role.insert(tag.clone(), name.clone());
                         }
-                        tags_by_role.insert(name, tags);
+                        tags_by_role.entry(name).or_default().extend(tags);
                     }
                 }
             }

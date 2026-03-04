@@ -132,7 +132,7 @@ fn load_definitions(fs: &dyn FsPort, dir: &Path) -> Result<Vec<SettingDefinition
     let entries = fs.read_dir(dir)?;
     let mut paths: Vec<PathBuf> = entries
         .into_iter()
-        .filter(|p| p.extension().and_then(|ext| ext.to_str()) == Some("yml"))
+        .filter(|p| matches!(p.extension().and_then(|ext| ext.to_str()), Some("yml" | "yaml")))
         .collect();
     paths.sort();
 
@@ -258,7 +258,9 @@ fn build_entry(def: &SettingDefinition, value: &str) -> Vec<String> {
 // ---------------------------------------------------------------------------
 
 fn execute_vscode(ctx: &AppContext, output_file: &Path) -> Result<(), AppError> {
-    let extensions = ctx.vscode.list_extensions()?;
+    let mut extensions = ctx.vscode.list_extensions()?;
+    extensions.sort();
+    extensions.dedup();
 
     let payload = serde_json::json!({ "extensions": extensions });
     let content = serde_json::to_string_pretty(&payload)

@@ -6,7 +6,8 @@ use crate::domain::error::AppError;
 use crate::domain::ports::macos_defaults::MacosDefaultsPort;
 
 /// Keys that must be read with `defaults read -g <key>` instead of
-/// `defaults read <domain> <key>`.
+/// `defaults read <domain> <key>` because macOS registers them
+/// under the global domain regardless of the preference pane domain.
 const SPECIAL_GLOBAL_KEYS: &[&str] = &[
     "com.apple.keyboard.fnState",
     "com.apple.trackpad.scaling",
