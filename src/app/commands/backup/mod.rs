@@ -7,6 +7,11 @@ use crate::app::AppContext;
 use crate::domain::backup::BackupTarget;
 use crate::domain::error::AppError;
 
+enum DefinitionsDirResolution {
+    Local(PathBuf),
+    PackageDefault { resolved_dir: PathBuf, missing_local_dir: PathBuf },
+}
+
 /// Execute the `backup` command for a given target.
 pub fn execute(ctx: &AppContext, target_input: &str) -> Result<(), AppError> {
     if matches!(target_input, "list" | "ls") {
@@ -29,7 +34,16 @@ pub fn execute(ctx: &AppContext, target_input: &str) -> Result<(), AppError> {
 
     match target {
         BackupTarget::System => {
-            let definitions_dir = resolve_definitions_dir(&local_config_dir, ctx, &target);
+            let definitions_dir = match resolve_definitions_dir(&local_config_dir, ctx, &target) {
+                DefinitionsDirResolution::Local(path) => path,
+                DefinitionsDirResolution::PackageDefault { resolved_dir, missing_local_dir } => {
+                    println!(
+                        "Local definitions not found at {}. Using package defaults.",
+                        missing_local_dir.display()
+                    );
+                    resolved_dir
+                }
+            };
             let output_file = local_config_dir.join("system.yml");
             system_defaults::execute(&definitions_dir, &output_file)
         }
@@ -50,23 +64,24 @@ fn resolve_definitions_dir(
     local_config_dir: &Path,
     ctx: &AppContext,
     target: &BackupTarget,
-) -> PathBuf {
+) -> DefinitionsDirResolution {
     let local_definitions = local_config_dir.join("definitions");
     if local_definitions.exists() {
-        return local_definitions;
+        return DefinitionsDirResolution::Local(local_definitions);
     }
 
-    println!(
-        "Local definitions not found at {}. Using package defaults.",
-        local_definitions.display()
-    );
-
-    ctx.ansible_dir
+    let package_default_dir = ctx
+        .ansible_dir
         .join("roles")
         .join(target.role())
         .join("config")
         .join(target.subpath())
-        .join("definitions")
+        .join("definitions");
+
+    DefinitionsDirResolution::PackageDefault {
+        resolved_dir: package_default_dir,
+        missing_local_dir: local_definitions,
+    }
 }
 
 fn list_targets() {

@@ -15,29 +15,21 @@ impl VersionSource for CargoPkgVersion {
     }
 
     fn latest_version(&self) -> Result<String, AppError> {
-        let output = Command::new("curl")
-            .args([
-                "-sSL",
-                "-H",
-                "Accept: application/vnd.github.v3+json",
-                "-H",
-                "User-Agent: mev-cli",
-                GITHUB_RELEASES_URL,
-            ])
-            .output()
-            .map_err(|e| AppError::VersionCheck(format!("failed to fetch latest version: {e}")))?;
+        let response = ureq::get(GITHUB_RELEASES_URL)
+            .set("Accept", "application/vnd.github.v3+json")
+            .set("User-Agent", "mev-cli")
+            .call()
+            .map_err(|e| match e {
+                ureq::Error::Status(code, _) => AppError::VersionCheck(format!(
+                    "failed to fetch latest version from GitHub (status: {code})"
+                )),
+                ureq::Error::Transport(err) => {
+                    AppError::VersionCheck(format!("failed to fetch latest version: {err}"))
+                }
+            })?;
 
-        if !output.status.success() {
-            let stderr = String::from_utf8_lossy(&output.stderr);
-            return Err(AppError::VersionCheck(format!(
-                "failed to fetch latest version from GitHub (exit code: {}): {}",
-                output.status.code().unwrap_or(-1),
-                stderr.trim()
-            )));
-        }
-
-        let body = String::from_utf8_lossy(&output.stdout);
-        let data: serde_json::Value = serde_json::from_str(&body)
+        let data: serde_json::Value = response
+            .into_json()
             .map_err(|e| AppError::VersionCheck(format!("failed to parse release data: {e}")))?;
 
         let tag = data["tag_name"]

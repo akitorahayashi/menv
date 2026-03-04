@@ -1,6 +1,7 @@
 //! Shell helper generators.
 
 use std::fs;
+use std::path::Path;
 
 use clap::Subcommand;
 
@@ -65,13 +66,20 @@ fn gen_gemini_aliases() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn gen_vscode_workspace(paths: Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
+    let cwd = std::env::current_dir()?;
+    gen_vscode_workspace_in_dir(paths, &cwd)
+}
+
+fn gen_vscode_workspace_in_dir(
+    paths: Vec<String>,
+    output_dir: &Path,
+) -> Result<(), Box<dyn std::error::Error>> {
     let folders: Vec<serde_json::Value> =
         paths.iter().map(|p| serde_json::json!({ "path": p })).collect();
 
     let workspace = serde_json::json!({ "folders": folders });
 
-    let cwd = std::env::current_dir()?;
-    let output_path = cwd.join("workspace.code-workspace");
+    let output_path = output_dir.join("workspace.code-workspace");
     let content = serde_json::to_string_pretty(&workspace)?;
     fs::write(&output_path, content)?;
     println!("✅ Workspace file created: {}", output_path.file_name().unwrap().to_string_lossy());
@@ -113,12 +121,10 @@ mod tests {
     #[test]
     fn gen_vscode_workspace_creates_file_with_expected_folders() {
         let dir = tempfile::tempdir().unwrap();
-        let orig = std::env::current_dir().unwrap();
-        std::env::set_current_dir(dir.path()).unwrap();
-
-        let result = gen_vscode_workspace(vec!["../path1".to_string(), "/abs/path2".to_string()]);
-
-        std::env::set_current_dir(orig).unwrap();
+        let result = gen_vscode_workspace_in_dir(
+            vec!["../path1".to_string(), "/abs/path2".to_string()],
+            dir.path(),
+        );
         result.unwrap();
 
         let ws_file = dir.path().join("workspace.code-workspace");

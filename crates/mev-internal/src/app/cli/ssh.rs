@@ -2,7 +2,7 @@
 
 use std::fs;
 use std::os::unix::fs::PermissionsExt;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use clap::Subcommand;
@@ -145,22 +145,26 @@ fn generate_key(key_type: &str, host: &str) -> Result<(), Box<dyn std::error::Er
 }
 
 fn list_hosts() -> Result<(), Box<dyn std::error::Error>> {
-    let conf = conf_dir();
-    if !conf.exists() {
-        return Ok(());
-    }
-
-    let mut hosts: Vec<String> = fs::read_dir(&conf)?
-        .filter_map(|e| e.ok())
-        .filter(|e| e.path().extension().and_then(|x| x.to_str()) == Some("conf"))
-        .filter_map(|e| e.path().file_stem().map(|s| s.to_string_lossy().into_owned()))
-        .collect();
-    hosts.sort();
+    let hosts = collect_hosts(&conf_dir())?;
 
     for host in hosts {
         println!("{host}");
     }
     Ok(())
+}
+
+fn collect_hosts(conf: &Path) -> Result<Vec<String>, Box<dyn std::error::Error>> {
+    if !conf.exists() {
+        return Ok(Vec::new());
+    }
+
+    let mut hosts: Vec<String> = fs::read_dir(conf)?
+        .filter_map(|e| e.ok())
+        .filter(|e| e.path().extension().and_then(|x| x.to_str()) == Some("conf"))
+        .filter_map(|e| e.path().file_stem().map(|s| s.to_string_lossy().into_owned()))
+        .collect();
+    hosts.sort();
+    Ok(hosts)
 }
 
 fn remove_host(host: &str) -> Result<(), Box<dyn std::error::Error>> {
@@ -259,10 +263,8 @@ mod tests {
     #[test]
     fn list_hosts_succeeds_when_conf_dir_absent() {
         let dir = tempfile::tempdir().unwrap();
-        unsafe {
-            std::env::set_var("HOME", dir.path());
-        }
-        let result = list_hosts();
-        assert!(result.is_ok());
+        let absent_conf = dir.path().join("conf.d");
+        let hosts = collect_hosts(&absent_conf).unwrap();
+        assert!(hosts.is_empty());
     }
 }

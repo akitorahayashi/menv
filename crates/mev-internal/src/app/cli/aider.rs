@@ -209,6 +209,18 @@ fn shell_quote(s: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use serial_test::serial;
+
+    fn restore_model_env(original: Option<String>) {
+        match original {
+            Some(value) => unsafe {
+                env::set_var(MODEL_ENV, value);
+            },
+            None => unsafe {
+                env::remove_var(MODEL_ENV);
+            },
+        }
+    }
 
     #[test]
     fn shell_quote_passes_through_safe_strings() {
@@ -234,23 +246,26 @@ mod tests {
     }
 
     #[test]
+    #[serial]
     fn unset_model_when_env_not_set_succeeds() {
+        let original = env::var(MODEL_ENV).ok();
         unsafe {
             env::remove_var(MODEL_ENV);
         }
         let result = unset_model();
+        restore_model_env(original);
         assert!(result.is_ok());
     }
 
     #[test]
+    #[serial]
     fn unset_model_when_env_set_succeeds() {
+        let original = env::var(MODEL_ENV).ok();
         unsafe {
             env::set_var(MODEL_ENV, "test-model");
         }
         let result = unset_model();
-        unsafe {
-            env::remove_var(MODEL_ENV);
-        }
+        restore_model_env(original);
         assert!(result.is_ok());
     }
 }
