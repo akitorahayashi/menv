@@ -157,25 +157,25 @@ fn format_value(def: &SettingDefinition, raw_value: &str) -> String {
     }
 }
 
-fn format_bool(raw_value: &str, default: &serde_yaml::Value) -> String {
-    let v = raw_value.trim().to_lowercase();
-    if matches!(v.as_str(), "1" | "true" | "yes") {
-        return "true".to_string();
+fn is_truthy(s: &str) -> Option<bool> {
+    match s.trim().to_lowercase().as_str() {
+        "1" | "true" | "yes" => Some(true),
+        "0" | "false" | "no" => Some(false),
+        _ => None,
     }
-    if matches!(v.as_str(), "0" | "false" | "no") {
-        return "false".to_string();
+}
+
+fn format_bool(raw_value: &str, default: &serde_yaml::Value) -> String {
+    if let Some(b) = is_truthy(raw_value) {
+        return b.to_string();
     }
     if let Some(b) = default.as_bool() {
         return b.to_string();
     }
-    if let Some(s) = default.as_str() {
-        let s_lower = s.trim().to_lowercase();
-        if matches!(s_lower.as_str(), "1" | "true" | "yes") {
-            return "true".to_string();
-        }
-        if matches!(s_lower.as_str(), "0" | "false" | "no") {
-            return "false".to_string();
-        }
+    if let Some(s) = default.as_str()
+        && let Some(b) = is_truthy(s)
+    {
+        return b.to_string();
     }
     "false".to_string()
 }
