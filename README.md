@@ -41,6 +41,7 @@ mev create macbook        # Full MacBook setup
 mev create mac-mini       # Full Mac mini setup
 mev cr mbk                # Shorthand
 mev cr mbk -v             # Verbose output
+mev cr mbk --overwrite    # Force overwrite role configs
 ```
 
 Run individual tasks:
@@ -83,6 +84,15 @@ mev switch personal       # Switch to personal identity
 mev switch work           # Switch to work identity
 mev sw p                  # Shorthand
 mev sw w                  # Shorthand
+```
+
+Backup:
+
+```sh
+mev backup system         # Backup macOS system defaults
+mev backup vscode         # Backup VSCode extensions list
+mev backup list           # List available backup targets
+mev bk system             # Shorthand
 ```
 
 Update:

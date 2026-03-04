@@ -22,10 +22,10 @@ pub use crate::domain::ports::config_store::MevConfig;
 // =============================================================================
 
 /// Provision a complete development environment for the given profile.
-pub fn create(profile: &str, verbose: bool) -> Result<(), AppError> {
+pub fn create(profile: &str, overwrite: bool, verbose: bool) -> Result<(), AppError> {
     let ansible_dir = ansible_asset_locator::locate_ansible_dir()?;
     let ctx = AppContext::new(ansible_dir).map_err(|e| AppError::Config(e.to_string()))?;
-    commands::create::execute(&ctx, profile, verbose)
+    commands::create::execute(&ctx, profile, overwrite, verbose)
 }
 
 // =============================================================================
@@ -33,10 +33,10 @@ pub fn create(profile: &str, verbose: bool) -> Result<(), AppError> {
 // =============================================================================
 
 /// Run a single Ansible task by tag within a profile.
-pub fn make(profile: &str, tag: &str, verbose: bool) -> Result<(), AppError> {
+pub fn make(profile: &str, tag: &str, overwrite: bool, verbose: bool) -> Result<(), AppError> {
     let ansible_dir = ansible_asset_locator::locate_ansible_dir()?;
     let ctx = AppContext::new(ansible_dir).map_err(|e| AppError::Config(e.to_string()))?;
-    commands::make::execute(&ctx, profile, tag, verbose)
+    commands::make::execute(&ctx, profile, tag, overwrite, verbose)
 }
 
 // =============================================================================
