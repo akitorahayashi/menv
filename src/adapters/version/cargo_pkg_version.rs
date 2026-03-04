@@ -56,6 +56,11 @@ impl VersionSource for CargoPkgVersion {
     }
 
     fn run_upgrade(&self) -> Result<(), AppError> {
+        // Upgrade strategy is intentionally tied to pipx.
+        // This project is installed as a pipx-managed unit (Python venv + bundled
+        // Rust binaries + packaged assets such as ansible content), so the updater
+        // must refresh the same installation boundary. A cargo-based self-update
+        // would only target Rust artifacts and can diverge from the pipx runtime.
         println!("Upgrading menv via pipx...");
 
         let status = Command::new("pipx").args(["upgrade", "menv"]).status().map_err(|e| {
