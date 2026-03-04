@@ -7,9 +7,7 @@
 use std::path::PathBuf;
 
 fn config_base() -> PathBuf {
-    dirs::home_dir()
-        .expect("home directory must be resolvable")
-        .join(".config")
+    dirs::home_dir().expect("home directory must be resolvable").join(".config")
 }
 
 /// Default path to the mev configuration file.

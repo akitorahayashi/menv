@@ -36,7 +36,7 @@ fmt:
     cargo fmt
 
 # Lint and check Rust code
-check:
+check: fmt
     cargo check
     cargo fmt --check
     cargo clippy --all-targets --all-features -- -D warnings

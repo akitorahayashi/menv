@@ -15,6 +15,8 @@ use crate::adapters::version::cargo_pkg_version::CargoPkgVersion;
 /// Application context wiring ports to concrete adapters.
 #[allow(dead_code)]
 pub struct AppContext {
+    pub ansible_dir: PathBuf,
+    pub local_config_root: PathBuf,
     pub ansible_executor: AnsibleProcessExecutor,
     pub tag_catalog: PlaybookTagCatalog,
     pub role_catalog: FsRoleCatalog,
@@ -31,25 +33,33 @@ impl AppContext {
         let roles_dir = ansible_dir.join("roles");
 
         Ok(Self {
-            ansible_executor: AnsibleProcessExecutor::new(ansible_dir, local_config_root),
+            ansible_executor: AnsibleProcessExecutor::new(
+                ansible_dir.clone(),
+                local_config_root.clone(),
+            ),
             tag_catalog: PlaybookTagCatalog::from_file(&playbook_path)?,
             role_catalog: FsRoleCatalog::new(roles_dir),
             config_store: ConfigFileStore::new(config_paths::default_config_path()),
             version_source: CargoPkgVersion,
+            ansible_dir,
+            local_config_root,
         })
     }
 
     /// Construct a config-only context (no ansible asset resolution needed).
     pub fn for_config() -> Self {
+        let local_config_root = config_paths::local_config_root();
         Self {
             ansible_executor: AnsibleProcessExecutor::new(
                 PathBuf::new(),
-                config_paths::local_config_root(),
+                local_config_root.clone(),
             ),
             tag_catalog: PlaybookTagCatalog::empty(),
             role_catalog: FsRoleCatalog::new(PathBuf::new()),
             config_store: ConfigFileStore::new(config_paths::default_config_path()),
             version_source: CargoPkgVersion,
+            ansible_dir: PathBuf::new(),
+            local_config_root,
         }
     }
 }
