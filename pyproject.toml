@@ -9,7 +9,7 @@ dependencies = [
 ]
 
 [project.scripts]
-mev = "mev_bootstrap.launcher:main"
+mev = "mev.launcher:main"
 
 [dependency-groups]
 dev = [
@@ -22,15 +22,15 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["python/mev_bootstrap"]
+packages = ["dist/mev"]
 
 [tool.hatch.build.targets.wheel.force-include]
-"src/assets/ansible" = "mev_bootstrap/assets/ansible"
-"src/assets/bundled_binaries" = "mev_bootstrap/assets/bundled_binaries"
+"dist/mev/ansible" = "mev/ansible"
+"dist/mev/bin" = "mev/bin"
 
 [tool.hatch.build.targets.sdist.force-include]
-"src/assets/ansible" = "mev_bootstrap/assets/ansible"
-"src/assets/bundled_binaries" = "mev_bootstrap/assets/bundled_binaries"
+"dist/mev/ansible" = "mev/ansible"
+"dist/mev/bin" = "mev/bin"
 
 [tool.ruff]
 target-version = "py312"

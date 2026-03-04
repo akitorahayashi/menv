@@ -14,8 +14,8 @@ Installable via `pipx` through a thin Python launcher that delegates to the preb
 | Ports | `src/domain/ports/` | Interface boundaries required by domain/application |
 | Adapters | `src/adapters/` | Process execution, file I/O, catalog loading, package asset resolution |
 | Internal dep | `crates/mev-internal/` | Internal command domain implementations reused by mev |
-| Python bootstrap | `python/mev_bootstrap/` | Thin launcher delegating to bundled binary |
-| Distribution assets | `src/assets/` | Bundled binaries and ansible assets for dev and packaging |
+| Python bootstrap | `dist/mev/` | Thin launcher delegating to bundled binary |
+| Distribution assets | `dist/mev/` | Bundled binaries and ansible assets for dev and packaging |
 
 ## CLI Commands
 
@@ -54,8 +54,11 @@ src/
 crates/
 └── mev-internal/          # Internal command implementations (aider, shell, ssh, vcs)
 
-python/
-└── mev_bootstrap/          # Thin Python launcher for pipx entry
+dist/
+└── mev/
+    ├── launcher.py         # Thin Python launcher for pipx entry
+    ├── bin/                # Bundled Rust binaries
+    └── ansible/            # Runtime ansible assets
 
 tests/
 ├── harness/                # Shared fixtures (TestContext)
@@ -68,7 +71,7 @@ tests/
 
 ## Python Surface
 
-Python ownership is limited to `python/mev_bootstrap/launcher.py`.
+Python ownership is limited to `dist/mev/launcher.py`.
 The launcher resolves packaged assets, sets `MEV_ANSIBLE_DIR`, and executes the bundled Rust binary.
 Runtime command ownership belongs to the Rust implementation.
 

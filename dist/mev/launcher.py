@@ -2,7 +2,7 @@
 
 This module is the sole Python entrypoint exposed via pipx.
 It locates the platform-specific mev binary committed in the
-bundled_binaries directory and executes it, forwarding all
+bin directory and executes it, forwarding all
 arguments and exit codes.
 """
 
@@ -30,7 +30,7 @@ def _locate_binary() -> Path:
 
     Resolution order:
     1. Package resource via importlib.resources (installed via pipx).
-    2. ``src/assets/bundled_binaries/<platform>/mev`` for repository dev mode.
+    2. ``dist/mev/bin/<platform>/mev`` for repository dev mode.
 
     Raises:
         FileNotFoundError: Binary is missing for this platform.
@@ -41,9 +41,7 @@ def _locate_binary() -> Path:
 
     # Installed via pipx — use importlib.resources for proper package resolution
     try:
-        ref = importlib.resources.files("mev_bootstrap").joinpath(
-            "assets", "bundled_binaries", key, "mev"
-        )
+        ref = importlib.resources.files("mev").joinpath("bin", key, "mev")
         resource_path = Path(str(ref))
         candidates.append(resource_path)
     except (ModuleNotFoundError, TypeError):
@@ -52,9 +50,9 @@ def _locate_binary() -> Path:
     # Repository development mode (running from source checkout)
     candidates.append(
         Path(__file__).resolve().parent.parent.parent
-        / "src"
-        / "assets"
-        / "bundled_binaries"
+        / "dist"
+        / "mev"
+        / "bin"
         / key
         / "mev",
     )
@@ -81,18 +79,18 @@ def _locate_ansible_dir() -> Path:
 
     Resolution order:
     1. Package resource via importlib.resources (installed via pipx).
-    2. ``src/assets/ansible`` for repository dev mode.
+    2. ``dist/mev/ansible`` for repository dev mode.
     """
     candidates: list[Path] = []
 
     try:
-        ref = importlib.resources.files("mev_bootstrap").joinpath("assets", "ansible")
+        ref = importlib.resources.files("mev").joinpath("ansible")
         candidates.append(Path(str(ref)))
     except (ModuleNotFoundError, TypeError):
         pass
 
     candidates.append(
-        Path(__file__).resolve().parent.parent.parent / "src" / "assets" / "ansible"
+        Path(__file__).resolve().parent.parent.parent / "dist" / "mev" / "ansible"
     )
 
     for candidate in candidates:
@@ -106,7 +104,7 @@ def _locate_ansible_dir() -> Path:
     raise FileNotFoundError(
         "Packaged ansible assets were not found.\n"
         f"Searched:\n  {searched}\n"
-        "Ensure src/assets/ansible is included in package build artifacts."
+        "Ensure dist/mev/ansible is included in package build artifacts."
     )
 
 

@@ -18,25 +18,25 @@ fn pyproject_toml_exists() {
 
 #[test]
 fn python_bootstrap_launcher_exists() {
-    let launcher = project_root().join("python").join("mev_bootstrap").join("launcher.py");
+    let launcher = project_root().join("dist").join("mev").join("launcher.py");
     assert!(launcher.exists(), "mev bootstrap launcher missing: {}", launcher.display());
 }
 
 #[test]
 fn bundled_binaries_directory_exists() {
-    let dir = project_root().join("src").join("assets").join("bundled_binaries");
+    let dir = project_root().join("dist").join("mev").join("bin");
     assert!(dir.is_dir(), "bundled_binaries directory missing: {}", dir.display());
 }
 
 #[test]
 fn ansible_assets_playbook_exists() {
-    let playbook = project_root().join("src").join("assets").join("ansible").join("playbook.yml");
+    let playbook = project_root().join("dist").join("mev").join("ansible").join("playbook.yml");
     assert!(playbook.exists(), "playbook.yml missing: {}", playbook.display());
 }
 
 #[test]
 fn ansible_assets_roles_directory_exists() {
-    let roles = project_root().join("src").join("assets").join("ansible").join("roles");
+    let roles = project_root().join("dist").join("mev").join("ansible").join("roles");
     assert!(roles.is_dir(), "ansible roles directory missing: {}", roles.display());
 }
 
