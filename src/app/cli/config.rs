@@ -28,13 +28,18 @@ pub enum ConfigCommand {
 }
 
 pub fn run(cmd: ConfigCommand) -> Result<(), AppError> {
-    let ansible_dir = ansible_asset_locator::locate_ansible_dir()?;
-    let ctx = AppContext::new(ansible_dir).map_err(|e| AppError::Config(e.to_string()))?;
-
     match cmd {
-        ConfigCommand::Show => commands::config::show(&ctx),
-        ConfigCommand::Set => commands::config::set(&ctx),
+        ConfigCommand::Show => {
+            let ctx = AppContext::for_config().map_err(|e| AppError::Config(e.to_string()))?;
+            commands::config::show(&ctx)
+        }
+        ConfigCommand::Set => {
+            let ctx = AppContext::for_config().map_err(|e| AppError::Config(e.to_string()))?;
+            commands::config::set(&ctx)
+        }
         ConfigCommand::Create { role, overwrite } => {
+            let ansible_dir = ansible_asset_locator::locate_ansible_dir()?;
+            let ctx = AppContext::new(ansible_dir).map_err(|e| AppError::Config(e.to_string()))?;
             commands::config::create(&ctx, role, overwrite)
         }
     }

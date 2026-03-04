@@ -56,15 +56,13 @@ pub fn list() -> Result<(), AppError> {
 
 /// Show current VCS identity configuration.
 pub fn config_show() -> Result<(), AppError> {
-    let ansible_dir = ansible_asset_locator::locate_ansible_dir()?;
-    let ctx = AppContext::new(ansible_dir).map_err(|e| AppError::Config(e.to_string()))?;
+    let ctx = AppContext::for_config().map_err(|e| AppError::Config(e.to_string()))?;
     commands::config::show(&ctx)
 }
 
 /// Interactively set VCS identity configuration.
 pub fn config_set() -> Result<(), AppError> {
-    let ansible_dir = ansible_asset_locator::locate_ansible_dir()?;
-    let ctx = AppContext::new(ansible_dir).map_err(|e| AppError::Config(e.to_string()))?;
+    let ctx = AppContext::for_config().map_err(|e| AppError::Config(e.to_string()))?;
     commands::config::set(&ctx)
 }
 
