@@ -24,6 +24,7 @@ help:
 
 fmt:
     cargo fmt
+    cargo fmt --manifest-path crates/mev-internal/Cargo.toml
 
 fix: fmt
     @uv run ruff format python/mev_bootstrap/
@@ -36,8 +37,11 @@ fix: fmt
 
 check:
     cargo check
+    cargo check --manifest-path crates/mev-internal/Cargo.toml
     cargo fmt --check
+    cargo fmt --manifest-path crates/mev-internal/Cargo.toml --check
     cargo clippy --all-targets --all-features -- -D warnings
+    cargo clippy --manifest-path crates/mev-internal/Cargo.toml --all-targets --all-features -- -D warnings
     @uv run ruff format --check python/mev_bootstrap/
     @uv run ruff check python/mev_bootstrap/
     @files=$(just _find_shell_files); \
@@ -75,6 +79,7 @@ build-bundle: build-release
 
 test:
     cargo test --all-targets --all-features
+    cargo test --manifest-path crates/mev-internal/Cargo.toml --all-targets --all-features
 
 # ==============================================================================
 # RUN

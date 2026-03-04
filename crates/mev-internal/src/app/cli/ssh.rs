@@ -259,7 +259,9 @@ mod tests {
     #[test]
     fn list_hosts_succeeds_when_conf_dir_absent() {
         let dir = tempfile::tempdir().unwrap();
-        std::env::set_var("HOME", dir.path());
+        unsafe {
+            std::env::set_var("HOME", dir.path());
+        }
         let result = list_hosts();
         assert!(result.is_ok());
     }

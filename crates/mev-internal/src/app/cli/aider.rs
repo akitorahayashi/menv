@@ -235,16 +235,22 @@ mod tests {
 
     #[test]
     fn unset_model_when_env_not_set_succeeds() {
-        env::remove_var(MODEL_ENV);
+        unsafe {
+            env::remove_var(MODEL_ENV);
+        }
         let result = unset_model();
         assert!(result.is_ok());
     }
 
     #[test]
     fn unset_model_when_env_set_succeeds() {
-        env::set_var(MODEL_ENV, "test-model");
+        unsafe {
+            env::set_var(MODEL_ENV, "test-model");
+        }
         let result = unset_model();
-        env::remove_var(MODEL_ENV);
+        unsafe {
+            env::remove_var(MODEL_ENV);
+        }
         assert!(result.is_ok());
     }
 }

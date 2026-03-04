@@ -104,8 +104,9 @@ mod tests {
             aliases.contains(&r#"alias gm-pr-y="gemini -m gemini-3.1-pro-preview -y""#.to_string())
         );
         assert!(
-            aliases
-                .contains(&r#"alias gm-fl-ap="gemini -m gemini-3-flash-preview -a -p""#.to_string())
+            aliases.contains(
+                &r#"alias gm-fl-ap="gemini -m gemini-3-flash-preview -a -p""#.to_string()
+            )
         );
     }
 
@@ -115,8 +116,7 @@ mod tests {
         let orig = std::env::current_dir().unwrap();
         std::env::set_current_dir(dir.path()).unwrap();
 
-        let result =
-            gen_vscode_workspace(vec!["../path1".to_string(), "/abs/path2".to_string()]);
+        let result = gen_vscode_workspace(vec!["../path1".to_string(), "/abs/path2".to_string()]);
 
         std::env::set_current_dir(orig).unwrap();
         result.unwrap();
