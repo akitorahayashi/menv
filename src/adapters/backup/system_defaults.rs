@@ -112,9 +112,7 @@ fn read_defaults(domain: &str, key: &str, default: &serde_yaml::Value) -> Result
     };
 
     match output {
-        Ok(o) if o.status.success() => {
-            Ok(String::from_utf8_lossy(&o.stdout).trim().to_string())
-        }
+        Ok(o) if o.status.success() => Ok(String::from_utf8_lossy(&o.stdout).trim().to_string()),
         Ok(o) => {
             let stderr = String::from_utf8_lossy(&o.stderr);
             if stderr.contains("does not exist") {
