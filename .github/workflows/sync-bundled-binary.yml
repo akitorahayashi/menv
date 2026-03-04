@@ -1,0 +1,51 @@
+name: Sync Bundled Binary
+
+on:
+  push:
+    branches: [ "main" ]
+    paths-ignore:
+      - 'dist/mev/bin/darwin-aarch64/mev'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-bundled-binary-main
+  cancel-in-progress: true
+
+jobs:
+  sync-darwin-aarch64:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: macos-14
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        uses: ./.github/actions/configure-git
+
+      - name: Add Rust target
+        run: rustup target add aarch64-apple-darwin
+
+      - name: Build mev for darwin-aarch64
+        run: cargo build --release --locked --target aarch64-apple-darwin
+
+      - name: Replace bundled binary
+        run: |
+          set -euo pipefail
+          install -m 0755 target/aarch64-apple-darwin/release/mev dist/mev/bin/darwin-aarch64/mev
+
+      - name: Commit bundled binary
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- dist/mev/bin/darwin-aarch64/mev; then
+            echo "Bundled binary already up to date."
+            exit 0
+          fi
+
+          git add dist/mev/bin/darwin-aarch64/mev
+          git commit -m "chore: sync bundled mev binary (darwin-aarch64) [skip ci]"
+          git push origin HEAD:main

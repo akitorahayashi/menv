@@ -4,6 +4,6 @@ use crate::app::commands;
 use crate::domain::error::AppError;
 
 pub fn run() -> Result<(), AppError> {
-    let source = crate::adapters::version_source::cargo::CargoVersion;
+    let source = crate::adapters::version_source::pipx::PipxVersionSource;
     commands::update::execute(&source)
 }
