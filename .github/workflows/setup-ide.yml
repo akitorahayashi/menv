@@ -1,23 +1,7 @@
 name: Setup IDE
 
 on:
-  push:
-    branches: [ "main" ]
-    paths:
-      - 'dist/mev/ansible/playbook.yml'
-      - 'dist/mev/ansible/ansible.cfg'
-      - 'dist/mev/ansible/roles/editor/**'
-      - '.github/workflows/setup-ide.yml'
-      - '.github/actions/setup-base/**'
-  pull_request:
-    branches: [ "main" ]
-    paths:
-      - 'dist/mev/ansible/playbook.yml'
-      - 'dist/mev/ansible/ansible.cfg'
-      - 'dist/mev/ansible/roles/editor/**'
-      - '.github/workflows/setup-ide.yml'
-      - '.github/actions/setup-base/**'
-  workflow_dispatch:
+  workflow_call:
 
 jobs:
   setup-vscode:

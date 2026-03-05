@@ -1,31 +1,7 @@
 name: Setup System
 
 on:
-  push:
-    branches: [ "main" ]
-    paths:
-      - 'dist/mev/ansible/playbook.yml'
-      - 'dist/mev/ansible/ansible.cfg'
-      - 'dist/mev/ansible/roles/vcs/**'
-      - 'dist/mev/ansible/roles/gh/**'
-      - 'dist/mev/ansible/roles/shell/**'
-      - 'dist/mev/ansible/roles/ssh/**'
-      - 'dist/mev/ansible/roles/system/**'
-      - '.github/workflows/setup-system.yml'
-      - '.github/actions/setup-base/**'
-  pull_request:
-    branches: [ "main" ]
-    paths:
-      - 'dist/mev/ansible/playbook.yml'
-      - 'dist/mev/ansible/ansible.cfg'
-      - 'dist/mev/ansible/roles/vcs/**'
-      - 'dist/mev/ansible/roles/gh/**'
-      - 'dist/mev/ansible/roles/shell/**'
-      - 'dist/mev/ansible/roles/ssh/**'
-      - 'dist/mev/ansible/roles/system/**'
-      - '.github/workflows/setup-system.yml'
-      - '.github/actions/setup-base/**'
-  workflow_dispatch:
+  workflow_call:
 
 jobs:
   setup-system:
