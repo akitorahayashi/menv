@@ -14,7 +14,7 @@ pub struct MakeArgs {
     pub tag: String,
 
     /// Profile to use (common, macbook/mbk, mac-mini/mmn).
-    #[arg(default_value = "common")]
+    #[arg(long, default_value = "common")]
     pub profile: String,
 
     /// Overwrite existing role configs with package defaults.
