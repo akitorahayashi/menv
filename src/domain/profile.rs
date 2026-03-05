@@ -5,7 +5,7 @@ use std::fmt;
 use crate::domain::error::AppError;
 
 /// A resolved, valid provisioning profile.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Profile {
     Macbook,
     MacMini,
@@ -59,9 +59,9 @@ const PROFILE_ALIASES: &[(&str, Profile)] = &[
 
 /// Resolve a profile identifier or alias to a `Profile`.
 pub fn resolve_profile(input: &str) -> Option<Profile> {
-    for &(alias, ref profile) in PROFILE_ALIASES {
+    for &(alias, profile) in PROFILE_ALIASES {
         if input == alias {
-            return Some(profile.clone());
+            return Some(profile);
         }
     }
     None
@@ -73,7 +73,13 @@ pub fn validate_machine_profile(input: &str) -> Result<Profile, AppError> {
         resolve_profile(input).ok_or_else(|| AppError::InvalidProfile(input.to_string()))?;
     if !profile.is_machine_profile() {
         return Err(AppError::InvalidProfile(format!(
-            "'{input}' is not a machine profile. Valid: macbook, mac-mini"
+            "'{input}' is not a machine profile. Valid: {}",
+            all_profiles()
+                .iter()
+                .filter(|p| p.is_machine_profile())
+                .map(Profile::as_str)
+                .collect::<Vec<_>>()
+                .join(", ")
         )));
     }
     Ok(profile)

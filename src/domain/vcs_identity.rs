@@ -13,7 +13,7 @@ pub struct VcsIdentity {
 }
 
 /// A resolved, valid VCS identity target for switching.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SwitchIdentity {
     Personal,
     Work,
@@ -48,7 +48,7 @@ pub fn resolve_switch_identity(input: &str) -> Option<SwitchIdentity> {
     let lower = input.to_lowercase();
     for (alias, identity) in SWITCH_IDENTITY_ALIASES {
         if lower == *alias {
-            return Some(identity.clone());
+            return Some(*identity);
         }
     }
     None

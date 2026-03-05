@@ -17,7 +17,7 @@ pub fn execute(ctx: &DependencyContainer, identity: SwitchIdentity) -> Result<()
 
     let vcs_identity = ctx
         .identity_store
-        .get_identity(identity.clone())?
+        .get_identity(identity)?
         .ok_or_else(|| AppError::Config(format!("failed to load {} identity", identity)))?;
 
     if vcs_identity.name.is_empty() || vcs_identity.email.is_empty() {
