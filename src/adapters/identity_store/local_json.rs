@@ -3,7 +3,7 @@
 use std::path::PathBuf;
 
 use crate::domain::error::AppError;
-use crate::domain::ports::identity_store::{IdentityStore, IdentityState};
+use crate::domain::ports::identity_store::{IdentityState, IdentityStore};
 use crate::domain::vcs_identity::VcsIdentity;
 
 pub struct IdentityFileStore {
@@ -14,15 +14,31 @@ impl IdentityFileStore {
     pub fn new(identity_path: PathBuf) -> Self {
         Self { identity_path }
     }
+
+    fn legacy_config_path(&self) -> PathBuf {
+        self.identity_path.with_file_name("config.json")
+    }
 }
 
 impl IdentityStore for IdentityFileStore {
     fn exists(&self) -> bool {
-        self.identity_path.exists()
+        self.identity_path.exists() || self.legacy_config_path().exists()
     }
 
     fn load(&self) -> Result<IdentityState, AppError> {
-        let content = std::fs::read_to_string(&self.identity_path)?;
+        let content = if self.identity_path.exists() {
+            std::fs::read_to_string(&self.identity_path)?
+        } else if self.legacy_config_path().exists() {
+            let content = std::fs::read_to_string(self.legacy_config_path())?;
+            // Migrate automatically to the new path
+            if let Ok(state) = serde_json::from_str::<IdentityState>(&content) {
+                let _ = self.save(&state);
+            }
+            content
+        } else {
+            return Err(AppError::Config("no identity configuration found".to_string()));
+        };
+
         serde_json::from_str(&content)
             .map_err(|e| AppError::Config(format!("failed to parse identity config: {e}")))
     }

@@ -2,8 +2,8 @@
 
 use crate::app::AppContext;
 use crate::domain::error::AppError;
-use crate::domain::ports::identity_store::IdentityStore;
 use crate::domain::ports::git::GitPort;
+use crate::domain::ports::identity_store::IdentityStore;
 use crate::domain::ports::jj::JjPort;
 use crate::domain::vcs_identity;
 

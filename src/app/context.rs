@@ -6,10 +6,10 @@
 use std::path::PathBuf;
 
 use crate::adapters::ansible::executor::AnsibleAdapter;
-use crate::adapters::identity_store::local_json::IdentityFileStore;
-use crate::adapters::identity_store::paths;
 use crate::adapters::fs::std_fs::StdFs;
 use crate::adapters::git::cli::GitCli;
+use crate::adapters::identity_store::local_json::IdentityFileStore;
+use crate::adapters::identity_store::paths;
 use crate::adapters::jj::cli::JjCli;
 use crate::adapters::macos_defaults::cli::MacosDefaultsCli;
 use crate::adapters::version_source::pipx::PipxVersionSource;

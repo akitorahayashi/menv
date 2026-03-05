@@ -4,7 +4,7 @@ use std::io::Write;
 
 use crate::app::AppContext;
 use crate::domain::error::AppError;
-use crate::domain::ports::identity_store::{IdentityStore, IdentityState};
+use crate::domain::ports::identity_store::{IdentityState, IdentityStore};
 use crate::domain::vcs_identity::VcsIdentity;
 
 /// Show current VCS identity configuration.
@@ -33,7 +33,8 @@ pub fn set(ctx: &AppContext) -> Result<(), AppError> {
     println!("Configure mev VCS identities");
     println!();
 
-    let existing = if ctx.identity_store.exists() { Some(ctx.identity_store.load()?) } else { None };
+    let existing =
+        if ctx.identity_store.exists() { Some(ctx.identity_store.load()?) } else { None };
 
     let (p_name_default, p_email_default, w_name_default, w_email_default) = match &existing {
         Some(state) => (
