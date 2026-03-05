@@ -3,7 +3,7 @@
 use clap::Subcommand;
 
 use crate::adapters::ansible::locator;
-use crate::app::AppContext;
+use crate::app::DependencyContainer;
 use crate::app::commands;
 use crate::domain::error::AppError;
 
@@ -30,16 +30,19 @@ pub enum ConfigCommand {
 pub fn run(cmd: ConfigCommand) -> Result<(), AppError> {
     match cmd {
         ConfigCommand::Show => {
-            let ctx = AppContext::for_config().map_err(|e| AppError::Config(e.to_string()))?;
+            let ctx =
+                DependencyContainer::for_config().map_err(|e| AppError::Config(e.to_string()))?;
             commands::config::show(&ctx)
         }
         ConfigCommand::Set => {
-            let ctx = AppContext::for_config().map_err(|e| AppError::Config(e.to_string()))?;
+            let ctx =
+                DependencyContainer::for_config().map_err(|e| AppError::Config(e.to_string()))?;
             commands::config::set(&ctx)
         }
         ConfigCommand::Create { role, overwrite } => {
             let ansible_dir = locator::locate_ansible_dir()?;
-            let ctx = AppContext::new(ansible_dir).map_err(|e| AppError::Config(e.to_string()))?;
+            let ctx = DependencyContainer::new(ansible_dir)
+                .map_err(|e| AppError::Config(e.to_string()))?;
             commands::config::create(&ctx, role, overwrite)
         }
     }

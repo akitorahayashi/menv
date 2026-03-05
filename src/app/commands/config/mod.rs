@@ -3,14 +3,14 @@
 use std::io::Write;
 use std::path::Path;
 
-use crate::app::AppContext;
+use crate::app::DependencyContainer;
 use crate::domain::error::AppError;
 use crate::domain::ports::ansible::AnsiblePort;
 use crate::domain::ports::config_store::{ConfigStore, MevConfig};
 use crate::domain::vcs_identity::VcsIdentity;
 
 /// Show current VCS identity configuration.
-pub fn show(ctx: &AppContext) -> Result<(), AppError> {
+pub fn show(ctx: &DependencyContainer) -> Result<(), AppError> {
     if !ctx.config_store.exists() {
         eprintln!("No configuration found.");
         eprintln!("Run 'mev config set' to configure.");
@@ -31,7 +31,7 @@ pub fn show(ctx: &AppContext) -> Result<(), AppError> {
 }
 
 /// Set VCS identity configuration interactively.
-pub fn set(ctx: &AppContext) -> Result<(), AppError> {
+pub fn set(ctx: &DependencyContainer) -> Result<(), AppError> {
     println!("Configure mev VCS identities");
     println!();
 
@@ -70,7 +70,11 @@ pub fn set(ctx: &AppContext) -> Result<(), AppError> {
 }
 
 /// Deploy role configs from ansible assets to local config root.
-pub fn create(ctx: &AppContext, role: Option<String>, overwrite: bool) -> Result<(), AppError> {
+pub fn create(
+    ctx: &DependencyContainer,
+    role: Option<String>,
+    overwrite: bool,
+) -> Result<(), AppError> {
     let available = ctx.ansible.roles_with_config()?;
 
     let roles_to_deploy = if let Some(role_name) = role {
