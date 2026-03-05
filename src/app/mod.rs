@@ -3,4 +3,4 @@ pub mod cli;
 pub mod commands;
 mod context;
 
-pub use context::AppContext;
+pub use context::DependencyContainer;

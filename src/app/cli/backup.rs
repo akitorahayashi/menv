@@ -3,7 +3,7 @@
 use clap::Args;
 
 use crate::adapters::ansible::locator;
-use crate::app::AppContext;
+use crate::app::DependencyContainer;
 use crate::app::commands;
 use crate::domain::error::AppError;
 
@@ -15,6 +15,6 @@ pub struct BackupArgs {
 
 pub fn run(args: BackupArgs) -> Result<(), AppError> {
     let ansible_dir = locator::locate_ansible_dir()?;
-    let ctx = AppContext::new(ansible_dir).map_err(|e| AppError::Config(e.to_string()))?;
+    let ctx = DependencyContainer::new(ansible_dir).map_err(|e| AppError::Config(e.to_string()))?;
     commands::backup::execute(&ctx, &args.target)
 }
