@@ -50,7 +50,7 @@ fn backup_short_list_flag_shows_targets() {
         .stdout(predicate::str::contains("Available backup targets"));
 
     ctx.cli()
-        .args(["backup", "-s"])
+        .args(["backup", "--ls"])
         .assert()
         .success()
         .stdout(predicate::str::contains("Available backup targets"));

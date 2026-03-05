@@ -9,7 +9,7 @@ use crate::domain::error::AppError;
 
 #[derive(Args)]
 pub struct BackupArgs {
-    #[arg(short = 'l', short_alias = 's', long, action = clap::ArgAction::SetTrue, help = "List available backup targets")]
+    #[arg(short = 'l', long = "list", aliases = ["ls"], action = clap::ArgAction::SetTrue, help = "List available backup targets")]
     pub list: bool,
 
     /// Backup target (system, vscode).
