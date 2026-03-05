@@ -15,7 +15,7 @@ use crate::domain::profile;
 pub use crate::domain::backup_target::BackupTarget;
 pub use crate::domain::error::AppError as Error;
 pub use crate::domain::execution_plan::ExecutionPlan;
-pub use crate::domain::ports::config_store::MevConfig;
+pub use crate::domain::ports::identity_store::IdentityState;
 pub use crate::domain::vcs_identity::VcsIdentity;
 
 // =============================================================================
@@ -54,22 +54,26 @@ pub fn list() -> Result<(), AppError> {
 // Config
 // =============================================================================
 
-/// Show current VCS identity configuration.
-pub fn config_show() -> Result<(), AppError> {
-    let ctx = config_context()?;
-    commands::config::show(&ctx)
-}
-
-/// Interactively set VCS identity configuration.
-pub fn config_set() -> Result<(), AppError> {
-    let ctx = config_context()?;
-    commands::config::set(&ctx)
-}
-
 /// Deploy role configuration files.
 pub fn config_create(role: Option<String>, overwrite: bool) -> Result<(), AppError> {
     let ctx = ansible_context()?;
     commands::config::create(&ctx, role, overwrite)
+}
+
+// =============================================================================
+// Identity
+// =============================================================================
+
+/// Show current VCS identity configuration.
+pub fn identity_show() -> Result<(), AppError> {
+    let ctx = identity_context()?;
+    commands::identity::show(&ctx)
+}
+
+/// Interactively set VCS identity configuration.
+pub fn identity_set() -> Result<(), AppError> {
+    let ctx = identity_context()?;
+    commands::identity::set(&ctx)
 }
 
 // =============================================================================
@@ -78,7 +82,7 @@ pub fn config_create(role: Option<String>, overwrite: bool) -> Result<(), AppErr
 
 /// Switch the global VCS identity between personal and work.
 pub fn switch(identity: &str) -> Result<(), AppError> {
-    let ctx = config_context()?;
+    let ctx = identity_context()?;
     commands::switch::execute(&ctx, identity)
 }
 
@@ -113,8 +117,8 @@ fn ansible_context() -> Result<DependencyContainer, AppError> {
     DependencyContainer::new(ansible_dir).map_err(|e| AppError::Config(e.to_string()))
 }
 
-fn config_context() -> Result<DependencyContainer, AppError> {
-    DependencyContainer::for_config().map_err(|e| AppError::Config(e.to_string()))
+fn identity_context() -> Result<DependencyContainer, AppError> {
+    DependencyContainer::for_identity().map_err(|e| AppError::Config(e.to_string()))
 }
 
 #[cfg(test)]

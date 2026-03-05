@@ -13,6 +13,6 @@ pub struct SwitchArgs {
 }
 
 pub fn run(args: SwitchArgs) -> Result<(), AppError> {
-    let ctx = DependencyContainer::for_config().map_err(|e| AppError::Config(e.to_string()))?;
+    let ctx = DependencyContainer::for_identity().map_err(|e| AppError::Config(e.to_string()))?;
     commands::switch::execute(&ctx, &args.identity)
 }
