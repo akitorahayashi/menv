@@ -1,6 +1,6 @@
 //! Dependency wiring for the application layer.
 //!
-//! `AppContext` wires port traits to concrete adapter implementations.
+//! `DependencyContainer` wires port traits to concrete adapter implementations.
 //! No command logic resides here.
 
 use std::path::PathBuf;
@@ -17,7 +17,7 @@ use crate::adapters::vscode::cli::VscodeCli;
 
 /// Application context wiring ports to concrete adapters.
 #[allow(dead_code)]
-pub struct AppContext {
+pub struct DependencyContainer {
     pub ansible_dir: PathBuf,
     pub local_config_root: PathBuf,
     pub ansible: AnsibleAdapter,
@@ -31,7 +31,7 @@ pub struct AppContext {
 }
 
 #[allow(dead_code)]
-impl AppContext {
+impl DependencyContainer {
     /// Construct the context from an ansible asset directory.
     pub fn new(ansible_dir: PathBuf) -> Result<Self, Box<dyn std::error::Error>> {
         let local_config_root = paths::local_config_root()?;
