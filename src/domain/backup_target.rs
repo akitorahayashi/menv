@@ -66,33 +66,26 @@ mod tests {
 
     #[test]
     fn backup_target_resolves_system() {
-        let target = BackupTarget::from_input("system");
-        assert!(target.is_some());
-        assert_eq!(target.unwrap().name(), "system");
+        assert_eq!(BackupTarget::from_input("system"), Some(BackupTarget::System));
     }
 
     #[test]
     fn backup_target_resolves_vscode() {
-        let target = BackupTarget::from_input("vscode");
-        assert!(target.is_some());
-        assert_eq!(target.unwrap().name(), "vscode");
+        assert_eq!(BackupTarget::from_input("vscode"), Some(BackupTarget::Vscode));
     }
 
     #[test]
     fn backup_target_resolves_vscode_extensions_alias() {
-        let target = BackupTarget::from_input("vscode-extensions");
-        assert!(target.is_some());
-        assert_eq!(target.unwrap().name(), "vscode");
+        assert_eq!(BackupTarget::from_input("vscode-extensions"), Some(BackupTarget::Vscode));
     }
 
     #[test]
     fn backup_target_rejects_unknown() {
-        assert!(BackupTarget::from_input("unknown").is_none());
+        assert_eq!(BackupTarget::from_input("unknown"), None);
     }
 
     #[test]
     fn backup_target_all_returns_expected_set() {
-        let all = BackupTarget::all();
-        assert_eq!(all.len(), 2);
+        assert_eq!(BackupTarget::all(), &[BackupTarget::System, BackupTarget::Vscode]);
     }
 }
