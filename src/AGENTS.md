@@ -2,6 +2,18 @@
 
 See [root AGENTS.md](../AGENTS.md) for project overview.
 
+## Architecture
+
+| Layer | Path | Responsibility |
+|---|---|---|
+| Application | src/app/ | CLI boundary, command orchestration, dependency wiring |
+| Domain | src/domain/ | Pure rules, command invariants, execution planning, interfaces |
+| Ports | src/domain/ports/ | Interface boundaries (traits) required by domain/application |
+| Adapters | src/adapters/ | Process execution, file I/O, catalog loading, package asset resolution |
+| Assets | dist/mev/ | Embedded static resources |
+| Testing | src/testing/ | In-process test doubles and builders |
+| Internal dep | crates/mev-internal/ | Internal command domain implementations reused by mev |
+
 ## app structure
 
 - `cli/` contains clap input contracts only.

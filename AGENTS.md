@@ -19,7 +19,7 @@ Installable via `pipx` through a thin Python launcher that delegates to the preb
 
 ## CLI Commands
 
-See [Usage Guide](docs/usage.md) for the list of available commands and usage instructions.
+See [README.md](README.md) for the list of available commands and usage instructions.
 
 ## Package Structure
 
