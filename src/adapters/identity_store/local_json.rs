@@ -69,9 +69,9 @@ impl IdentityStore for IdentityFileStore {
         Ok(())
     }
 
-    fn get_identity(&self, profile: &str) -> Result<Option<VcsIdentity>, AppError> {
+    fn get_identity(&self, identity: &str) -> Result<Option<VcsIdentity>, AppError> {
         let state = self.load()?;
-        match profile {
+        match identity {
             "personal" => Ok(Some(state.personal)),
             "work" => Ok(Some(state.work)),
             _ => Ok(None),
