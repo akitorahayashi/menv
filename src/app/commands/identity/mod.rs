@@ -2,13 +2,13 @@
 
 use std::io::Write;
 
-use crate::app::AppContext;
+use crate::app::DependencyContainer;
 use crate::domain::error::AppError;
 use crate::domain::ports::identity_store::{IdentityState, IdentityStore};
 use crate::domain::vcs_identity::VcsIdentity;
 
 /// Show current VCS identity configuration.
-pub fn show(ctx: &AppContext) -> Result<(), AppError> {
+pub fn show(ctx: &DependencyContainer) -> Result<(), AppError> {
     if !ctx.identity_store.exists() {
         eprintln!("No identity configuration found.");
         eprintln!("Run 'mev identity set' to configure.");
@@ -29,7 +29,7 @@ pub fn show(ctx: &AppContext) -> Result<(), AppError> {
 }
 
 /// Set VCS identity configuration interactively.
-pub fn set(ctx: &AppContext) -> Result<(), AppError> {
+pub fn set(ctx: &DependencyContainer) -> Result<(), AppError> {
     println!("Configure mev VCS identities");
     println!();
 

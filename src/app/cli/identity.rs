@@ -2,7 +2,7 @@
 
 use clap::Subcommand;
 
-use crate::app::AppContext;
+use crate::app::DependencyContainer;
 use crate::app::commands;
 use crate::domain::error::AppError;
 
@@ -18,11 +18,13 @@ pub enum IdentityCommand {
 pub fn run(cmd: IdentityCommand) -> Result<(), AppError> {
     match cmd {
         IdentityCommand::Show => {
-            let ctx = AppContext::for_identity().map_err(|e| AppError::Config(e.to_string()))?;
+            let ctx =
+                DependencyContainer::for_identity().map_err(|e| AppError::Config(e.to_string()))?;
             commands::identity::show(&ctx)
         }
         IdentityCommand::Set => {
-            let ctx = AppContext::for_identity().map_err(|e| AppError::Config(e.to_string()))?;
+            let ctx =
+                DependencyContainer::for_identity().map_err(|e| AppError::Config(e.to_string()))?;
             commands::identity::set(&ctx)
         }
     }

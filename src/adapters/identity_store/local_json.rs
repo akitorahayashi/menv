@@ -34,8 +34,9 @@ impl IdentityStore for IdentityFileStore {
 
         if self.legacy_config_path().exists() {
             let content = std::fs::read_to_string(self.legacy_config_path())?;
-            let state: IdentityState = serde_json::from_str(&content)
-                .map_err(|e| AppError::Config(format!("failed to parse legacy identity config: {e}")))?;
+            let state: IdentityState = serde_json::from_str(&content).map_err(|e| {
+                AppError::Config(format!("failed to parse legacy identity config: {e}"))
+            })?;
 
             // Migrate automatically to the new path.
             if let Err(e) = self.save(&state) {
