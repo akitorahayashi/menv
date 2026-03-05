@@ -1,6 +1,6 @@
 //! `switch` command orchestration — VCS identity switching.
 
-use crate::app::DependencyContainer;
+use crate::app::AppContext;
 use crate::domain::error::AppError;
 use crate::domain::ports::config_store::ConfigStore;
 use crate::domain::ports::git::GitPort;
@@ -8,7 +8,7 @@ use crate::domain::ports::jj::JjPort;
 use crate::domain::vcs_identity;
 
 /// Execute the `switch` command: change global git/jj identity.
-pub fn execute(ctx: &DependencyContainer, profile_input: &str) -> Result<(), AppError> {
+pub fn execute(ctx: &AppContext, profile_input: &str) -> Result<(), AppError> {
     if !ctx.config_store.exists() {
         eprintln!("No configuration found.");
         eprintln!("Run 'mev config set' first to configure identities.");

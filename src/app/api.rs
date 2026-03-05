@@ -6,7 +6,7 @@
 
 use crate::adapters::ansible::locator;
 use crate::adapters::version_source::pipx::PipxVersionSource;
-use crate::app::DependencyContainer;
+use crate::app::AppContext;
 use crate::app::commands;
 use crate::domain::error::AppError;
 use crate::domain::ports::version_source::VersionSource;
@@ -24,7 +24,7 @@ pub use crate::domain::vcs_identity::VcsIdentity;
 /// Provision a complete development environment for the given profile.
 pub fn create(profile: &str, overwrite: bool, verbose: bool) -> Result<(), AppError> {
     let ansible_dir = locator::locate_ansible_dir()?;
-    let ctx = DependencyContainer::new(ansible_dir).map_err(|e| AppError::Config(e.to_string()))?;
+    let ctx = AppContext::new(ansible_dir).map_err(|e| AppError::Config(e.to_string()))?;
     commands::create::execute(&ctx, profile, overwrite, verbose)
 }
 
@@ -35,7 +35,7 @@ pub fn create(profile: &str, overwrite: bool, verbose: bool) -> Result<(), AppEr
 /// Run a single Ansible task by tag within a profile.
 pub fn make(profile: &str, tag: &str, overwrite: bool, verbose: bool) -> Result<(), AppError> {
     let ansible_dir = locator::locate_ansible_dir()?;
-    let ctx = DependencyContainer::new(ansible_dir).map_err(|e| AppError::Config(e.to_string()))?;
+    let ctx = AppContext::new(ansible_dir).map_err(|e| AppError::Config(e.to_string()))?;
     commands::make::execute(&ctx, profile, tag, overwrite, verbose)
 }
 
@@ -46,7 +46,7 @@ pub fn make(profile: &str, tag: &str, overwrite: bool, verbose: bool) -> Result<
 /// Print the available tags, tag groups, and profiles.
 pub fn list() -> Result<(), AppError> {
     let ansible_dir = locator::locate_ansible_dir()?;
-    let ctx = DependencyContainer::new(ansible_dir).map_err(|e| AppError::Config(e.to_string()))?;
+    let ctx = AppContext::new(ansible_dir).map_err(|e| AppError::Config(e.to_string()))?;
     commands::list::execute(&ctx)
 }
 
@@ -56,20 +56,20 @@ pub fn list() -> Result<(), AppError> {
 
 /// Show current VCS identity configuration.
 pub fn config_show() -> Result<(), AppError> {
-    let ctx = DependencyContainer::for_config().map_err(|e| AppError::Config(e.to_string()))?;
+    let ctx = AppContext::for_config().map_err(|e| AppError::Config(e.to_string()))?;
     commands::config::show(&ctx)
 }
 
 /// Interactively set VCS identity configuration.
 pub fn config_set() -> Result<(), AppError> {
-    let ctx = DependencyContainer::for_config().map_err(|e| AppError::Config(e.to_string()))?;
+    let ctx = AppContext::for_config().map_err(|e| AppError::Config(e.to_string()))?;
     commands::config::set(&ctx)
 }
 
 /// Deploy role configuration files.
 pub fn config_create(role: Option<String>, overwrite: bool) -> Result<(), AppError> {
     let ansible_dir = locator::locate_ansible_dir()?;
-    let ctx = DependencyContainer::new(ansible_dir).map_err(|e| AppError::Config(e.to_string()))?;
+    let ctx = AppContext::new(ansible_dir).map_err(|e| AppError::Config(e.to_string()))?;
     commands::config::create(&ctx, role, overwrite)
 }
 
@@ -79,7 +79,7 @@ pub fn config_create(role: Option<String>, overwrite: bool) -> Result<(), AppErr
 
 /// Switch the global VCS identity between personal and work.
 pub fn switch(profile: &str) -> Result<(), AppError> {
-    let ctx = DependencyContainer::for_config().map_err(|e| AppError::Config(e.to_string()))?;
+    let ctx = AppContext::for_config().map_err(|e| AppError::Config(e.to_string()))?;
     commands::switch::execute(&ctx, profile)
 }
 
@@ -106,6 +106,6 @@ pub(crate) fn update_with_source(source: &dyn VersionSource) -> Result<(), AppEr
 /// Backup a system setting or configuration target.
 pub fn backup(target: &str) -> Result<(), AppError> {
     let ansible_dir = locator::locate_ansible_dir()?;
-    let ctx = DependencyContainer::new(ansible_dir).map_err(|e| AppError::Config(e.to_string()))?;
+    let ctx = AppContext::new(ansible_dir).map_err(|e| AppError::Config(e.to_string()))?;
     commands::backup::execute(&ctx, target)
 }

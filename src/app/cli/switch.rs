@@ -2,7 +2,7 @@
 
 use clap::Args;
 
-use crate::app::DependencyContainer;
+use crate::app::AppContext;
 use crate::app::commands;
 use crate::domain::error::AppError;
 
@@ -13,6 +13,6 @@ pub struct SwitchArgs {
 }
 
 pub fn run(args: SwitchArgs) -> Result<(), AppError> {
-    let ctx = DependencyContainer::for_config().map_err(|e| AppError::Config(e.to_string()))?;
+    let ctx = AppContext::for_config().map_err(|e| AppError::Config(e.to_string()))?;
     commands::switch::execute(&ctx, &args.profile)
 }

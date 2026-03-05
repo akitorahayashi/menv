@@ -1,6 +1,6 @@
 //! `make` command orchestration — run individual tasks by tag.
 
-use crate::app::DependencyContainer;
+use crate::app::AppContext;
 use crate::app::commands::deploy_configs;
 use crate::domain::error::AppError;
 use crate::domain::execution_plan::ExecutionPlan;
@@ -9,7 +9,7 @@ use crate::domain::tag;
 
 /// Execute the `make` command: deploy configs and run specified tags.
 pub fn execute(
-    ctx: &DependencyContainer,
+    ctx: &AppContext,
     profile: &str,
     tag_input: &str,
     overwrite: bool,

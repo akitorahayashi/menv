@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 
 use serde::Deserialize;
 
-use crate::app::DependencyContainer;
+use crate::app::AppContext;
 use crate::domain::backup_target::BackupTarget;
 use crate::domain::error::AppError;
 use crate::domain::ports::fs::FsPort;
@@ -36,7 +36,7 @@ enum DefinitionsDirResolution {
 }
 
 /// Execute the `backup` command for a given target.
-pub fn execute(ctx: &DependencyContainer, target_input: &str) -> Result<(), AppError> {
+pub fn execute(ctx: &AppContext, target_input: &str) -> Result<(), AppError> {
     if matches!(target_input, "list" | "ls") {
         list_targets();
         return Ok(());
@@ -87,7 +87,7 @@ pub fn execute(ctx: &DependencyContainer, target_input: &str) -> Result<(), AppE
 // ---------------------------------------------------------------------------
 
 fn execute_system(
-    ctx: &DependencyContainer,
+    ctx: &AppContext,
     definitions_dir: &Path,
     output_file: &Path,
 ) -> Result<(), AppError> {
@@ -257,7 +257,7 @@ fn build_entry(def: &SettingDefinition, value: &str) -> Vec<String> {
 // VSCode extensions backup
 // ---------------------------------------------------------------------------
 
-fn execute_vscode(ctx: &DependencyContainer, output_file: &Path) -> Result<(), AppError> {
+fn execute_vscode(ctx: &AppContext, output_file: &Path) -> Result<(), AppError> {
     let mut extensions = ctx.vscode.list_extensions()?;
     extensions.sort();
     extensions.dedup();
@@ -282,7 +282,7 @@ fn execute_vscode(ctx: &DependencyContainer, output_file: &Path) -> Result<(), A
 /// Resolve definitions directory with fallback from local to package defaults.
 fn resolve_definitions_dir(
     local_config_dir: &Path,
-    ctx: &DependencyContainer,
+    ctx: &AppContext,
     target: &BackupTarget,
 ) -> DefinitionsDirResolution {
     let local_definitions = local_config_dir.join("definitions");
