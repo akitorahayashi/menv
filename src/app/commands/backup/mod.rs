@@ -37,6 +37,11 @@ enum DefinitionsDirResolution {
 
 /// Execute the `backup` command for a given target.
 pub fn execute(ctx: &AppContext, target_input: &str) -> Result<(), AppError> {
+    if matches!(target_input, "list" | "ls") {
+        list_targets();
+        return Ok(());
+    }
+
     let target = BackupTarget::from_input(target_input).ok_or_else(|| {
         let valid: Vec<_> = BackupTarget::all().iter().map(|t| t.name()).collect();
         AppError::Backup(format!(
@@ -299,7 +304,7 @@ fn resolve_definitions_dir(
     }
 }
 
-pub fn list_targets() {
+fn list_targets() {
     println!("Available backup targets:");
     println!();
     for target in BackupTarget::all() {
