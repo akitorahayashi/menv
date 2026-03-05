@@ -9,12 +9,6 @@ use crate::domain::error::AppError;
 
 #[derive(Subcommand)]
 pub enum ConfigCommand {
-    /// Display current VCS identity configuration.
-    Show,
-
-    /// Set VCS identity configuration interactively.
-    Set,
-
     /// Deploy role configs to ~/.config/mev/roles/.
     #[command(alias = "cr")]
     Create {
@@ -29,14 +23,6 @@ pub enum ConfigCommand {
 
 pub fn run(cmd: ConfigCommand) -> Result<(), AppError> {
     match cmd {
-        ConfigCommand::Show => {
-            let ctx = AppContext::for_config().map_err(|e| AppError::Config(e.to_string()))?;
-            commands::config::show(&ctx)
-        }
-        ConfigCommand::Set => {
-            let ctx = AppContext::for_config().map_err(|e| AppError::Config(e.to_string()))?;
-            commands::config::set(&ctx)
-        }
         ConfigCommand::Create { role, overwrite } => {
             let ansible_dir = locator::locate_ansible_dir()?;
             let ctx = AppContext::new(ansible_dir).map_err(|e| AppError::Config(e.to_string()))?;

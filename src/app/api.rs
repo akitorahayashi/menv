@@ -14,7 +14,7 @@ use crate::domain::ports::version_source::VersionSource;
 pub use crate::domain::backup_target::BackupTarget;
 pub use crate::domain::error::AppError as Error;
 pub use crate::domain::execution_plan::ExecutionPlan;
-pub use crate::domain::ports::config_store::MevConfig;
+pub use crate::domain::ports::identity_store::IdentityState;
 pub use crate::domain::vcs_identity::VcsIdentity;
 
 // =============================================================================
@@ -54,18 +54,6 @@ pub fn list() -> Result<(), AppError> {
 // Config
 // =============================================================================
 
-/// Show current VCS identity configuration.
-pub fn config_show() -> Result<(), AppError> {
-    let ctx = AppContext::for_config().map_err(|e| AppError::Config(e.to_string()))?;
-    commands::config::show(&ctx)
-}
-
-/// Interactively set VCS identity configuration.
-pub fn config_set() -> Result<(), AppError> {
-    let ctx = AppContext::for_config().map_err(|e| AppError::Config(e.to_string()))?;
-    commands::config::set(&ctx)
-}
-
 /// Deploy role configuration files.
 pub fn config_create(role: Option<String>, overwrite: bool) -> Result<(), AppError> {
     let ansible_dir = locator::locate_ansible_dir()?;
@@ -74,12 +62,28 @@ pub fn config_create(role: Option<String>, overwrite: bool) -> Result<(), AppErr
 }
 
 // =============================================================================
+// Identity
+// =============================================================================
+
+/// Show current VCS identity configuration.
+pub fn identity_show() -> Result<(), AppError> {
+    let ctx = AppContext::for_identity().map_err(|e| AppError::Config(e.to_string()))?;
+    commands::identity::show(&ctx)
+}
+
+/// Interactively set VCS identity configuration.
+pub fn identity_set() -> Result<(), AppError> {
+    let ctx = AppContext::for_identity().map_err(|e| AppError::Config(e.to_string()))?;
+    commands::identity::set(&ctx)
+}
+
+// =============================================================================
 // Switch
 // =============================================================================
 
 /// Switch the global VCS identity between personal and work.
 pub fn switch(profile: &str) -> Result<(), AppError> {
-    let ctx = AppContext::for_config().map_err(|e| AppError::Config(e.to_string()))?;
+    let ctx = AppContext::for_identity().map_err(|e| AppError::Config(e.to_string()))?;
     commands::switch::execute(&ctx, profile)
 }
 

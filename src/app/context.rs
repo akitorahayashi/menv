@@ -6,8 +6,8 @@
 use std::path::PathBuf;
 
 use crate::adapters::ansible::executor::AnsibleAdapter;
-use crate::adapters::config_store::local_json::ConfigFileStore;
-use crate::adapters::config_store::paths;
+use crate::adapters::identity_store::local_json::IdentityFileStore;
+use crate::adapters::identity_store::paths;
 use crate::adapters::fs::std_fs::StdFs;
 use crate::adapters::git::cli::GitCli;
 use crate::adapters::jj::cli::JjCli;
@@ -21,7 +21,7 @@ pub struct AppContext {
     pub ansible_dir: PathBuf,
     pub local_config_root: PathBuf,
     pub ansible: AnsibleAdapter,
-    pub config_store: ConfigFileStore,
+    pub identity_store: IdentityFileStore,
     pub version_source: PipxVersionSource,
     pub git: GitCli,
     pub jj: JjCli,
@@ -38,7 +38,7 @@ impl AppContext {
 
         Ok(Self {
             ansible: AnsibleAdapter::new(ansible_dir.clone(), local_config_root.clone())?,
-            config_store: ConfigFileStore::new(paths::default_config_path()?),
+            identity_store: IdentityFileStore::new(paths::default_identity_path()?),
             version_source: PipxVersionSource,
             git: GitCli,
             jj: JjCli,
@@ -50,12 +50,12 @@ impl AppContext {
         })
     }
 
-    /// Construct a config-only context (no ansible asset resolution needed).
-    pub fn for_config() -> Result<Self, Box<dyn std::error::Error>> {
+    /// Construct a lightweight identity-only context (no ansible asset resolution needed).
+    pub fn for_identity() -> Result<Self, Box<dyn std::error::Error>> {
         let local_config_root = paths::local_config_root()?;
         Ok(Self {
             ansible: AnsibleAdapter::empty(local_config_root.clone()),
-            config_store: ConfigFileStore::new(paths::default_config_path()?),
+            identity_store: IdentityFileStore::new(paths::default_identity_path()?),
             version_source: PipxVersionSource,
             git: GitCli,
             jj: JjCli,

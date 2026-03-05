@@ -6,26 +6,26 @@ use crate::domain::error::AppError;
 use crate::domain::vcs_identity::VcsIdentity;
 
 /// Persists and retrieves VCS identity configuration.
-pub trait ConfigStore {
-    /// Check if configuration file exists.
+pub trait IdentityStore {
+    /// Check if identity configuration file exists.
     fn exists(&self) -> bool;
 
-    /// Load the full configuration.
-    fn load(&self) -> Result<MevConfig, AppError>;
+    /// Load the full identity configuration.
+    fn load(&self) -> Result<IdentityState, AppError>;
 
-    /// Save the full configuration.
-    fn save(&self, config: &MevConfig) -> Result<(), AppError>;
+    /// Save the full identity configuration.
+    fn save(&self, state: &IdentityState) -> Result<(), AppError>;
 
     /// Get a specific VCS identity by profile name.
     fn get_identity(&self, profile: &str) -> Result<Option<VcsIdentity>, AppError>;
 
-    /// Get the configuration file path.
-    fn config_path(&self) -> PathBuf;
+    /// Get the identity configuration file path.
+    fn identity_path(&self) -> PathBuf;
 }
 
-/// Top-level configuration model stored on disk.
+/// Top-level identity model stored on disk.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct MevConfig {
+pub struct IdentityState {
     pub personal: VcsIdentity,
     pub work: VcsIdentity,
 }
