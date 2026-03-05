@@ -16,8 +16,8 @@ pub trait ConfigStore {
     /// Save the full configuration.
     fn save(&self, config: &MevConfig) -> Result<(), AppError>;
 
-    /// Get a specific VCS identity by profile name.
-    fn get_identity(&self, profile: &str) -> Result<Option<VcsIdentity>, AppError>;
+    /// Get a specific VCS identity by identity name.
+    fn get_identity(&self, identity: &str) -> Result<Option<VcsIdentity>, AppError>;
 
     /// Get the configuration file path.
     fn config_path(&self) -> PathBuf;

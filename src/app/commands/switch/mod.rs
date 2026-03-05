@@ -8,16 +8,16 @@ use crate::domain::ports::jj::JjPort;
 use crate::domain::vcs_identity;
 
 /// Execute the `switch` command: change global git/jj identity.
-pub fn execute(ctx: &AppContext, profile_input: &str) -> Result<(), AppError> {
+pub fn execute(ctx: &AppContext, identity_input: &str) -> Result<(), AppError> {
     if !ctx.config_store.exists() {
         eprintln!("No configuration found.");
         eprintln!("Run 'mev config set' first to configure identities.");
         return Err(AppError::Config("no configuration found".to_string()));
     }
 
-    let resolved = vcs_identity::resolve_switch_profile(profile_input).ok_or_else(|| {
-        AppError::InvalidProfile(format!(
-            "invalid profile '{profile_input}'. Valid: personal (p), work (w)"
+    let resolved = vcs_identity::resolve_switch_identity(identity_input).ok_or_else(|| {
+        AppError::InvalidIdentity(format!(
+            "invalid identity '{identity_input}'. Valid: personal (p), work (w)"
         ))
     })?;
 

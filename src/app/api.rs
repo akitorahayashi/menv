@@ -78,9 +78,9 @@ pub fn config_create(role: Option<String>, overwrite: bool) -> Result<(), AppErr
 // =============================================================================
 
 /// Switch the global VCS identity between personal and work.
-pub fn switch(profile: &str) -> Result<(), AppError> {
+pub fn switch(identity: &str) -> Result<(), AppError> {
     let ctx = AppContext::for_config().map_err(|e| AppError::Config(e.to_string()))?;
-    commands::switch::execute(&ctx, profile)
+    commands::switch::execute(&ctx, identity)
 }
 
 // =============================================================================

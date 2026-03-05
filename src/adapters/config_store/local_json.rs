@@ -48,9 +48,9 @@ impl ConfigStore for ConfigFileStore {
         Ok(())
     }
 
-    fn get_identity(&self, profile: &str) -> Result<Option<VcsIdentity>, AppError> {
+    fn get_identity(&self, identity: &str) -> Result<Option<VcsIdentity>, AppError> {
         let config = self.load()?;
-        match profile {
+        match identity {
             "personal" => Ok(Some(config.personal)),
             "work" => Ok(Some(config.work)),
             _ => Ok(None),
