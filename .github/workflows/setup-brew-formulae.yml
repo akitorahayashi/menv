@@ -1,0 +1,42 @@
+name: Setup Brew Formulae
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'dist/mev/ansible/playbook.yml'
+      - 'dist/mev/ansible/ansible.cfg'
+      - 'dist/mev/ansible/roles/brew/**'
+      - '.github/workflows/setup-brew-formulae.yml'
+      - '.github/actions/setup-base/**'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'dist/mev/ansible/playbook.yml'
+      - 'dist/mev/ansible/ansible.cfg'
+      - 'dist/mev/ansible/roles/brew/**'
+      - '.github/workflows/setup-brew-formulae.yml'
+      - '.github/actions/setup-base/**'
+  workflow_dispatch:
+
+jobs:
+  setup-brew-formulae:
+    runs-on: macos-15
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup base environment
+        uses: ./.github/actions/setup-base
+
+      - name: Setup GitHub authentication for Homebrew
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "HOMEBREW_GITHUB_API_TOKEN=${{ github.token }}" >> "$GITHUB_ENV"
+          git config --global http.https://github.com/.extraheader "AUTHORIZATION: bearer ${{ github.token }}"
+
+      - name: Run Homebrew formulae setup for common
+        run: just run make brew-formulae

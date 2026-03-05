@@ -1,7 +1,23 @@
 name: Setup Python
 
 on:
-  workflow_call:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'dist/mev/ansible/playbook.yml'
+      - 'dist/mev/ansible/ansible.cfg'
+      - 'dist/mev/ansible/roles/python/**'
+      - '.github/workflows/setup-python.yml'
+      - '.github/actions/setup-base/**'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'dist/mev/ansible/playbook.yml'
+      - 'dist/mev/ansible/ansible.cfg'
+      - 'dist/mev/ansible/roles/python/**'
+      - '.github/workflows/setup-python.yml'
+      - '.github/actions/setup-base/**'
+  workflow_dispatch:
 
 jobs:
   setup-python:
