@@ -8,11 +8,11 @@ use crate::domain::error::AppError;
 
 #[derive(Args)]
 pub struct SwitchArgs {
-    /// Profile to switch to (personal/p, work/w).
-    pub profile: String,
+    /// Identity to switch to (personal/p, work/w).
+    pub identity: String,
 }
 
 pub fn run(args: SwitchArgs) -> Result<(), AppError> {
     let ctx = DependencyContainer::for_config().map_err(|e| AppError::Config(e.to_string()))?;
-    commands::switch::execute(&ctx, &args.profile)
+    commands::switch::execute(&ctx, &args.identity)
 }

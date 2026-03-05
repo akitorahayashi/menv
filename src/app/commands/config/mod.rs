@@ -22,7 +22,7 @@ pub fn show(ctx: &DependencyContainer) -> Result<(), AppError> {
 
     println!("Config file: {}", path.display());
     println!();
-    println!("{:<12} {:<20} Email", "Profile", "Name");
+    println!("{:<12} {:<20} Email", "Identity", "Name");
     println!("{:-<12} {:-<20} {:-<30}", "", "", "");
     println!("{:<12} {:<20} {}", "personal", config.personal.name, config.personal.email);
     println!("{:<12} {:<20} {}", "work", config.work.name, config.work.email);
