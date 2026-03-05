@@ -16,7 +16,11 @@ fn switch_help_shows_identity_argument() {
 #[test]
 fn switch_alias_sw_is_accepted() {
     let ctx = TestContext::new();
-    ctx.cli().args(["sw", "--help"]).assert().success().stdout(predicate::str::contains("IDENTITY"));
+    ctx.cli()
+        .args(["sw", "--help"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("IDENTITY"));
 }
 
 #[test]
