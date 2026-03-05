@@ -4,7 +4,7 @@
 fn domain_profile_types_are_public() {
     // Confirms that profile resolution is accessible from the library crate.
     let resolved = mev::domain::profile::resolve_profile("macbook");
-    assert_eq!(resolved, Some("macbook"));
+    assert_eq!(resolved, Some(mev::domain::profile::Profile::Macbook));
 }
 
 #[test]
@@ -16,5 +16,5 @@ fn domain_tag_resolution_is_public() {
 #[test]
 fn domain_config_resolution_is_public() {
     let profile = mev::domain::vcs_identity::resolve_switch_profile("p");
-    assert_eq!(profile, Some("personal"));
+    assert_eq!(profile, Some(mev::domain::vcs_identity::SwitchProfile::Personal));
 }

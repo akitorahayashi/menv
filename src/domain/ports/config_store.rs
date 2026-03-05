@@ -3,7 +3,7 @@
 use std::path::PathBuf;
 
 use crate::domain::error::AppError;
-use crate::domain::vcs_identity::VcsIdentity;
+use crate::domain::vcs_identity::{SwitchProfile, VcsIdentity};
 
 /// Persists and retrieves VCS identity configuration.
 pub trait ConfigStore {
@@ -17,7 +17,7 @@ pub trait ConfigStore {
     fn save(&self, config: &MevConfig) -> Result<(), AppError>;
 
     /// Get a specific VCS identity by profile name.
-    fn get_identity(&self, profile: &str) -> Result<Option<VcsIdentity>, AppError>;
+    fn get_identity(&self, profile: SwitchProfile) -> Result<Option<VcsIdentity>, AppError>;
 
     /// Get the configuration file path.
     fn config_path(&self) -> PathBuf;

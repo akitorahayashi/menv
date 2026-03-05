@@ -5,34 +5,29 @@ use crate::domain::error::AppError;
 use crate::domain::ports::config_store::ConfigStore;
 use crate::domain::ports::git::GitPort;
 use crate::domain::ports::jj::JjPort;
-use crate::domain::vcs_identity;
+use crate::domain::vcs_identity::SwitchProfile;
 
 /// Execute the `switch` command: change global git/jj identity.
-pub fn execute(ctx: &AppContext, profile_input: &str) -> Result<(), AppError> {
+pub fn execute(ctx: &AppContext, profile: SwitchProfile) -> Result<(), AppError> {
     if !ctx.config_store.exists() {
         eprintln!("No configuration found.");
         eprintln!("Run 'mev config set' first to configure identities.");
         return Err(AppError::Config("no configuration found".to_string()));
     }
 
-    let resolved = vcs_identity::resolve_switch_profile(profile_input).ok_or_else(|| {
-        AppError::InvalidProfile(format!(
-            "invalid profile '{profile_input}'. Valid: personal (p), work (w)"
-        ))
-    })?;
-
     let identity = ctx
         .config_store
-        .get_identity(resolved)?
-        .ok_or_else(|| AppError::Config(format!("failed to load {resolved} identity")))?;
+        .get_identity(profile)?
+        .ok_or_else(|| AppError::Config(format!("failed to load {} identity", profile.as_str())))?;
 
     if identity.name.is_empty() || identity.email.is_empty() {
         return Err(AppError::Config(format!(
-            "{resolved} identity is not configured. Run 'mev config set' to configure."
+            "{} identity is not configured. Run 'mev config set' to configure.",
+            profile.as_str()
         )));
     }
 
-    println!("Switching to {resolved} identity...");
+    println!("Switching to {} identity...", profile.as_str());
 
     // Git configuration (required)
     ctx.git.set_identity(&identity.name, &identity.email)?;
@@ -47,7 +42,7 @@ pub fn execute(ctx: &AppContext, profile_input: &str) -> Result<(), AppError> {
     // Show current configuration via git (primary VCS)
     let (name, email) = ctx.git.get_identity()?;
     println!();
-    println!("Switched to {resolved} identity");
+    println!("Switched to {} identity", profile.as_str());
     println!("  Name:  {name}");
     println!("  Email: {email}");
 

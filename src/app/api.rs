@@ -15,6 +15,8 @@ pub use crate::domain::backup_target::BackupTarget;
 pub use crate::domain::error::AppError as Error;
 pub use crate::domain::execution_plan::ExecutionPlan;
 pub use crate::domain::ports::config_store::MevConfig;
+pub use crate::domain::profile::Profile;
+pub use crate::domain::vcs_identity::SwitchProfile;
 pub use crate::domain::vcs_identity::VcsIdentity;
 
 // =============================================================================
@@ -22,7 +24,7 @@ pub use crate::domain::vcs_identity::VcsIdentity;
 // =============================================================================
 
 /// Provision a complete development environment for the given profile.
-pub fn create(profile: &str, overwrite: bool, verbose: bool) -> Result<(), AppError> {
+pub fn create(profile: Profile, overwrite: bool, verbose: bool) -> Result<(), AppError> {
     let ansible_dir = locator::locate_ansible_dir()?;
     let ctx = AppContext::new(ansible_dir).map_err(|e| AppError::Config(e.to_string()))?;
     commands::create::execute(&ctx, profile, overwrite, verbose)
@@ -33,7 +35,7 @@ pub fn create(profile: &str, overwrite: bool, verbose: bool) -> Result<(), AppEr
 // =============================================================================
 
 /// Run a single Ansible task by tag within a profile.
-pub fn make(profile: &str, tag: &str, overwrite: bool, verbose: bool) -> Result<(), AppError> {
+pub fn make(profile: Profile, tag: &str, overwrite: bool, verbose: bool) -> Result<(), AppError> {
     let ansible_dir = locator::locate_ansible_dir()?;
     let ctx = AppContext::new(ansible_dir).map_err(|e| AppError::Config(e.to_string()))?;
     commands::make::execute(&ctx, profile, tag, overwrite, verbose)
@@ -78,7 +80,7 @@ pub fn config_create(role: Option<String>, overwrite: bool) -> Result<(), AppErr
 // =============================================================================
 
 /// Switch the global VCS identity between personal and work.
-pub fn switch(profile: &str) -> Result<(), AppError> {
+pub fn switch(profile: SwitchProfile) -> Result<(), AppError> {
     let ctx = AppContext::for_config().map_err(|e| AppError::Config(e.to_string()))?;
     commands::switch::execute(&ctx, profile)
 }

@@ -4,7 +4,7 @@ use std::path::PathBuf;
 
 use crate::domain::error::AppError;
 use crate::domain::ports::config_store::{ConfigStore, MevConfig};
-use crate::domain::vcs_identity::VcsIdentity;
+use crate::domain::vcs_identity::{SwitchProfile, VcsIdentity};
 
 pub struct ConfigFileStore {
     config_path: PathBuf,
@@ -48,12 +48,11 @@ impl ConfigStore for ConfigFileStore {
         Ok(())
     }
 
-    fn get_identity(&self, profile: &str) -> Result<Option<VcsIdentity>, AppError> {
+    fn get_identity(&self, profile: SwitchProfile) -> Result<Option<VcsIdentity>, AppError> {
         let config = self.load()?;
         match profile {
-            "personal" => Ok(Some(config.personal)),
-            "work" => Ok(Some(config.work)),
-            _ => Ok(None),
+            SwitchProfile::Personal => Ok(Some(config.personal)),
+            SwitchProfile::Work => Ok(Some(config.work)),
         }
     }
 

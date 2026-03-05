@@ -34,11 +34,11 @@ pub fn execute(ctx: &AppContext) -> Result<(), AppError> {
 
     // Profiles
     let mut profiles_to_show = Vec::new();
-    if VALID_PROFILES.contains(&"common") {
-        profiles_to_show.push("common");
+    if VALID_PROFILES.contains(&crate::domain::profile::Profile::Common) {
+        profiles_to_show.push(crate::domain::profile::Profile::Common);
     }
     for &p in VALID_PROFILES {
-        if p != "common" {
+        if p != crate::domain::profile::Profile::Common {
             profiles_to_show.push(p);
         }
     }
@@ -52,8 +52,8 @@ pub fn execute(ctx: &AppContext) -> Result<(), AppError> {
             .collect();
         let alias_str =
             if aliases.is_empty() { String::new() } else { format!(" ({})", aliases.join(", ")) };
-        let suffix = if *p == "common" { " (default)" } else { "" };
-        profile_strs.push(format!("{p}{alias_str}{suffix}"));
+        let suffix = if *p == crate::domain::profile::Profile::Common { " (default)" } else { "" };
+        profile_strs.push(format!("{}{alias_str}{suffix}", p.as_str()));
     }
     println!("Profiles: {}", profile_strs.join(", "));
 
