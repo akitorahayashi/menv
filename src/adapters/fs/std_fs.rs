@@ -30,4 +30,19 @@ impl FsPort for StdFs {
     fn create_dir_all(&self, path: &Path) -> Result<(), AppError> {
         std::fs::create_dir_all(path).map_err(AppError::Io)
     }
+
+    fn copy_dir_recursive(&self, src: &Path, dst: &Path) -> Result<(), AppError> {
+        std::fs::create_dir_all(dst).map_err(AppError::Io)?;
+        for entry in std::fs::read_dir(src).map_err(AppError::Io)? {
+            let entry = entry.map_err(AppError::Io)?;
+            let src_path = entry.path();
+            let dst_path = dst.join(entry.file_name());
+            if src_path.is_dir() {
+                self.copy_dir_recursive(&src_path, &dst_path)?;
+            } else {
+                std::fs::copy(&src_path, &dst_path).map_err(AppError::Io)?;
+            }
+        }
+        Ok(())
+    }
 }

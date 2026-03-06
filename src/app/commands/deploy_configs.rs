@@ -8,6 +8,7 @@ use std::path::Path;
 
 use crate::domain::error::AppError;
 use crate::domain::ports::ansible::AnsiblePort;
+use crate::domain::ports::fs::FsPort;
 
 /// Deploy configs for roles associated with the given tags.
 ///
@@ -21,6 +22,7 @@ pub fn deploy_for_tags(
     local_config_root: &Path,
     ansible: &dyn AnsiblePort,
     overwrite: bool,
+    fs: &dyn FsPort,
 ) -> Result<(), AppError> {
     let available: HashSet<String> = ansible.roles_with_config()?.into_iter().collect();
 
@@ -45,34 +47,18 @@ pub fn deploy_for_tags(
         }
 
         let source = ansible_dir.join("roles").join(&role).join("config");
-        if let Err(e) = copy_dir_recursive(&source, &target) {
+        if !source.is_dir() {
+            return Err(AppError::Config(format!(
+                "config source directory is missing: {}",
+                source.display()
+            )));
+        }
+        if let Err(e) = fs.copy_dir_recursive(&source, &target) {
             let _ = std::fs::remove_dir_all(&target);
             return Err(e);
         }
         println!("  Deployed config for {role}");
     }
 
-    Ok(())
-}
-
-/// Recursively copy a directory tree.
-pub fn copy_dir_recursive(src: &Path, dst: &Path) -> Result<(), AppError> {
-    if !src.is_dir() {
-        return Err(AppError::Config(format!(
-            "config source directory is missing: {}",
-            src.display()
-        )));
-    }
-    std::fs::create_dir_all(dst)?;
-    for entry in std::fs::read_dir(src)? {
-        let entry = entry?;
-        let src_path = entry.path();
-        let dst_path = dst.join(entry.file_name());
-        if src_path.is_dir() {
-            copy_dir_recursive(&src_path, &dst_path)?;
-        } else {
-            std::fs::copy(&src_path, &dst_path)?;
-        }
-    }
     Ok(())
 }

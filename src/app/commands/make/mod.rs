@@ -36,6 +36,7 @@ pub fn execute(
         &ctx.local_config_root,
         &ctx.ansible,
         overwrite,
+        &ctx.fs,
     )?;
 
     println!("Running tags: {}", plan.tags.join(", "));
