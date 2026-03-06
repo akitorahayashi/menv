@@ -58,8 +58,8 @@ pub fn deploy_for_tags(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tempfile::tempdir;
     use std::collections::HashMap;
+    use tempfile::tempdir;
 
     struct MockAnsible {
         roles_with_config: Vec<String>,
@@ -67,7 +67,12 @@ mod tests {
     }
 
     impl AnsiblePort for MockAnsible {
-        fn run_playbook(&self, _profile: &str, _tags: &[String], _verbose: bool) -> Result<(), AppError> {
+        fn run_playbook(
+            &self,
+            _profile: &str,
+            _tags: &[String],
+            _verbose: bool,
+        ) -> Result<(), AppError> {
             Ok(())
         }
         fn roles_with_config(&self) -> Result<Vec<String>, AppError> {
@@ -108,7 +113,8 @@ mod tests {
             local_config_root.path(),
             &mock_ansible,
             false,
-        ).unwrap();
+        )
+        .unwrap();
 
         let deployed_file = local_config_root.path().join("test_role").join("settings.json");
         assert!(deployed_file.exists());
@@ -139,7 +145,8 @@ mod tests {
             local_config_root.path(),
             &mock_ansible,
             false,
-        ).unwrap();
+        )
+        .unwrap();
 
         let content = std::fs::read_to_string(deployed_dir.join("settings.json")).unwrap();
         assert_eq!(content, "old"); // Should not overwrite
@@ -151,7 +158,8 @@ mod tests {
             local_config_root.path(),
             &mock_ansible,
             true,
-        ).unwrap();
+        )
+        .unwrap();
 
         let content = std::fs::read_to_string(deployed_dir.join("settings.json")).unwrap();
         assert_eq!(content, "new"); // Should overwrite

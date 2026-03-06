@@ -71,8 +71,6 @@ pub fn execute(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::path::PathBuf;
-    use tempfile::tempdir;
     use crate::adapters::ansible::executor::AnsibleAdapter;
     use crate::adapters::fs::std_fs::StdFs;
     use crate::adapters::git::cli::GitCli;
@@ -81,6 +79,8 @@ mod tests {
     use crate::adapters::macos_defaults::cli::MacosDefaultsCli;
     use crate::adapters::version_source::pipx::PipxVersionSource;
     use crate::adapters::vscode::cli::VscodeCli;
+    use std::path::PathBuf;
+    use tempfile::tempdir;
 
     fn build_test_container() -> (tempfile::TempDir, DependencyContainer) {
         let dir = tempdir().unwrap();

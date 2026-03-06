@@ -51,8 +51,6 @@ pub fn execute(ctx: &DependencyContainer, identity: SwitchIdentity) -> Result<()
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::path::PathBuf;
-    use tempfile::tempdir;
     use crate::adapters::ansible::executor::AnsibleAdapter;
     use crate::adapters::fs::std_fs::StdFs;
     use crate::adapters::git::cli::GitCli;
@@ -63,6 +61,8 @@ mod tests {
     use crate::adapters::vscode::cli::VscodeCli;
     use crate::domain::ports::identity_store::IdentityState;
     use crate::domain::vcs_identity::VcsIdentity;
+    use std::path::PathBuf;
+    use tempfile::tempdir;
 
     fn build_test_container() -> (tempfile::TempDir, DependencyContainer) {
         let dir = tempdir().unwrap();
@@ -90,7 +90,10 @@ mod tests {
 
         let result = execute(&ctx, SwitchIdentity::Personal);
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().to_string(), "configuration error: no identity configuration found");
+        assert_eq!(
+            result.unwrap_err().to_string(),
+            "configuration error: no identity configuration found"
+        );
     }
 
     #[test]

@@ -362,12 +362,18 @@ mod tests {
         let lines = build_entry(&def, "42");
         assert_eq!(lines.len(), 2);
         assert_eq!(lines[0], "# A test comment");
-        assert_eq!(lines[1], "- { key: \"TestKey\", domain: \"TestDomain\", type: \"int\", value: 42 }");
+        assert_eq!(
+            lines[1],
+            "- { key: \"TestKey\", domain: \"TestDomain\", type: \"int\", value: 42 }"
+        );
     }
 
     #[test]
     fn format_string_json_encodes() {
         assert_eq!(format_string("plain", "key", &serde_yaml::Value::Null), "\"plain\"");
-        assert_eq!(format_string("contains \"quotes\"", "key", &serde_yaml::Value::Null), "\"contains \\\"quotes\\\"\"");
+        assert_eq!(
+            format_string("contains \"quotes\"", "key", &serde_yaml::Value::Null),
+            "\"contains \\\"quotes\\\"\""
+        );
     }
 }
