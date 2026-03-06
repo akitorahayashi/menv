@@ -27,10 +27,10 @@ pub fn execute(
 
     let plan = ExecutionPlan::full_setup(profile, verbose);
 
-    println!();
-    println!("mev: Creating {} environment", plan.profile);
-    println!("This will run {} tasks.", plan.tags.len());
-    println!();
+    eprintln!();
+    eprintln!("mev: Creating {} environment", plan.profile);
+    eprintln!("This will run {} tasks.", plan.tags.len());
+    eprintln!();
 
     // Deploy configs for roles about to be executed
     deploy_configs::deploy_for_tags(
@@ -45,25 +45,25 @@ pub fn execute(
     for (i, tag) in plan.tags.iter().enumerate() {
         let step = i + 1;
         let total = plan.tags.len();
-        println!("[{step}/{total}] Running: {tag}");
+        eprintln!("[{step}/{total}] Running: {tag}");
 
         ctx.ansible
             .run_playbook(plan.profile.as_str(), std::slice::from_ref(tag), plan.verbose)
             .inspect_err(|e| {
                 eprintln!("Failed at step {step}/{total}: {tag}: {e}");
             })?;
-        println!("  ✓ Completed");
+        eprintln!("  ✓ Completed");
     }
 
-    println!();
-    println!("✓ Environment created successfully!");
-    println!("Profile: {}", plan.profile);
+    eprintln!();
+    eprintln!("✓ Environment created successfully!");
+    eprintln!("Profile: {}", plan.profile);
 
-    println!();
-    println!("Optional steps (skipped for stability/speed):");
-    println!("  GUI Applications:  mev make brew-cask --profile {}", plan.profile);
-    println!("  Ollama Models:     mev make ollama-models");
-    println!("  MLX Models:        mev make mlx-models");
+    eprintln!();
+    eprintln!("Optional steps (skipped for stability/speed):");
+    eprintln!("  GUI Applications:  mev make brew-cask --profile {}", plan.profile);
+    eprintln!("  Ollama Models:     mev make ollama-models");
+    eprintln!("  MLX Models:        mev make mlx-models");
 
     Ok(())
 }

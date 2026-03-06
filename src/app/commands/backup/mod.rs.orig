@@ -329,5 +329,5 @@ pub fn list_targets() {
         eprintln!("  {:<8} - {}", target.name(), target.description());
     }
     eprintln!();
-    eprintln!("Usage: mev backup target <TARGET>");
+    eprintln!("Usage: mev backup <target>");
 }
