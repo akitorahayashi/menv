@@ -10,7 +10,6 @@ The `app::api` module re-exports components directly from the domain layer (like
 
 ## Evidence
 
-
 - path: "src/app/api.rs"
   loc: "line 14-19"
   note: "Directly re-exports `BackupTarget`, `Error`, `ExecutionPlan`, `IdentityState`, `Profile`, and `VcsIdentity` using `pub use crate::domain::...`."

@@ -10,7 +10,6 @@ The domain layer relies heavily on stringly-typed primitives rather than strong 
 
 ## Evidence
 
-
 - path: "src/domain/ports/ansible.rs"
   loc: "line 10, 13, 16, 19, 22, 25"
   note: "Directly uses `&str` and `Vec<String>` to represent Ansible tags and profiles rather than strong typing, despite having dedicated concept models."

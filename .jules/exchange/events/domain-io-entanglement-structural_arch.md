@@ -10,7 +10,6 @@ The domain layer contains multiple ports that leak I/O concerns into the pure do
 
 ## Evidence
 
-
 - path: "src/domain/ports/fs.rs"
   loc: "line 3, 16"
   note: "Directly uses std::path::Path and std::path::PathBuf in domain port definition."
