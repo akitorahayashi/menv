@@ -31,6 +31,10 @@ impl TestContext {
         let bin_path = assert_cmd::cargo::cargo_bin!("mev");
         let mut cmd = Command::new(bin_path);
         cmd.current_dir(&self.work_dir);
+        cmd.env("HOME", self._root.path().to_str().unwrap());
+        cmd.env_remove("XDG_CONFIG_HOME");
+        cmd.env_remove("XDG_DATA_HOME");
+        cmd.env_remove("XDG_STATE_HOME");
         cmd
     }
 

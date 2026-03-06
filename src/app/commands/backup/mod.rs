@@ -308,3 +308,72 @@ pub fn list_targets() {
     println!();
     println!("Usage: mev backup <target>");
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn is_truthy_detects_booleans() {
+        assert_eq!(is_truthy("1"), Some(true));
+        assert_eq!(is_truthy("true"), Some(true));
+        assert_eq!(is_truthy("yes"), Some(true));
+
+        assert_eq!(is_truthy("0"), Some(false));
+        assert_eq!(is_truthy("false"), Some(false));
+        assert_eq!(is_truthy("no"), Some(false));
+
+        assert_eq!(is_truthy("maybe"), None);
+    }
+
+    #[test]
+    fn format_bool_resolves_value() {
+        assert_eq!(format_bool("1", &serde_yaml::Value::Bool(false)), "true");
+        assert_eq!(format_bool("", &serde_yaml::Value::Bool(true)), "true");
+        assert_eq!(format_bool("", &serde_yaml::Value::String("yes".to_string())), "true");
+        assert_eq!(format_bool("unknown", &serde_yaml::Value::Null), "false");
+    }
+
+    #[test]
+    fn format_numeric_resolves_value() {
+        assert_eq!(format_numeric("42", &serde_yaml::Value::Null, false), "42");
+        assert_eq!(format_numeric("42.5", &serde_yaml::Value::Null, false), "42"); // truncates if not float
+        assert_eq!(format_numeric("42.5", &serde_yaml::Value::Null, true), "42.5");
+        assert_eq!(format_numeric("", &serde_yaml::Value::Number(10.into()), false), "10");
+    }
+
+    #[test]
+    fn value_to_string_handles_types() {
+        assert_eq!(value_to_string(&serde_yaml::Value::Bool(true)), "true");
+        assert_eq!(value_to_string(&serde_yaml::Value::Number(42.into())), "42");
+        assert_eq!(value_to_string(&serde_yaml::Value::String("hello".to_string())), "hello");
+        assert_eq!(value_to_string(&serde_yaml::Value::Null), "");
+    }
+
+    #[test]
+    fn build_entry_formats_yaml() {
+        let def = SettingDefinition {
+            key: "TestKey".to_string(),
+            domain: "TestDomain".to_string(),
+            type_name: "int".to_string(),
+            default: serde_yaml::Value::Null,
+            comment: Some("A test comment".to_string()),
+        };
+        let lines = build_entry(&def, "42");
+        assert_eq!(lines.len(), 2);
+        assert_eq!(lines[0], "# A test comment");
+        assert_eq!(
+            lines[1],
+            "- { key: \"TestKey\", domain: \"TestDomain\", type: \"int\", value: 42 }"
+        );
+    }
+
+    #[test]
+    fn format_string_json_encodes() {
+        assert_eq!(format_string("plain", "key", &serde_yaml::Value::Null), "\"plain\"");
+        assert_eq!(
+            format_string("contains \"quotes\"", "key", &serde_yaml::Value::Null),
+            "\"contains \\\"quotes\\\"\""
+        );
+    }
+}

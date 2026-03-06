@@ -47,3 +47,70 @@ pub fn execute(ctx: &DependencyContainer, identity: SwitchIdentity) -> Result<()
 
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::adapters::ansible::executor::AnsibleAdapter;
+    use crate::adapters::fs::std_fs::StdFs;
+    use crate::adapters::git::cli::GitCli;
+    use crate::adapters::identity_store::local_json::IdentityFileStore;
+    use crate::adapters::jj::cli::JjCli;
+    use crate::adapters::macos_defaults::cli::MacosDefaultsCli;
+    use crate::adapters::version_source::pipx::PipxVersionSource;
+    use crate::adapters::vscode::cli::VscodeCli;
+    use crate::domain::ports::identity_store::IdentityState;
+    use crate::domain::vcs_identity::VcsIdentity;
+    use std::path::PathBuf;
+    use tempfile::tempdir;
+
+    fn build_test_container() -> (tempfile::TempDir, DependencyContainer) {
+        let dir = tempdir().unwrap();
+        let identity_path = dir.path().join("identity.json");
+        let local_config_root = dir.path().join("config_root");
+
+        let container = DependencyContainer {
+            ansible_dir: PathBuf::new(),
+            local_config_root: local_config_root.clone(),
+            ansible: AnsibleAdapter::empty(local_config_root),
+            identity_store: IdentityFileStore::new(identity_path),
+            version_source: PipxVersionSource,
+            git: GitCli,
+            jj: JjCli,
+            fs: StdFs,
+            macos_defaults: MacosDefaultsCli,
+            vscode: VscodeCli,
+        };
+        (dir, container)
+    }
+
+    #[test]
+    fn execute_switch_fails_if_no_config() {
+        let (_dir, ctx) = build_test_container();
+
+        let result = execute(&ctx, SwitchIdentity::Personal);
+        assert!(result.is_err());
+        assert_eq!(
+            result.unwrap_err().to_string(),
+            "configuration error: no identity configuration found"
+        );
+    }
+
+    #[test]
+    fn execute_switch_fails_if_identity_missing_data() {
+        let (_dir, ctx) = build_test_container();
+
+        let state = IdentityState {
+            personal: VcsIdentity { name: "".to_string(), email: "".to_string() },
+            work: VcsIdentity { name: "W".to_string(), email: "w@w.com".to_string() },
+        };
+        ctx.identity_store.save(&state).unwrap();
+
+        let result = execute(&ctx, SwitchIdentity::Personal);
+        assert!(result.is_err());
+        assert_eq!(
+            result.unwrap_err().to_string(),
+            "configuration error: personal identity is not configured. Run 'mev identity set' to configure."
+        );
+    }
+}

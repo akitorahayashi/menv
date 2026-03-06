@@ -22,3 +22,26 @@ impl ExecutionPlan {
         Self { profile, tags, verbose }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::domain::tag::FULL_SETUP_TAGS;
+
+    #[test]
+    fn execution_plan_full_setup() {
+        let plan = ExecutionPlan::full_setup(Profile::Macbook, true);
+        assert_eq!(plan.profile, Profile::Macbook);
+        assert!(plan.verbose);
+        assert_eq!(plan.tags.len(), FULL_SETUP_TAGS.len());
+        assert_eq!(plan.tags[0], FULL_SETUP_TAGS[0]);
+    }
+
+    #[test]
+    fn execution_plan_make() {
+        let plan = ExecutionPlan::make(Profile::Common, vec!["shell".to_string()], false);
+        assert_eq!(plan.profile, Profile::Common);
+        assert!(!plan.verbose);
+        assert_eq!(plan.tags, vec!["shell".to_string()]);
+    }
+}
