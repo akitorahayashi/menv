@@ -1,5 +1,5 @@
 ---
-created_at: "YYYY-MM-DD"
+created_at: "2026-03-06"
 author_role: "librarian"
 confidence: "high"
 ---
