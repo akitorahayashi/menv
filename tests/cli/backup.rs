@@ -60,11 +60,10 @@ fn backup_short_list_flag_shows_targets() {
 fn backup_unknown_target_fails() {
     let ctx = TestContext::new();
 
-    ctx.cli()
-        .args(["backup", "target", "nonexistent"])
-        .assert()
-        .failure()
-        .stderr(predicate::str::contains("unknown backup target").or(predicate::str::contains("unrecognized subcommand")));
+    ctx.cli().args(["backup", "target", "nonexistent"]).assert().failure().stderr(
+        predicate::str::contains("unknown backup target")
+            .or(predicate::str::contains("unrecognized subcommand")),
+    );
 }
 
 #[test]
