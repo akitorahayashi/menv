@@ -1,4 +1,4 @@
-//! Aider integration commands.
+//! Aider integration helpers.
 
 use std::env;
 use std::process::Command;

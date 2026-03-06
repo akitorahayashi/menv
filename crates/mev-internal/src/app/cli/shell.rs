@@ -1,4 +1,4 @@
-//! Shell generation commands.
+//! Shell helper generators.
 
 use std::fs;
 use std::path::Path;

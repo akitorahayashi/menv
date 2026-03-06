@@ -20,7 +20,7 @@ pub fn show(ctx: &DependencyContainer) -> Result<(), AppError> {
 
     println!("Identity file: {}", path.display());
     println!();
-    println!("{:<12} {:<20} Email", "Identity", "Name");
+    println!("{:<12} {:<20} Email", "Profile", "Name");
     println!("{:-<12} {:-<20} {:-<30}", "", "", "");
     println!("{:<12} {:<20} {}", "personal", state.personal.name, state.personal.email);
     println!("{:<12} {:<20} {}", "work", state.work.name, state.work.email);

@@ -18,11 +18,11 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    /// Aider integration commands.
+    /// Aider integration helpers.
     #[command(subcommand)]
     Aider(aider::AiderCommand),
 
-    /// Shell generation commands.
+    /// Shell helper generators.
     #[command(subcommand)]
     Shell(shell::ShellCommand),
 
@@ -30,7 +30,7 @@ enum Commands {
     #[command(subcommand)]
     Ssh(ssh::SshCommand),
 
-    /// VCS commands.
+    /// VCS helpers.
     #[command(subcommand)]
     Vcs(vcs::VcsCommand),
 }
