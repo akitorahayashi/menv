@@ -38,16 +38,16 @@ pub fn execute(
         overwrite,
     )?;
 
-    println!("Running tags: {}", plan.tags.join(", "));
+    eprintln!("Running tags: {}", plan.tags.join(", "));
     if plan.profile != Profile::Common {
-        println!("Profile: {}", plan.profile);
+        eprintln!("Profile: {}", plan.profile);
     }
-    println!();
+    eprintln!();
 
     ctx.ansible.run_playbook(plan.profile.as_str(), &plan.tags, plan.verbose)?;
 
-    println!();
-    println!("✓ Completed successfully!");
+    eprintln!();
+    eprintln!("✓ Completed successfully!");
 
     Ok(())
 }

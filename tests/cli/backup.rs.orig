@@ -44,7 +44,7 @@ fn backup_short_list_flag_shows_targets() {
     let ctx = TestContext::new();
 
     ctx.cli()
-        .args(["backup", "list"])
+        .args(["backup", "ls"])
         .assert()
         .success()
         .stderr(predicate::str::contains("Available backup targets"));

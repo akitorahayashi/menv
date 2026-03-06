@@ -105,9 +105,9 @@ pub(crate) fn update_with_source(source: &dyn VersionSource) -> Result<(), AppEr
 // =============================================================================
 
 /// Backup a system setting or configuration target.
-pub fn backup(target: &str) -> Result<(), AppError> {
+pub fn backup(target: &str, overwrite: bool) -> Result<(), AppError> {
     let ctx = ansible_context()?;
-    commands::backup::execute(&ctx, target)
+    commands::backup::execute(&ctx, target, overwrite)
 }
 
 fn ansible_context() -> Result<DependencyContainer, AppError> {
