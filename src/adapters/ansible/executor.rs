@@ -1,7 +1,7 @@
 //! Ansible adapter — unified playbook execution, tag resolution, and role discovery.
 
 use std::collections::HashMap;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
 use crate::domain::error::AppError;
@@ -69,6 +69,13 @@ impl AnsiblePort for AnsibleAdapter {
         }
 
         let mut cmd = Command::new("uv");
+        let repo_root_path = self.ansible_dir.parent().ok_or_else(|| {
+            AppError::AnsibleExecution {
+                message: "ansible_dir has no parent directory".to_string(),
+                exit_code: None,
+            }
+        })?;
+
         cmd.arg("run")
             .arg("ansible-playbook")
             .arg(&playbook_path)
@@ -77,10 +84,7 @@ impl AnsiblePort for AnsibleAdapter {
             .arg("-e")
             .arg(format!("config_dir_abs_path={}", self.ansible_dir.display()))
             .arg("-e")
-            .arg(format!(
-                "repo_root_path={}",
-                self.ansible_dir.parent().unwrap_or(Path::new(".")).display()
-            ))
+            .arg(format!("repo_root_path={}", repo_root_path.display()))
             .arg("-e")
             .arg(format!("local_config_root={}", self.local_config_root.display()));
 
@@ -103,8 +107,12 @@ impl AnsiblePort for AnsibleAdapter {
 
         if !status.success() {
             let code = status.code();
+            let msg = match code {
+                Some(c) => format!("ansible-playbook exited with code {c}"),
+                None => "ansible-playbook exited with unknown code".to_string(),
+            };
             return Err(AppError::AnsibleExecution {
-                message: format!("ansible-playbook exited with code {}", code.unwrap_or(-1)),
+                message: msg,
                 exit_code: code,
             });
         }

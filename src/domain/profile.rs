@@ -119,9 +119,10 @@ mod tests {
     }
 
     #[test]
-    fn validate_machine_profile_accepts_macbook() {
-        assert_eq!(validate_machine_profile("macbook").unwrap(), Profile::Macbook);
-        assert_eq!(validate_machine_profile("mbk").unwrap(), Profile::Macbook);
+    fn validate_machine_profile_accepts_macbook() -> Result<(), AppError> {
+        assert_eq!(validate_machine_profile("macbook")?, Profile::Macbook);
+        assert_eq!(validate_machine_profile("mbk")?, Profile::Macbook);
+        Ok(())
     }
 
     #[test]

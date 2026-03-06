@@ -108,7 +108,7 @@ fn execute_system(
             Some(v) => v,
             None => value_to_string(&def.default),
         };
-        let formatted = format_value(def, &raw_value);
+        let formatted = format_value(def, &raw_value)?;
         lines.extend(build_entry(def, &formatted));
     }
 
@@ -154,7 +154,7 @@ fn value_to_string(v: &serde_yaml::Value) -> String {
     }
 }
 
-fn format_value(def: &SettingDefinition, raw_value: &str) -> String {
+fn format_value(def: &SettingDefinition, raw_value: &str) -> Result<String, AppError> {
     match def.type_name.to_lowercase().as_str() {
         "bool" => format_bool(raw_value, &def.default),
         "int" => format_numeric(raw_value, &def.default, false),
@@ -166,7 +166,9 @@ fn format_value(def: &SettingDefinition, raw_value: &str) -> String {
             } else {
                 raw_value.to_string()
             };
-            serde_json::to_string(&value).unwrap_or(value)
+            serde_json::to_string(&value).map_err(|e| {
+                AppError::Backup(format!("failed to serialize fallback value: {e}"))
+            })
         }
     }
 }
@@ -179,37 +181,41 @@ fn is_truthy(s: &str) -> Option<bool> {
     }
 }
 
-fn format_bool(raw_value: &str, default: &serde_yaml::Value) -> String {
+fn format_bool(raw_value: &str, default: &serde_yaml::Value) -> Result<String, AppError> {
     if let Some(b) = is_truthy(raw_value) {
-        return b.to_string();
+        return Ok(b.to_string());
     }
     if let Some(b) = default.as_bool() {
-        return b.to_string();
+        return Ok(b.to_string());
     }
     if let Some(s) = default.as_str()
         && let Some(b) = is_truthy(s)
     {
-        return b.to_string();
+        return Ok(b.to_string());
     }
-    "false".to_string()
+    Ok("false".to_string())
 }
 
-fn format_numeric(raw_value: &str, default: &serde_yaml::Value, as_float: bool) -> String {
+fn format_numeric(raw_value: &str, default: &serde_yaml::Value, as_float: bool) -> Result<String, AppError> {
     let target = if raw_value.trim().is_empty() {
         value_to_string(default)
     } else {
         raw_value.trim().to_string()
     };
     if as_float {
-        target.parse::<f64>().map(|f| f.to_string()).unwrap_or(target)
+        target.parse::<f64>()
+            .map(|f| f.to_string())
+            .map_err(|_| AppError::Backup(format!("failed to parse '{target}' as float")))
     } else if let Ok(i) = target.parse::<i64>() {
-        i.to_string()
+        Ok(i.to_string())
     } else {
-        target.parse::<f64>().map(|f| (f as i64).to_string()).unwrap_or(target)
+        target.parse::<f64>()
+            .map(|f| (f as i64).to_string())
+            .map_err(|_| AppError::Backup(format!("failed to parse '{target}' as int")))
     }
 }
 
-fn format_string(raw_value: &str, key: &str, default: &serde_yaml::Value) -> String {
+fn format_string(raw_value: &str, key: &str, default: &serde_yaml::Value) -> Result<String, AppError> {
     let mut value = if raw_value.is_empty() {
         match default {
             serde_yaml::Value::String(s) => s.clone(),
@@ -226,7 +232,9 @@ fn format_string(raw_value: &str, key: &str, default: &serde_yaml::Value) -> Str
         value = value.replacen(&home, "$HOME", 1);
     }
 
-    serde_json::to_string(&value).unwrap_or(value)
+    serde_json::to_string(&value).map_err(|e| {
+        AppError::Backup(format!("failed to serialize string value: {e}"))
+    })
 }
 
 fn build_entry(def: &SettingDefinition, value: &str) -> Vec<String> {
