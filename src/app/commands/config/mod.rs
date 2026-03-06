@@ -1,9 +1,10 @@
 //! `config` command orchestration — deploy configuration.
 
+use std::path::Path;
+
 use crate::app::DependencyContainer;
 use crate::domain::error::AppError;
 use crate::domain::ports::ansible::AnsiblePort;
-use crate::domain::ports::fs::FsPort;
 
 /// Deploy role configs from ansible assets to local config root.
 pub fn create(
@@ -43,7 +44,7 @@ pub fn create(
                 AppError::Config(format!("failed to clean staging for {role_name}: {e}"))
             })?;
         }
-        ctx.fs.copy_dir_recursive(&source, &staging)?;
+        copy_dir_recursive(&source, &staging)?;
         if target.exists() {
             std::fs::remove_dir_all(&target).map_err(|e| {
                 AppError::Config(format!("failed to remove existing config for {role_name}: {e}"))
@@ -55,5 +56,20 @@ pub fn create(
         println!("✓ {role_name}: config deployed");
     }
 
+    Ok(())
+}
+
+fn copy_dir_recursive(src: &Path, dst: &Path) -> Result<(), AppError> {
+    std::fs::create_dir_all(dst)?;
+    for entry in std::fs::read_dir(src)? {
+        let entry = entry?;
+        let src_path = entry.path();
+        let dst_path = dst.join(entry.file_name());
+        if src_path.is_dir() {
+            copy_dir_recursive(&src_path, &dst_path)?;
+        } else {
+            std::fs::copy(&src_path, &dst_path)?;
+        }
+    }
     Ok(())
 }

@@ -39,7 +39,6 @@ pub fn execute(
         &ctx.local_config_root,
         &ctx.ansible,
         overwrite,
-        &ctx.fs,
     )?;
 
     // Execute each tag

@@ -20,7 +20,4 @@ pub trait FsPort {
 
     /// Create a directory and all parent directories.
     fn create_dir_all(&self, path: &Path) -> Result<(), AppError>;
-
-    /// Recursively copy a directory tree.
-    fn copy_dir_recursive(&self, src: &Path, dst: &Path) -> Result<(), AppError>;
 }
