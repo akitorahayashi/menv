@@ -55,6 +55,28 @@ pub fn deploy_for_tags(
     Ok(())
 }
 
+/// Recursively copy a directory tree.
+pub fn copy_dir_recursive(src: &Path, dst: &Path) -> Result<(), AppError> {
+    if !src.is_dir() {
+        return Err(AppError::Config(format!(
+            "config source directory is missing: {}",
+            src.display()
+        )));
+    }
+    std::fs::create_dir_all(dst)?;
+    for entry in std::fs::read_dir(src)? {
+        let entry = entry?;
+        let src_path = entry.path();
+        let dst_path = dst.join(entry.file_name());
+        if src_path.is_dir() {
+            copy_dir_recursive(&src_path, &dst_path)?;
+        } else {
+            std::fs::copy(&src_path, &dst_path)?;
+        }
+    }
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -179,26 +201,4 @@ mod tests {
         assert!(dst_file.exists());
         assert_eq!(std::fs::read_to_string(dst_file).unwrap(), "test");
     }
-}
-
-/// Recursively copy a directory tree.
-pub fn copy_dir_recursive(src: &Path, dst: &Path) -> Result<(), AppError> {
-    if !src.is_dir() {
-        return Err(AppError::Config(format!(
-            "config source directory is missing: {}",
-            src.display()
-        )));
-    }
-    std::fs::create_dir_all(dst)?;
-    for entry in std::fs::read_dir(src)? {
-        let entry = entry?;
-        let src_path = entry.path();
-        let dst_path = dst.join(entry.file_name());
-        if src_path.is_dir() {
-            copy_dir_recursive(&src_path, &dst_path)?;
-        } else {
-            std::fs::copy(&src_path, &dst_path)?;
-        }
-    }
-    Ok(())
 }
