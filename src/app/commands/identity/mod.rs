@@ -18,7 +18,7 @@ pub fn show(ctx: &DependencyContainer) -> Result<(), AppError> {
     let state = ctx.identity_store.load()?;
     let path = ctx.identity_store.identity_path();
 
-    println!("Identity file: {}", path.display());
+    println!("Identity file: {}", path);
     println!();
     println!("{:<12} {:<20} Email", "Profile", "Name");
     println!("{:-<12} {:-<20} {:-<30}", "", "", "");
@@ -63,7 +63,7 @@ pub fn set(ctx: &DependencyContainer) -> Result<(), AppError> {
     ctx.identity_store.save(&state)?;
 
     println!();
-    println!("Identity configuration saved to {}", ctx.identity_store.identity_path().display());
+    println!("Identity configuration saved to {}", ctx.identity_store.identity_path());
 
     Ok(())
 }

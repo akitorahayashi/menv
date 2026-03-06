@@ -77,7 +77,7 @@ impl IdentityStore for IdentityFileStore {
         }
     }
 
-    fn identity_path(&self) -> PathBuf {
-        self.identity_path.clone()
+    fn identity_path(&self) -> String {
+        self.identity_path.to_string_lossy().into_owned()
     }
 }
