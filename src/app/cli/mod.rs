@@ -64,11 +64,11 @@ enum Commands {
 /// Internal subcommands delegated to `mev-internal`.
 #[derive(Subcommand)]
 enum InternalCommand {
-    /// Aider integration helpers.
+    /// Aider integration commands.
     #[command(subcommand)]
     Aider(mev_internal::app::cli::aider::AiderCommand),
 
-    /// Shell helper generators.
+    /// Shell generation commands.
     #[command(subcommand)]
     Shell(mev_internal::app::cli::shell::ShellCommand),
 
@@ -76,7 +76,7 @@ enum InternalCommand {
     #[command(subcommand)]
     Ssh(mev_internal::app::cli::ssh::SshCommand),
 
-    /// VCS helpers.
+    /// VCS commands.
     #[command(subcommand)]
     Vcs(mev_internal::app::cli::vcs::VcsCommand),
 }

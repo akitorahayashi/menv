@@ -1,4 +1,4 @@
-//! VCS helpers.
+//! VCS commands.
 
 use std::process::Command;
 
