@@ -74,19 +74,13 @@ pub struct VcsIdentity {
 
 impl From<crate::domain::vcs_identity::VcsIdentity> for VcsIdentity {
     fn from(domain_id: crate::domain::vcs_identity::VcsIdentity) -> Self {
-        VcsIdentity {
-            name: domain_id.name,
-            email: domain_id.email,
-        }
+        VcsIdentity { name: domain_id.name, email: domain_id.email }
     }
 }
 
 impl From<VcsIdentity> for crate::domain::vcs_identity::VcsIdentity {
     fn from(api_id: VcsIdentity) -> Self {
-        crate::domain::vcs_identity::VcsIdentity {
-            name: api_id.name,
-            email: api_id.email,
-        }
+        crate::domain::vcs_identity::VcsIdentity { name: api_id.name, email: api_id.email }
     }
 }
 
@@ -98,10 +92,7 @@ pub struct IdentityState {
 
 impl From<crate::domain::ports::identity_store::IdentityState> for IdentityState {
     fn from(domain_state: crate::domain::ports::identity_store::IdentityState) -> Self {
-        IdentityState {
-            personal: domain_state.personal.into(),
-            work: domain_state.work.into(),
-        }
+        IdentityState { personal: domain_state.personal.into(), work: domain_state.work.into() }
     }
 }
 
@@ -164,11 +155,7 @@ pub struct ExecutionPlan {
 
 impl From<crate::domain::execution_plan::ExecutionPlan> for ExecutionPlan {
     fn from(plan: crate::domain::execution_plan::ExecutionPlan) -> Self {
-        ExecutionPlan {
-            profile: plan.profile.into(),
-            tags: plan.tags,
-            verbose: plan.verbose,
-        }
+        ExecutionPlan { profile: plan.profile.into(), tags: plan.tags, verbose: plan.verbose }
     }
 }
 

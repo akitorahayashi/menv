@@ -127,7 +127,12 @@ fn load_definitions(fs: &dyn FsPort, dir: &Path) -> Result<Vec<SettingDefinition
     let entries = fs.read_dir(&dir.to_string_lossy())?;
     let mut paths: Vec<String> = entries
         .into_iter()
-        .filter(|p| matches!(std::path::Path::new(p).extension().and_then(|ext| ext.to_str()), Some("yml" | "yaml")))
+        .filter(|p| {
+            matches!(
+                std::path::Path::new(p).extension().and_then(|ext| ext.to_str()),
+                Some("yml" | "yaml")
+            )
+        })
         .collect();
     paths.sort();
 

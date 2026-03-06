@@ -19,7 +19,9 @@ impl FsPort for StdFs {
     fn read_dir(&self, path: &str) -> Result<Vec<String>, AppError> {
         std::fs::read_dir(path)
             .map_err(AppError::Io)?
-            .map(|entry| entry.map(|e| e.path().to_string_lossy().into_owned()).map_err(AppError::Io))
+            .map(|entry| {
+                entry.map(|e| e.path().to_string_lossy().into_owned()).map_err(AppError::Io)
+            })
             .collect()
     }
 
