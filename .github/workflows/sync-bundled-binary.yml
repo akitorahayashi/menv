@@ -3,6 +3,8 @@ name: Sync Bundled Binary
 on:
   push:
     branches: [ "main" ]
+    paths-ignore:
+      - 'dist/mev/bin/darwin-aarch64/mev'
   workflow_dispatch:
 
 permissions:
@@ -29,7 +31,7 @@ jobs:
     name: Build
     uses: ./.github/workflows/build-bundled-binary.yml
 
-  publish-darwin-aarch64:
+  sync-darwin-aarch64:
     needs: [lint, test, build]
     if: github.actor != 'github-actions[bot]' && github.ref == 'refs/heads/main'
     runs-on: macos-14
@@ -39,16 +41,29 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Configure Git
+        uses: ./.github/actions/configure-git
+
       - name: Download bundled binary artifact
         uses: actions/download-artifact@v4
         with:
           name: mev-darwin-aarch64
           path: .tmp/artifacts
 
-      - name: Publish release artifact
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Replace bundled binary
         run: |
           set -euo pipefail
-          gh release view latest || gh release create latest --title "Latest Build" --notes "Continuous build from main"
-          gh release upload latest .tmp/artifacts/mev-darwin-aarch64#mev-darwin-aarch64 --clobber
+          install -m 0755 .tmp/artifacts/mev-darwin-aarch64 dist/mev/bin/darwin-aarch64/mev
+
+      - name: Commit bundled binary
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- dist/mev/bin/darwin-aarch64/mev; then
+            echo "Bundled binary already up to date."
+            exit 0
+          fi
+
+          git add dist/mev/bin/darwin-aarch64/mev
+          git commit -m "chore: sync bundled mev binary (darwin-aarch64) [skip ci]"
+          git pull --rebase origin main
+          git push origin HEAD:main
