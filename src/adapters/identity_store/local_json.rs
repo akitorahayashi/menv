@@ -81,3 +81,100 @@ impl IdentityStore for IdentityFileStore {
         self.identity_path.clone()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tempfile::tempdir;
+
+    #[test]
+    fn identity_store_exists_and_load_empty() {
+        let dir = tempdir().unwrap();
+        let store = IdentityFileStore::new(dir.path().join("identity.json"));
+
+        assert!(!store.exists());
+        assert!(store.load().is_err());
+    }
+
+    #[test]
+    fn identity_store_save_and_load() {
+        let dir = tempdir().unwrap();
+        let store = IdentityFileStore::new(dir.path().join("identity.json"));
+
+        let state = IdentityState {
+            personal: VcsIdentity {
+                name: "John Doe".to_string(),
+                email: "john@example.com".to_string(),
+            },
+            work: VcsIdentity {
+                name: "John Worker".to_string(),
+                email: "john@work.example.com".to_string(),
+            },
+        };
+
+        store.save(&state).unwrap();
+        assert!(store.exists());
+
+        let loaded = store.load().unwrap();
+        assert_eq!(loaded.personal.name, "John Doe");
+        assert_eq!(loaded.personal.email, "john@example.com");
+        assert_eq!(loaded.work.name, "John Worker");
+        assert_eq!(loaded.work.email, "john@work.example.com");
+    }
+
+    #[test]
+    fn identity_store_get_identity() {
+        let dir = tempdir().unwrap();
+        let store = IdentityFileStore::new(dir.path().join("identity.json"));
+
+        let state = IdentityState {
+            personal: VcsIdentity {
+                name: "John Doe".to_string(),
+                email: "john@example.com".to_string(),
+            },
+            work: VcsIdentity {
+                name: "John Worker".to_string(),
+                email: "john@work.example.com".to_string(),
+            },
+        };
+
+        store.save(&state).unwrap();
+
+        let personal = store.get_identity(SwitchIdentity::Personal).unwrap().unwrap();
+        assert_eq!(personal.name, "John Doe");
+
+        let work = store.get_identity(SwitchIdentity::Work).unwrap().unwrap();
+        assert_eq!(work.name, "John Worker");
+    }
+
+    #[test]
+    fn identity_store_migrates_legacy_config() {
+        let dir = tempdir().unwrap();
+        let identity_path = dir.path().join("identity.json");
+        let store = IdentityFileStore::new(identity_path.clone());
+
+        // Write to legacy path manually
+        let legacy_state = IdentityState {
+            personal: VcsIdentity {
+                name: "Legacy User".to_string(),
+                email: "legacy@example.com".to_string(),
+            },
+            work: VcsIdentity {
+                name: "Legacy Work User".to_string(),
+                email: "legacy_work@example.com".to_string(),
+            },
+        };
+        let legacy_content = serde_json::to_string(&legacy_state).unwrap();
+        std::fs::write(store.legacy_config_path(), legacy_content).unwrap();
+
+        // Ensure exists() picks it up
+        assert!(store.exists());
+
+        // load() should read legacy and migrate it
+        let loaded = store.load().unwrap();
+        assert_eq!(loaded.personal.name, "Legacy User");
+
+        // The new identity file should now exist
+        assert!(identity_path.exists());
+    }
+}

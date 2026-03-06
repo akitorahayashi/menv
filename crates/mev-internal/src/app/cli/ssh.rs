@@ -268,4 +268,20 @@ mod tests {
         assert!(hosts.is_empty());
         Ok(())
     }
+
+    #[test]
+    fn collect_hosts_finds_valid_confs() {
+        let dir = tempfile::tempdir().unwrap();
+        let conf_dir = dir.path().join("conf.d");
+        fs::create_dir_all(&conf_dir).unwrap();
+
+        fs::write(conf_dir.join("host1.conf"), "").unwrap();
+        fs::write(conf_dir.join("host2.conf"), "").unwrap();
+        fs::write(conf_dir.join("not_a_conf.txt"), "").unwrap();
+
+        let hosts = collect_hosts(&conf_dir).unwrap();
+        assert_eq!(hosts.len(), 2);
+        assert_eq!(hosts[0], "host1");
+        assert_eq!(hosts[1], "host2");
+    }
 }

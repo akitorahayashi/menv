@@ -268,4 +268,27 @@ mod tests {
         restore_model_env(original);
         assert!(result.is_ok());
     }
+
+    #[test]
+    fn collect_extension_matches_finds_files() {
+        let dir = tempfile::tempdir().unwrap();
+        let file_path = dir.path().join("test.mev_test_ext");
+        std::fs::write(&file_path, "test").unwrap();
+
+        let cwd = env::current_dir().unwrap();
+        env::set_current_dir(dir.path()).unwrap();
+
+        let matches = collect_extension_matches(&["mev_test_ext".to_string()]);
+
+        env::set_current_dir(cwd).unwrap();
+
+        assert_eq!(matches.len(), 1);
+        assert_eq!(matches[0], "test.mev_test_ext");
+    }
+
+    #[test]
+    fn collect_extension_matches_ignores_empty() {
+        let matches = collect_extension_matches(&["".to_string(), ".".to_string()]);
+        assert_eq!(matches.len(), 0);
+    }
 }

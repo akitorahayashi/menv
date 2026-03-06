@@ -67,3 +67,51 @@ pub fn execute(
 
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::PathBuf;
+    use tempfile::tempdir;
+    use crate::adapters::ansible::executor::AnsibleAdapter;
+    use crate::adapters::fs::std_fs::StdFs;
+    use crate::adapters::git::cli::GitCli;
+    use crate::adapters::identity_store::local_json::IdentityFileStore;
+    use crate::adapters::jj::cli::JjCli;
+    use crate::adapters::macos_defaults::cli::MacosDefaultsCli;
+    use crate::adapters::version_source::pipx::PipxVersionSource;
+    use crate::adapters::vscode::cli::VscodeCli;
+
+    fn build_test_container() -> (tempfile::TempDir, DependencyContainer) {
+        let dir = tempdir().unwrap();
+        let identity_path = dir.path().join("identity.json");
+        let local_config_root = dir.path().join("config_root");
+
+        let container = DependencyContainer {
+            ansible_dir: PathBuf::new(),
+            local_config_root: local_config_root.clone(),
+            ansible: AnsibleAdapter::empty(local_config_root),
+            identity_store: IdentityFileStore::new(identity_path),
+            version_source: PipxVersionSource,
+            git: GitCli,
+            jj: JjCli,
+            fs: StdFs,
+            macos_defaults: MacosDefaultsCli,
+            vscode: VscodeCli,
+        };
+        (dir, container)
+    }
+
+    #[test]
+    fn execute_create_fails_on_missing_tags() {
+        let (_dir, ctx) = build_test_container();
+        // Since ctx.ansible.all_tags() is empty for AnsibleAdapter::empty(),
+        // FULL_SETUP_TAGS won't be found, and it should fail validation.
+
+        let result = execute(&ctx, Profile::Macbook, false, false);
+        assert!(result.is_err());
+        let err_msg = result.unwrap_err().to_string();
+        assert!(err_msg.contains("invalid tags in setup:"));
+        assert!(err_msg.contains("brew-formulae")); // First tag
+    }
+}
