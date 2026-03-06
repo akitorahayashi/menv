@@ -10,6 +10,12 @@ The `backup` command lacks an `--overwrite` flag or confirmation prompt, making 
 
 ## Evidence
 
+Destructive operation specs:
+- Confirmation path: None (silently overwrites).
+- Dry-run behavior: None supported.
+- Exit codes: 0 on success, 1 on failure.
+
+Code References:
 - path: "src/app/cli/backup.rs"
   loc: "11-17"
   note: "The `BackupArgs` struct does not define an `--overwrite` flag or any other safety mechanism."

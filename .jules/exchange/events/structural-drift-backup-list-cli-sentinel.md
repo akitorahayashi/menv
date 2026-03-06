@@ -10,6 +10,14 @@ The `backup` command uses a `--list` flag as an action, substituting the require
 
 ## Evidence
 
+Command sentence skeleton and representative usage examples:
+- Standard: `mev backup [target] arguments`
+  - Example: `mev backup system`
+- Drifted: `mev backup --list`
+  - The `--list` flag substitutes the required `target` object and acts as a separate action.
+- Mandatory option justification: The `--list` flag replaces the target entirely and does not fit the exception conditions (e.g. order-independence, repeated keyed input, explicit toggle). It is an action rather than an option.
+
+Code References:
 - path: "src/app/cli/backup.rs"
   loc: "12"
   note: "The `--list` flag acts as an alternative execution path, rendering the `target` argument optional."
